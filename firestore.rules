@@ -1,0 +1,68 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    
+    // Función central de roles
+    function getRole() {
+      return get(/databases/$(database)/documents/usuarios/$(request.auth.uid)).data.rol;
+    }
+
+    // --- COLECCIÓN DE USUARIOS Y PROGRESO ---
+    match /usuarios/{userId} {
+      // Un usuario puede leer su propio perfil; el Admin lee todo.
+      allow read: if request.auth != null && (request.auth.uid == userId || getRole() == 'Admin');
+      
+      // Solo el Admin gestiona los perfiles (Roles, correos, etc.)
+      allow write: if request.auth != null && getRole() == 'Admin';
+
+      // SUB-COLECCIÓN QUIRÚRGICA: Habilita el guardado de Workbooks y Academia
+      // El usuario puede leer y escribir su propio avance. Admin y Consultores pueden supervisar.
+      match /progreso_workbooks/{sessionId} {
+        allow read: if request.auth != null && (
+          request.auth.uid == userId || 
+          getRole() in ['Admin', 'Consultor', 'Capacitador']
+        );
+        allow write: if request.auth != null && request.auth.uid == userId;
+      }
+    }
+
+    // --- COLECCIÓN DE RESPUESTAS (Libro de Trabajo) ---
+    match /respuestas/{documentId} {
+      
+      // Lectura: Clientes leen lo suyo; Admin, Consultor y Capacitador leen todo.
+      allow read: if request.auth != null && (
+        resource.data.usuarioId == request.auth.uid || 
+        getRole() in ['Admin', 'Consultor', 'Capacitador']
+      );
+
+      // Escritura de Respuestas: 
+      // El Cliente crea/edita su avance. El Admin tiene control total.
+      // El Consultor NO puede modificar la respuesta del cliente aquí.
+      allow write: if request.auth != null && (
+        (request.resource.data.usuarioId == request.auth.uid) || 
+        getRole() == 'Admin'
+      );
+
+      // --- SUB-COLECCIÓN DE FEEDBACK (Nueva) ---
+      // Aquí es donde el Consultor deja sus comentarios.
+      match /feedback/{feedbackId} {
+        
+        // Lectura: El Cliente puede leer el feedback que le dejaron. 
+        // Admin, Consultor y Capacitador también pueden leerlo.
+        allow read: if request.auth != null && (
+          get(/databases/$(database)/documents/respuestas/$(documentId)).data.usuarioId == request.auth.uid ||
+          getRole() in ['Admin', 'Consultor', 'Capacitador']
+        );
+
+        // Escritura de Feedback: 
+        // Solo el Consultor y el Admin pueden escribir o editar comentarios.
+        allow create, update: if request.auth != null && (
+          getRole() in ['Admin', 'Consultor']
+        );
+        
+        // Borrado: Solo el Admin puede borrar comentarios permanentemente.
+        allow delete: if request.auth != null && getRole() == 'Admin';
+      }
+    }
+  }
+}
