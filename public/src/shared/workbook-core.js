@@ -6,8 +6,30 @@
 
 const WorkbookCore = {
     config: {
-        debounceTime: 2000, // Optimizado a 2s para mayor agilidad
-        timers: {} // Registro de hilos por campo
+        debounceTime: 2000, 
+        timers: {} 
+    },
+
+    // TRACEABILIDAD: Recuperamos los metadatos de la URL para dar contexto al motor de rutas
+    metadata: {
+        courseID: new URLSearchParams(window.location.search).get('courseId') || 'consolida-360',
+        sessionID: new URLSearchParams(window.location.search).get('sessionId') || 'sesion-a',
+        lastUpdate: new Date().toISOString()
+    },
+
+    // --- MOTOR DE ACTIVOS PARA WORKBOOKS ---
+    initWorkbookAssets() {
+        const logo = document.getElementById('workbook-logo');
+        if (logo) {
+            // Buscamos el logo global en la carpeta brand
+            const logoUrl = this.utils.resolvePath('logo.png');
+            logo.src = logoUrl;
+            
+            logo.onerror = () => {
+                console.warn("⚠️ Logo de nube no hallado. Aplicando fallback local.");
+                logo.src = "../../../../../assets/images/brand/logo.png";
+            };
+        }
     },
 
     // --- MOTOR DE PERSISTENCIA MULTI-HILO (REGLA DE ORO) ---
@@ -136,6 +158,12 @@ window.addEventListener('message', (e) => {
 });
 
 window.addEventListener('online', () => WorkbookCore.syncQueue.process());
+
+// Handshake Inicial
+// Inicialización Sincronizada
+document.addEventListener('DOMContentLoaded', () => {
+    WorkbookCore.initWorkbookAssets();
+});
 
 // Handshake Inicial
 window.parent.postMessage({ type: 'WORKBOOK_READY', metadata: WorkbookCore.metadata }, '*');

@@ -216,20 +216,29 @@ document.addEventListener('DOMContentLoaded', () => {
         // B. Sincronización de respuestas con Firestore (Persistencia Real)
         if (type === 'dreamsSync') {
             const user = auth.currentUser;
-            if (!user) return;
+            if (!user) {
+                console.warn("⚠️ Intento de sincronización sin sesión activa.");
+                return;
+            }
 
-            const workbookId = metadata.sessionID || 'sesion_general';
+            // Normalización de Metadatos: Aceptamos tanto sessionId como sessionID para evitar fallos de capitalización
+            const workbookId = metadata.sessionId || metadata.sessionID || 'sesion_general';
             const docRef = doc(db, "usuarios", user.uid, "progreso_workbooks", workbookId);
 
             try {
                 await setDoc(docRef, {
                     [data.id]: data.value,
                     lastUpdate: new Date().toISOString(),
-                    courseID: metadata.courseID
+                    courseID: metadata.courseID || 'consolida-360'
                 }, { merge: true });
-                console.log(`☁️ Dreams Cloud: Campo [${data.id}] persistido.`);
+                
+                // Verificación Visual en Consola:
+                console.groupCollapsed(`☁️ Dreams Sync: ${workbookId}`);
+                console.log("Campo:", data.id);
+                console.log("Valor:", data.value);
+                console.groupEnd();
             } catch (error) {
-                console.error("🚨 Error de persistencia:", error);
+                console.error("🚨 Error de persistencia en Firestore:", error);
             }
         }
 
