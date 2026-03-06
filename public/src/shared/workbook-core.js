@@ -6,29 +6,26 @@
 
 const WorkbookCore = {
     config: {
-        debounceTime: 3000, 
-        autosaveTimer: null
+        debounceTime: 2000, // Optimizado a 2s para mayor agilidad
+        timers: {} // Registro de hilos por campo
     },
 
-    metadata: {
-        courseID: new URLSearchParams(window.location.search).get('courseId') || 'consolida_360',
-        sessionID: new URLSearchParams(window.location.search).get('sessionId') || 'sesion_a',
-        lastUpdate: new Date().toISOString()
-    },
-
-    // --- NUEVO: MOTOR DE PERSISTENCIA CON DEBOUNCE (REGLA DE ORO) ---
+    // --- MOTOR DE PERSISTENCIA MULTI-HILO (REGLA DE ORO) ---
     saveProgress(fieldId, value) {
-        clearTimeout(this.config.autosaveTimer);
+        // Trazabilidad: Cancelamos solo el cronómetro de ESTE campo específico
+        clearTimeout(this.config.timers[fieldId]);
         
-        // Guardado inmediato en LocalStorage (Capa 1 de seguridad)
+        // Capa 1: Persistencia local inmediata
         localStorage.setItem(`cuaderno_${fieldId}`, value);
 
-        this.config.autosaveTimer = setTimeout(() => {
-            console.log(`☁️ Intentando sincronizar: ${fieldId}`);
+        // Capa 2: Programación de sincronización a la nube (Cero colisiones)
+        this.config.timers[fieldId] = setTimeout(() => {
+            console.log(`☁️ Dreams Sync [Pendiente]: ${fieldId}`);
             this.syncQueue.push({
-                id: fieldId, // Normalizamos a "id" para hacer match con app.js
+                id: fieldId, 
                 value: this.utils.sanitize(value)
             });
+            delete this.config.timers[fieldId]; // Limpieza de memoria
         }, this.config.debounceTime);
     },
 
@@ -79,9 +76,12 @@ const WorkbookCore = {
             return val.replace(/<\/?[^>]+(>|$)/g, "").trim();
         },
         resolvePath(asset) {
-            // Delegamos la responsabilidad al motor central de rutas en env-config.js
-            // Usamos el sessionID detectado automáticamente (ej: sesion_a) para saber qué carpeta de Firebase usar
-            return DREAMS_CONFIG.resolvePath(asset, WorkbookCore.metadata.sessionID);
+            // TRACEABILIDAD: Acceso al motor global mediante window para evitar ReferenceError
+            if (window.DREAMS_CONFIG && typeof window.DREAMS_CONFIG.resolvePath === 'function') {
+                return window.DREAMS_CONFIG.resolvePath(asset, WorkbookCore.metadata.sessionID);
+            }
+            console.warn("⚠️ Dreams Core: Motor de rutas no detectado. Retornando asset original.");
+            return asset;
         }
     },
 
