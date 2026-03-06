@@ -1,5 +1,5 @@
 // public/src/shared/env-config.template.js (Versión para Producción)
-const DREAMS_CONFIG = {
+var DREAMS_CONFIG = {
     // Estas variables las leerá del panel de Netlify si usas un build step, 
     // pero para tu arquitectura actual, usaremos un "Fallback" inteligente:
     FIREBASE_STORAGE_BASE: "https://firebasestorage.googleapis.com/v0/b/dreams-d1334.firebasestorage.app/o/",
