@@ -17,19 +17,23 @@ const WorkbookCore = {
         lastUpdate: new Date().toISOString()
     },
 
-    // --- MOTOR DE ACTIVOS PARA WORKBOOKS ---
+    // --- MOTOR DE ACTIVOS PARA WORKBOOKS (UNIFICADO) ---
     initWorkbookAssets() {
-        const logo = document.getElementById('workbook-logo');
-        if (logo) {
-            // Buscamos el logo global en la carpeta brand
+        // TRACEABILIDAD: Escaneamos todos los logos (por data-asset o ID) para sincronizar 
+        // la identidad visual en Sidebars, Headers y Reportes de forma masiva.
+        const logos = document.querySelectorAll('[data-asset="logo.png"], #workbook-logo');
+        
+        logos.forEach(logo => {
             const logoUrl = this.utils.resolvePath('logo.png');
-            logo.src = logoUrl;
+            if (logoUrl) {
+                logo.src = logoUrl;
+            }
             
             logo.onerror = () => {
-                console.warn("⚠️ Logo de nube no hallado. Aplicando fallback local.");
+                console.warn(`⚠️ Dreams Core: Error al cargar logo en ${this.metadata.sessionID}. Aplicando fallback.`);
                 logo.src = "../../../../../assets/images/brand/logo.png";
             };
-        }
+        });
     },
 
     // --- MOTOR DE PERSISTENCIA MULTI-HILO (REGLA DE ORO) ---
