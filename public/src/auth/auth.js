@@ -10,7 +10,11 @@ import { signInWithEmailAndPassword, onAuthStateChanged, signOut } from "https:/
 export const logout = async () => {
     try {
         await signOut(auth);
+        // Limpieza de Trazabilidad: Aseguramos que el estado local del ecosistema se limpie por completo
+        sessionStorage.clear(); 
         console.log("🔓 Sesión cerrada. Retornando al control de acceso.");
+        // Redirección Determinística: Forzamos el regreso al Login sin depender del centinela
+        window.location.href = '/index.html';
     } catch (error) {
         console.error("🚨 Error de Trazabilidad en Logout:", error.message);
     }
