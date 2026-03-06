@@ -1,5 +1,5 @@
 // public/src/shared/env-config.template.js (Versión para Producción)
-var DREAMS_CONFIG = {
+window.DREAMS_CONFIG = window.DREAMS_CONFIG || {
     // Estas variables las leerá del panel de Netlify si usas un build step, 
     // pero para tu arquitectura actual, usaremos un "Fallback" inteligente:
     FIREBASE_STORAGE_BASE: "https://firebasestorage.googleapis.com/v0/b/dreams-d1334.firebasestorage.app/o/",
@@ -12,9 +12,8 @@ var DREAMS_CONFIG = {
         if (fileName.startsWith('http')) return fileName;
         
         // 1. DETECCIÓN INTELIGENTE DE YOUTUBE: 
-        // Si el texto tiene 11 caracteres y no tiene punto (extensión), es un ID de video.
         if (fileName.length === 11 && !fileName.includes('.')) {
-            return `${DREAMS_CONFIG.YOUTUBE_BASE_URL}${fileName}`;
+            return `${window.DREAMS_CONFIG.YOUTUBE_BASE_URL}${fileName}`;
         }
 
         const sessionInput = session.toLowerCase();
@@ -40,9 +39,7 @@ var DREAMS_CONFIG = {
         }
 
         // 4. CONSTRUCCIÓN DE RUTA PARA FIREBASE STORAGE:
-        // Respetamos la jerarquía: root (shared) > carpeta > subcarpeta > archivo.
         const fullPath = `shared%2F${folderName}%2F${subFolder}%2F${encodeURIComponent(fileName)}`;
-        return `${DREAMS_CONFIG.FIREBASE_STORAGE_BASE}${fullPath}?alt=media`;
+        return `${window.DREAMS_CONFIG.FIREBASE_STORAGE_BASE}${fullPath}?alt=media`;
     }
 };
-window.DREAMS_CONFIG = DREAMS_CONFIG;
