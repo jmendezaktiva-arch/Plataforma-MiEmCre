@@ -1,0 +1,277 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Academia | Dreams</title>
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;600;700;900&display=swap" rel="stylesheet">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+    
+    <link rel="stylesheet" href="assets/css/style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/reveal.js/4.3.1/reset.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/reveal.js/4.3.1/reveal.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/reveal.js/4.3.1/theme/white.min.css">
+
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: {
+                        'sans': ['Montserrat', 'ui-sans-serif', 'system-ui'],
+                    },
+                    colors: {
+                        // Sincronización con Design Tokens de style.css
+                        'brand-blue': '#0F3460', 
+                        'brand-orange': '#957C3D',
+                    }
+                }
+            }
+        }
+    </script>
+</head>
+<body>
+    <div id="app">
+        <header class="navbar">
+    <div class="nav-left" style="width: 180px;">
+        <a href="dashboard.html" class="btn-nav-back" style="text-decoration: none; display: flex; align-items: center; gap: 8px; color: var(--primary-midnight); font-weight: 600; font-size: 0.85rem; transition: all 0.3s ease;">
+            <span style="font-size: 1.2rem;">←</span> 
+            <span style="text-transform: uppercase; letter-spacing: 0.05em;">Volver al Panel</span>
+        </a>
+    </div>
+
+    <div class="logo-container">
+        <img id="main-logo" data-asset="logo.png" alt="Dreams Logo" class="logo-header opacity-0 transition-opacity duration-300">
+    </div>
+
+    <div class="contact-container" style="width: 180px; display: flex; justify-content: flex-end;">
+        <button id="btn-open-contact" class="btn-contact-trigger" title="Asistencia y Soporte">
+            <span class="btn-text">Asistencia</span> ✉️
+        </button>
+    </div>
+</header>
+
+       <main class="container" style="max-width: 1400px; margin: 40px auto; padding: 0 20px;">
+            
+            <div id="view-lobby">
+                <header class="section-header" style="margin-bottom: 50px; text-align: center;">
+                    <h1 style="font-weight: 700; color: var(--primary-color); font-size: 1.875rem; letter-spacing: -0.025em;">Tu Ruta de Crecimiento</h1>
+<p style="color: #4A5568; font-size: 1.125rem; font-weight: 400; max-width: 700px; margin: 12px auto 0; line-height: 1.5;">Selecciona un módulo para continuar con tu transformación empresarial basada en los principios de resiliencia y propósito trascendente.</p>
+                </header>
+
+                <div id="course-lobby" style="display: grid; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); gap: 25px; justify-content: center;">
+                    <article class="card">
+                        <div class="card-content">
+                            <span style="color: var(--secondary-color); font-weight: 600; font-size: 0.7rem; text-transform: uppercase; letter-spacing: 1px;">Programa Autogestivo</span>
+                            <h3>Consolida 360º - Online</h3>
+                            <p>Domina los conceptos a tu propio ritmo con las láminas interactivas y material de apoyo.</p>
+                            <button class="btn-reveal-purpose" id="btn-show-purpose-online">Revelar Hoja de Ruta Online</button>
+                        </div>
+                        <div class="btn-group">
+                            <button class="btn-primary" id="btn-open-online" style="font-size: 0.8rem;">Iniciar Programa Online</button>
+                        </div>
+                    </article>
+
+                    <article class="card">
+                        <div class="card-content">
+                            <span style="color: var(--primary-color); font-weight: 600; font-size: 0.7rem; text-transform: uppercase; letter-spacing: 1px;">Sesión en Vivo</span>
+                            <h3>Consolida 360º - Mentoría</h3>
+                            <p>Acceso directo al cuaderno de trabajo sincronizado para tu sesión de consultoría vía Zoom.</p>
+                            <button class="btn-reveal-purpose" id="btn-show-purpose-live">Revelar Propósito de Mentoría</button>
+                        </div>
+                        <div class="btn-group">
+                            <button class="btn-primary" id="btn-open-live" style="font-size: 0.8rem;">Entrar al Cuaderno Live</button>
+                        </div>
+                    </article>
+
+                    <article class="card" style="opacity: 0.6; border: 1px dashed #ccc;">
+                        <div class="card-content">
+                            <span style="color: #999; font-weight: 600; font-size: 0.7rem; text-transform: uppercase; letter-spacing: 1px;">Programa</span>
+                            <h3 style="color: #999;">Optimizando mi tiempo</h3>
+                            <p>Próximamente: Dominio de la gestión de la agenda con un método único y comprobado para hacer tu día más productivo</p>
+                        </div>
+                        <div class="btn-group">
+                            <button class="btn-primary" style="background: #e2e8f0; color: #94a3b8; cursor: not-allowed; box-shadow: none;" disabled>Próximamente</button>
+                        </div>
+                    </article>
+                </div>
+            </div>
+
+
+            <div id="view-session-selector" style="display: none; max-width: 1000px; margin: 40px auto; padding: 0 20px;">
+            <header class="section-header" style="margin-bottom: 50px; text-align: center;">
+                <h2 id="session-selector-title" style="font-weight: 600; letter-spacing: -1.5px; color: var(--primary-color); font-size: 2.2rem;">Estructura de Acompañamiento</h2>
+                <p style="color: #555; font-size: 1.05rem; font-weight: 300; max-width: 600px; margin: 15px auto 0;">Selecciona la sesión correspondiente para acceder a los materiales interactivos y herramientas estratégicas.</p>
+            </header>
+
+            <div id="session-list" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 20px;">
+                </div>
+
+            <div style="text-align: center; margin-top: 40px;">
+                <button id="btn-sessions-back-to-lobby" style="background: none; border: none; color: #666; cursor: pointer; font-weight: 600; text-decoration: underline; font-size: 0.9rem;">← VOLVER AL CATÁLOGO</button>
+            </div>
+        </div>
+
+            <div id="view-presentation" style="display: none; padding-top: 5px;">
+                <div style="display: flex; gap: 20px; align-items: flex-start; max-width: 1200px; margin: 0 auto; height: 82vh; min-height: 600px;">
+                    
+                    <div class="presentation-wrapper" style="flex: 1; height: 100%; background: #fff; border-radius: 24px; box-shadow: 0 20px 50px rgba(0,0,0,0.08); overflow: hidden; position: relative; border: 1px solid #eee;">
+                        <div class="reveal" style="width: 100%; height: 100%;">
+                            <div class="slides"></div>
+                        </div>
+                    </div>
+
+                    <nav class="bubble-dashboard" style="display: flex; flex-direction: column; gap: 15px; background: rgba(255, 255, 255, 0.8); backdrop-filter: blur(15px); padding: 25px 14px; border-radius: 50px; box-shadow: 0 15px 45px rgba(0, 90, 156, 0.12); border: 1px solid rgba(255, 255, 255, 0.5); position: sticky; top: 10px;">
+                        <button id="btn-pres-back-to-lobby" title="Volver al Catálogo" style="background: var(--primary-color); border: none; width: 50px; height: 50px; border-radius: 50%; color: white; font-size: 1.8rem; cursor: pointer; display: flex; align-items: center; justify-content: center; box-shadow: 0 8px 25px rgba(0, 90, 156, 0.2); transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275); line-height: 1;">←</button>
+                        
+                        <div style="height: 1px; width: 35px; background: #ddd; margin: 5px auto;"></div>
+                        
+                        <button id="btn-toggle-video" class="btn-bubble-toggle" title="Video Tutorial" style="background: white; border: none; width: 58px; height: 58px; border-radius: 50%; font-size: 1.8rem; cursor: pointer; display: flex; align-items: center; justify-content: center; box-shadow: 0 5px 20px rgba(0,0,0,0.1); transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);">📺</button>
+                        
+                        <button id="btn-toggle-podcast" class="btn-bubble-toggle" title="Material de Apoyo" style="background: white; border: none; width: 58px; height: 58px; border-radius: 50%; font-size: 1.8rem; cursor: pointer; display: flex; align-items: center; justify-content: center; box-shadow: 0 5px 20px rgba(0,0,0,0.1); transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);">🎧</button>
+                        
+                        <button id="btn-toggle-workbook" class="btn-bubble-toggle" title="Cuaderno de Trabajo" style="background: white; border: none; width: 58px; height: 58px; border-radius: 50%; font-size: 1.8rem; cursor: pointer; display: flex; align-items: center; justify-content: center; box-shadow: 0 5px 20px rgba(0,0,0,0.1); transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);">📝</button>
+
+                        <button class="btn-bubble-toggle btn-contact-trigger" title="Soporte y Asistencia" style="background: white; border: none; width: 58px; height: 58px; border-radius: 50%; font-size: 1.8rem; cursor: pointer; display: flex; align-items: center; justify-content: center; box-shadow: 0 5px 20px rgba(0,0,0,0.1); transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);">✉️</button>
+
+                    </nav>
+                </div>
+            </div>
+
+            <div id="video-tutorial" class="podcast-hidden" style="position: fixed; top: 100px; right: 20px; width: 320px; background: white; border-radius: 16px; box-shadow: 0 15px 35px rgba(0,0,0,0.2); z-index: 2500; overflow: hidden; border: 1px solid #eee;">
+                <div style="background: var(--primary-color); padding: 10px 15px; display: flex; justify-content: space-between; align-items: center; color: white;">
+                    <span style="font-size: 0.7rem; font-weight: 600;">VIDEO TUTORIAL</span>
+                    <button onclick="document.getElementById('video-tutorial').classList.add('podcast-hidden')" style="background:none; border:none; color:white; cursor:pointer;">&times;</button>
+                </div>
+                <div id="tutorial-media-container" style="padding: 10px; aspect-ratio: 16/9;">
+                    <video id="tutorial-video" width="100%" height="100%" controls 
+                           controlsList="nodownload" 
+                           oncontextmenu="return false;" 
+                           disablePictureInPicture
+                           style="border-radius: 8px; display: block; background: #000; object-fit: contain;">
+                        <source id="video-source" src="" type="video/mp4">
+                    </video>
+
+                    <iframe id="tutorial-youtube" width="100%" height="100%" 
+                            src="" frameborder="0" 
+                            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" 
+                            allowfullscreen 
+                            style="border-radius: 8px; display: none; background: #000;">
+                    </iframe>
+                </div>
+            </div>
+
+            <div id="view-workbook" style="display: none; height: 90vh;">
+                <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 15px;">
+                    <div style="display: flex; justify-content: space-between; align-items: center; width: 100%;">
+                        <div>
+                            <button id="btn-back-to-lobby" style="background: none; border: none; color: var(--primary-color); cursor: pointer; font-weight: 600; font-size: 0.9rem;">← VOLVER AL CURSO</button>
+                            <br>
+                            <span id="status-message" style="font-size: 0.75rem; color: #999; margin-left: 5px;"></span>
+                        </div>
+                        <button class="btn-contact-trigger" title="Soporte técnico" style="background: none; border: 1px solid var(--accent-gold); color: var(--primary-midnight); padding: 8px 15px; border-radius: 8px; font-size: 0.65rem; font-weight: 600; cursor: pointer; display: flex; align-items: center; gap: 5px;">
+                            AYUDA ✉️
+                        </button>
+                    </div>
+                    
+                </div>
+                
+                <iframe id="workbook-iframe" src="" style="width: 100%; height: 100%; border: none; border-radius: 16px; box-shadow: 0 10px 30px rgba(0,0,0,0.1);"></iframe>
+            </div>
+        </main>
+
+        <div id="podcast-player" class="podcast-hidden" style="position: fixed; bottom: 20px; right: 20px; background: #fff; padding: 15px; border-radius: 12px; box-shadow: 0 10px 30px rgba(0,0,0,0.15); z-index: 1000; width: 300px; border: 1px solid #eee;">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
+                <span style="font-size: 0.65rem; font-weight: 600; color: var(--primary-color); text-transform: uppercase;">Material de Apoyo</span>
+                <button id="btn-close-podcast" style="background: none; border: none; font-size: 1.2rem; cursor: pointer; color: #999;">&times;</button>
+            </div>
+            <select id="podcast-selector" style="width: 100%; margin-bottom: 12px; padding: 6px; border-radius: 6px; border: 1px solid #eee; font-family: 'Montserrat'; font-size: 0.7rem; color: #666;"></select>
+            <audio id="audio-element" controls 
+                   controlsList="nodownload" 
+                   oncontextmenu="return false;"
+                   style="width: 100%; height: 35px;">
+                <source id="podcast-source" src="" type="audio/mpeg">
+            </audio>
+        </div>
+
+        <div id="purpose-overlay-universal" class="purpose-overlay">
+            <div class="purpose-bubble">
+                <button class="close-bubble" id="btn-close-purpose-universal">&times;</button>
+                <h3 id="universal-purpose-title" style="color: var(--primary-color); margin-top: 0; line-height: 1.2;"></h3>
+                <div id="universal-purpose-content" style="margin-top: 15px; color: #4A5568; line-height: 1.6;">
+                    </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/reveal.js/4.3.1/reveal.js"></script>
+
+    <script>
+    (function() {
+        var mainScript = document.createElement('script');
+        mainScript.src = '/src/shared/env-config.js';
+        mainScript.onerror = function() {
+            console.warn('⚠️ Configuración privada no encontrada. Cargando respaldo...');
+            var backupScript = document.createElement('script');
+            backupScript.src = '/src/shared/env-config.template.js';
+            document.head.appendChild(backupScript);
+        };
+        document.head.appendChild(mainScript);
+    })();
+</script>
+    
+    <script type="module" src="src/app.js"></script>
+
+    <script type="module" src="src/academia/academia.js"></script>
+
+    <div id="contact-overlay" class="purpose-overlay">
+        <div class="purpose-bubble" style="max-width: 500px;">
+            <button class="close-bubble" id="btn-close-contact">&times;</button>
+            
+            <header style="margin-bottom: 25px;">
+                <h2 style="color: var(--primary-midnight); font-weight: 700; font-size: 1.5rem; margin-bottom: 8px;">Conecta con tu Crecimiento</h2>
+                <p style="font-weight: 300; font-size: 0.9rem; color: #666; line-height: 1.4;">¿Deseas escalar tu PyME o tienes alguna duda sobre nuestros programas? Estamos para servirte.</p>
+            </header>
+
+            <form id="contact-form" style="display: flex; flex-direction: column; gap: 10px;">
+                <div class="form-group">
+                    <input type="text" id="contact-name" placeholder="Nombre completo" required>
+                </div>
+                
+                <div class="form-group">
+                    <input type="email" id="contact-email" placeholder="Correo electrónico" required>
+                </div>
+
+                <div class="form-group">
+                    <select id="contact-interest" required style="width: 100%; padding: 16px 20px; border-radius: 12px; border: 1.5px solid rgba(15, 52, 96, 0.12); font-family: 'Montserrat';">
+                        <option value="" disabled selected>¿En qué podemos apoyarte?</option>
+                        <option value="Duda Técnica">Duda con el Workbook</option>
+                        <option value="Consultoría">Consultoría estratégica</option>
+                        <option value="Soporte">Problema de acceso</option>
+                        <option value="Otro">Otro asunto</option>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <textarea id="contact-message" placeholder="Escribe tu duda o mensaje aquí..." required style="min-height: 120px; resize: none;"></textarea>
+                </div>
+                
+                <button type="submit" class="btn-primary" id="btn-send-contact" style="margin-top: 10px;">
+                    ENVIAR MENSAJE
+                </button>
+                
+                <p id="contact-status" style="font-size: 0.75rem; text-align: center; margin-top: 10px; font-weight: 600; min-height: 20px;"></p>
+            </form>
+        </div>
+    </div>
+    <script type="module">
+    import { SupportService } from './src/shared/support-service.js';
+    
+    // Inicializamos el escucha del formulario de contacto
+    document.addEventListener('DOMContentLoaded', () => {
+        SupportService.init();
+    });
+</script>
+</body>
+</html>

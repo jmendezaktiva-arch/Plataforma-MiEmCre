@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard | Dreams</title>
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;600&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="assets/css/style.css">
+    <link rel="stylesheet" href="assets/css/bento.css">
+</head>
+<body>
+    <div id="app">
+        <header class="navbar" style="padding: 12px 40px; border-bottom: 1px solid rgba(15, 52, 96, 0.08); display: flex; justify-content: space-between; align-items: center; background: rgba(255, 255, 255, 0.85); backdrop-filter: blur(12px); position: sticky; top: 0; z-index: 1000;">
+    <div style="width: 140px;" class="hidden md:block"></div> 
+    
+    <div class="logo-container">
+        <img id="main-logo" data-asset="logo.png" alt="Mi Empresa Crece" class="logo-header opacity-0 transition-opacity duration-300">
+    </div>
+
+    <div class="nav-actions-container" style="width: 160px; display: flex; justify-content: flex-end; gap: 12px;">
+        <button id="btn-open-contact" title="Soporte" style="background: var(--primary-midnight); color: white; width: 42px; height: 42px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 1.1rem; border: 1px solid var(--accent-gold); cursor: pointer; transition: all 0.3s ease; box-shadow: 0 4px 12px rgba(15, 52, 96, 0.15);">
+            ✉️
+        </button>
+        <button id="btn-logout" title="Cerrar Sesión" style="background: #fdf2f2; color: #dc2626; width: 42px; height: 42px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 1.1rem; border: 1px solid #fee2e2; cursor: pointer; transition: all 0.3s ease; box-shadow: 0 4px 12px rgba(220, 38, 38, 0.08);">
+            🚪
+        </button>
+    </div>
+</header>
+
+        <main class="welcome-container">
+            <h2>Panel de Crecimiento</h2>
+            <p style="color: #666;">Bienvenido a tu ecosistema tecnológico. Selecciona un área para comenzar.</p>
+            
+            <div class="grid-recursos">
+                <section class="card-recurso">
+                    <h3>📚 Academia</h3>
+                    <p style="font-size: 0.9rem; color: #777;">Accede nuestra oferta de programas destinados a proporcionar los conocimientos y habilidades a los líderes de las empresas para hacer sus empresas resilientes ante las exigencias del mercado. Domina herramientas de autogestión y liderazgo integral para transformar tu PyME en una organización responsable y próspera.</p>
+                    <button class="btn-primary" 
+                            onclick="window.location.href='academia.html'" 
+                            style="margin-top: 10px; font-size: 0.8rem;">
+                        Acceder
+                    </button>
+                </section>
+
+                <section class="card-recurso">
+                    <h3>⚙️ Apps de Gestión</h3>
+                    <p style="font-size: 0.9rem; color: #777;">Gestiona tu estrategia, sus KPIs asegurando una Operación estable con mediciones en tiempo real con herramientas tecnológicas de vanguardia que les permite a ti y a tu equipo implementar y optimiza sus procesos para reducir la dependencia del líder y estabilizar el crecimiento de tu empresa.</p>
+                    <button class="btn-primary" style="margin-top: 10px; font-size: 0.8rem;">Abrir</button>
+                </section>
+
+                <section class="card-recurso">
+                    <h3>🤖 Consultoría IA</h3>
+                    <p style="font-size: 0.9rem; color: #777;">Consultoría 24/7 impulsada por IA para el análisis de tendencias y toma de decisiones estrategicas y éticas. Minimiza riesgos de reales de tu negocio que ponen en peligro tu patrimonio y el de todas las personas que contribuyen a lograr su propósito trascendente y sus objetivos.</p>
+                    <button class="btn-primary" style="margin-top: 10px; font-size: 0.8rem;">Consultar</button>
+                </section>
+            </div>
+        </main>
+    </div>
+    <script>
+    (function() {
+        var mainScript = document.createElement('script');
+        mainScript.src = '/src/shared/env-config.js';
+        mainScript.onerror = function() {
+            console.warn('⚠️ Configuración privada no encontrada. Cargando respaldo...');
+            var backupScript = document.createElement('script');
+            backupScript.src = '/src/shared/env-config.template.js';
+            document.head.appendChild(backupScript);
+        };
+        document.head.appendChild(mainScript);
+    })();
+</script>
+    
+    <script type="module" src="src/app.js"></script>
+
+    <div id="contact-overlay" class="purpose-overlay">
+        <div class="purpose-bubble" style="max-width: 500px;">
+            <button class="close-bubble" id="btn-close-contact">&times;</button>
+            
+            <header style="margin-bottom: 25px;">
+                <h2 style="color: var(--primary-midnight); font-weight: 700; font-size: 1.5rem; margin-bottom: 8px;">Conecta con tu Crecimiento</h2>
+                <p style="font-weight: 300; font-size: 0.9rem; color: #666; line-height: 1.4;">¿Deseas escalar tu PyME o tienes alguna duda sobre nuestros programas? Estamos para servirte.</p>
+            </header>
+
+            <form id="contact-form" style="display: flex; flex-direction: column; gap: 10px;">
+                <div class="form-group">
+                    <input type="text" id="contact-name" placeholder="Nombre completo" required>
+                </div>
+                
+                <div class="form-group">
+                    <input type="email" id="contact-email" placeholder="Correo electrónico" required>
+                </div>
+
+                <div class="form-group">
+                    <select id="contact-interest" required style="width: 100%; padding: 16px 20px; border-radius: 12px; border: 1.5px solid rgba(15, 52, 96, 0.12); font-family: 'Montserrat';">
+                        <option value="" disabled selected>¿En qué podemos apoyarte?</option>
+                        <option value="Duda Técnica">Duda con el Workbook</option>
+                        <option value="Consultoría">Consultoría estratégica</option>
+                        <option value="Soporte">Problema de acceso</option>
+                        <option value="Otro">Otro asunto</option>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <textarea id="contact-message" placeholder="Escribe tu duda o mensaje aquí..." required style="min-height: 120px; resize: none;"></textarea>
+                </div>
+                
+                <button type="submit" class="btn-primary" id="btn-send-contact" style="margin-top: 10px;">
+                    ENVIAR MENSAJE
+                </button>
+                
+                <p id="contact-status" style="font-size: 0.75rem; text-align: center; margin-top: 10px; font-weight: 600; min-height: 20px;"></p>
+            </form>
+        </div>
+    </div>
+
+</body>
+</html>

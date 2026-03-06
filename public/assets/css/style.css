@@ -1,0 +1,1228 @@
+/* ========================================================================== */
+/* DREAMS ACADEMIA | ESTILOS INSTITUCIONALES "MI EMPRESA CRECE" */
+/* ========================================================================== */
+
+:root {
+    /* TRACEABILIDAD: Se elimina la variable de ruta estática. 
+       La gestión de activos de marca ha sido migrada al motor dinámico en la nube 
+       para garantizar la integridad de la identidad visual en producción. */
+
+    /* --- DESIGN TOKENS: PRESTIGE (MARCA OFICIAL) --- */
+    --bg-base: #F5F5F0;           /* Marfil de Lino (Calidez sofisticada) */
+    --primary-midnight: #0F3460;  /* Azul Medianoche (Autoridad) */
+    --accent-gold: #957C3D;       /* Oro Bronceado (Exclusividad) */
+    
+    /* Mapeo de Identidad Blindado */
+    --primary-color: var(--primary-midnight);
+    --accent-color: var(--accent-gold);
+    --text-color: #1A1A1A;
+    --card-bg: #FFFFFF;
+
+    /* --- WORKBOOK UI TOKENS (MI EMPRESA CRECE) --- */
+    --brand-blue: #00529B;         /* Azul Institucional (Confianza) */
+    --brand-orange: #F68D2E;       /* Naranja Institucional (Acción) */
+    --brand-blue-light: #eff6ff;   /* Fondo para instructions-box */
+    --brand-orange-light: #fffbeb; /* Fondo para pro-tip */
+
+    /* --- INFRAESTRUCTURA DE ESPACIADO (FASE 1) --- */
+    --container-max-width: 1400px; 
+    /* Padding Dinámico: escala suavemente de 1.5rem (p-6) a 3rem (p-12) según la pantalla */
+    --dynamic-padding: clamp(1.5rem, 5vw, 3rem); 
+    --content-gap: 1.5rem;
+}
+
+/* Expansión del Canvas de Trabajo y Normalización */
+.container, .main-content {
+    width: 100%;
+    max-width: var(--container-max-width);
+    margin: 0 auto;
+    padding: 0 var(--content-gap);
+    box-sizing: border-box;
+}
+
+/* Corrección de Hiper-densidad: Se aplica el estándar dinámico p-6/p-12 */
+.section-content {
+    padding: var(--dynamic-padding) !important;
+    background-color: var(--card-bg);
+}
+
+/* Forzamos Montserrat en todos los elementos interactivos y definimos escala base */
+body, button, input, textarea, select {
+    font-family: 'Montserrat', sans-serif;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+}
+
+body {
+    font-size: 16px;
+    background-color: var(--bg-base); /* Transición al Marfil de Lino */
+    color: var(--text-color);
+    margin: 0;
+    min-height: 100vh;
+    line-height: 1.6;
+    font-weight: 400; /* Peso base para estabilidad en la interfaz */
+}
+
+/* --- AJUSTE GLOBAL DE REVEAL PARA ACADEMIA --- */
+.reveal {
+    font-family: 'Montserrat', sans-serif !important;
+    font-size: 24px; 
+    color: var(--text-color);
+}
+
+/* --- JERARQUÍA TIPOGRÁFICA PRESTIGE (MONTSERRAT CORE) --- */
+/* Encabezados Maestros: Autoridad y Claridad */
+h1, h2, .reveal h1, .reveal h2 {
+    font-family: 'Montserrat', sans-serif !important;
+    font-size: 1.875rem !important; /* 30px optimizado para lectura rápida */
+    font-weight: 700 !important;
+    color: var(--primary-midnight) !important;
+    letter-spacing: -0.02em !important; /* Tracking negativo para look editorial */
+    line-height: 1.3 !important;
+    margin-bottom: 1.5rem;
+    text-transform: none !important;
+}
+
+/* Títulos de Módulos y Cards: Distinción Visual */
+h3, .reveal h3 {
+    font-family: 'Montserrat', sans-serif !important;
+    font-size: 1.25rem !important; /* 20px estandarizado */
+    font-weight: 700 !important;
+    color: var(--primary-midnight) !important;
+    letter-spacing: -0.01em !important;
+    margin-bottom: 1rem;
+}
+
+/* Cuerpo de Texto: Lujo Silencioso y Legibilidad Extendida */
+p, li, .reveal p, .reveal li {
+    font-family: 'Montserrat', sans-serif !important;
+    font-weight: 300 !important; /* Peso light para sofisticación */
+    font-size: 1rem; /* 16px base */
+    line-height: 1.8 !important; /* Espaciado generoso para reducir fatiga visual */
+    color: var(--text-color);
+    margin-bottom: 1.25rem;
+}
+
+/* Énfasis y Datos Críticos: Blindaje de Trazabilidad */
+strong, b, .calculation-label {
+    font-weight: 600 !important; /* Semi-bold para destacar sin saturar */
+    color: var(--primary-midnight);
+}
+
+/* --- ESTRUCTURA DE CONTENEDOR DE DIAPOSITIVA (Normalizado para Reveal) --- */
+.reveal .slides section {
+    /* Eliminamos display:flex y height:100% para que Reveal controle la visibilidad y el escalado */
+    padding: 40px 60px; 
+    box-sizing: border-box;
+    text-align: center;
+}
+
+/* Aplicamos el diseño flexible solo a la diapositiva que se está mostrando actualmente */
+.reveal .slides section.present {
+    display: flex !important;
+    flex-direction: column !important;
+    justify-content: center !important; 
+    height: 100% !important;
+}
+
+/* Asegura que los títulos tengan margen inferior consistente */
+.reveal .slides section h2 {
+    margin-top: 0;
+    margin-bottom: 30px;
+}
+
+/* Contenedor Principal */
+#app {
+    width: 100%;
+    margin: 0;
+    display: block; /* Restablece el flujo vertical para las pantallas internas */
+}
+
+/* --- HEADER / NAVBAR (Normalizado) --- */
+.navbar {
+    padding: 12px 40px;
+    background: rgba(255, 255, 255, 0.85); /* Transparencia sofisticada */
+    backdrop-filter: blur(12px);          /* Efecto de cristal esmerilado */
+    border-bottom: 1px solid rgba(15, 52, 96, 0.08); /* Línea capilar casi invisible */
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    position: sticky;
+    top: 0;
+    z-index: 1000;
+    /* Soft Depth: Sombra multicapa orgánica */
+    box-shadow: 
+        0 1px 2px rgba(0,0,0,0.02),
+        0 4px 12px rgba(15, 52, 96, 0.06); 
+}
+
+/* --- ESTILIZACIÓN DEL LOGO INSTITUCIONAL (IMPACTO PREMIUM) --- */
+.logo-header {
+    height: 70px; /* Altura optimizada para presencia visual sin desbordar el header */
+    width: auto;
+    object-fit: contain; /* Ignora bordes transparentes excesivos del archivo de imagen */
+    display: block;
+    transition: transform 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+}
+
+.logo-header:hover {
+    transform: scale(1.03); /* Micro-interacción sutil y elegante */
+}
+
+/* Contenedor flexible que garantiza el centrado y respiro del logo */
+.logo-container {
+    display: flex;
+    align-items: center;
+    padding: 8px 0;
+}
+
+.navbar a {
+    text-decoration: none;
+    color: var(--text-color);
+    font-size: 0.85rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    transition: color 0.3s ease;
+}
+
+.navbar a:hover {
+    color: var(--primary-color);
+}
+
+/* --- BOTONES Y COMPONENTES (Normalizados) --- */
+/* --- ESTILIZACIÓN QUIRÚRGICA DEL BOTÓN DE ACCIÓN --- */
+/* --- BOTÓN PRIMARIO: PRESTIGE (AZUL & ORO) --- */
+.btn-primary {
+    background-color: var(--primary-midnight); /* [cite: 7, 64] */
+    color: #FFFFFF;
+    border: 1px solid var(--accent-gold); /* [cite: 73] Micro-destello en Oro */
+    padding: 18px 32px;
+    border-radius: 12px;
+    cursor: pointer;
+    font-family: 'Montserrat', sans-serif !important; /* [cite: 465] */
+    font-weight: 600; /* [cite: 85] */
+    font-size: 1rem; /* [cite: 85, 471] */
+    letter-spacing: 0.05em; /* [cite: 85] */
+    text-transform: uppercase; /* [cite: 85] */
+    transition: all 300ms ease-out; /* [cite: 26, 123] */
+    width: 100%;
+    /* Soft Depth Shadow teñida de Midnight */
+    box-shadow: 0 4px 6px rgba(15, 52, 96, 0.08), 0 1px 3px rgba(15, 52, 96, 0.04); /* [cite: 102] */
+    position: relative;
+    overflow: hidden;
+}
+
+.btn-primary:hover:not([disabled]) {
+    background-color: #164275; /* Variante sutil del azul para profundidad */
+    transform: translateY(-2px);
+    box-shadow: 0 10px 15px -3px rgba(15, 52, 96, 0.12); /* [cite: 103] */
+}
+
+.btn-primary:active:not([disabled]) {
+    transform: scale(0.98); /* [cite: 32, 125] Micro-escala de calidad */
+    box-shadow: 0 2px 4px rgba(15, 52, 96, 0.1);
+}
+
+.btn-primary[disabled] {
+    background-color: #e2e8f0;
+    color: #94a3b8;
+    cursor: not-allowed;
+    box-shadow: none;
+    transform: none;
+}
+
+.card {
+    background: var(--card-bg);
+    padding: 1.75rem; /* Reducción quirúrgica para un look más compacto y ágil */
+    border-radius: 16px; /* Ajuste proporcional a la nueva escala bento */
+    border: 1px solid rgba(15, 52, 96, 0.04);
+    display: flex;
+    flex-direction: column;
+    transition: all 0.5s cubic-bezier(0.165, 0.84, 0.44, 1);
+    /* Mantenemos la profundidad suave (Soft Depth) del Lujo Silencioso */
+    box-shadow: 
+        0 4px 6px rgba(15, 52, 96, 0.02),
+        0 15px 35px rgba(15, 52, 96, 0.05);
+}
+
+.card:hover {
+    transform: translateY(-8px); /* Elevación sutil al interactuar */
+    box-shadow: 
+        0 12px 20px rgba(15, 52, 96, 0.05),
+        0 30px 60px rgba(15, 52, 96, 0.08);
+}
+
+/* --- REPARACIÓN DE PORTAL: PRESTIGE LOGIN --- */
+.login-split-wrapper {
+    display: grid;
+    grid-template-columns: 1fr 1fr; /* Proporción 50/50 para estabilidad */
+    max-width: 900px;
+    width: 95%; /* Asegura visibilidad en pantallas medianas */
+    min-height: 500px;
+    background: var(--card-bg);
+    border-radius: 32px;
+    overflow: hidden;
+    margin: 8vh auto;
+    border: 1px solid rgba(15, 52, 96, 0.05);
+    box-shadow: 0 40px 100px rgba(15, 52, 96, 0.12);
+}
+
+.login-brand-side {
+    background-color: var(--primary-midnight);
+    padding: 60px; /* Aumentamos el aire para evitar el efecto 'amontonado' */
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #ffffff !important;
+}
+
+/* Blindaje de Contraste: Evita que el Midnight global oscurezca el texto sobre fondo azul */
+.login-brand-side h1, 
+.login-brand-side p {
+    color: #ffffff !important;
+}
+
+.brand-content {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    width: 100%;
+    gap: 20px; /* Alineación perfecta de Logo, H1 y P [cite: 161] */
+}
+
+.brand-content h1 {
+    margin: 0; /* Elimina la brecha vertical asimétrica [cite: 84] */
+    line-height: 1.2;
+}
+
+.login-brand-side p {
+    margin: 0; /* Elimina desplazamientos por herencia */
+    max-width: 280px; /* Estrecha el texto para mejorar el 'justificado' visual  */
+}
+
+/* RESTRICCIÓN CRÍTICA DEL LOGO (NORMALIZADA) */
+.login-hero-logo {
+    max-width: 160px; 
+    height: auto;
+    display: block;
+    filter: brightness(0) invert(1);
+    /* TRACEABILIDAD: Se eliminan los 'translateY' que eran parches para el logo antiguo. 
+       El centrado ahora es gestionado de forma nativa por Flexbox. */
+}
+
+.brand-content p {
+    margin: 0 auto;
+    max-width: 320px;
+    font-weight: 300;
+    line-height: 1.6;
+    opacity: 0.85;
+    text-wrap: balance;
+}
+
+.login-form-side {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 40px;
+    background: rgba(255, 255, 255, 0.5);
+    backdrop-filter: blur(10px);
+}
+
+#auth-card {
+    width: 100%;
+    max-width: 320px; /* Compacto para evitar desproporción */
+}
+
+#auth-card h2 {
+    font-weight: 700 !important;
+    font-size: 1.6rem !important;
+    letter-spacing: -0.02em;
+    color: var(--primary-midnight);
+    margin-bottom: 2rem;
+    text-align: center;
+}
+
+/* Ajuste Responsivo para Móviles */
+@media (max-width: 900px) {
+    .login-split-wrapper {
+        grid-template-columns: 1fr;
+        margin: 20px;
+    }
+    .login-brand-side {
+        display: none; /* En móviles ocultamos la marca para priorizar el acceso */
+    }
+}
+
+/* --- BOTÓN SECUNDARIO (Modalidad Live) --- */
+#btn-open-live {
+    background: var(--card-bg);
+    color: var(--secondary-color); /* Verde Original */
+    border: 2px solid var(--secondary-color);
+}
+
+#btn-open-live:hover {
+    background: var(--secondary-color);
+    color: #ffffff;
+}
+
+/* --- ENTRADAS DE CRISTAL LÍQUIDO: AISLAMIENTO QUIRÚRGICO (FASE 1) --- */
+/* Target exclusivo para campos de escritura, blindando botones y selectores */
+input[type="text"], 
+input[type="email"], 
+input[type="password"], 
+input[type="number"], 
+input[type="date"], 
+textarea,
+select {
+    width: 100%;
+    padding: 16px 20px;
+    margin: 8px 0 24px 0;
+    background: rgba(255, 255, 255, 0.5) !important; /* Opacidad Prestige inicial */
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    border: 1.5px solid rgba(15, 52, 96, 0.12); /* Definición aumentada */
+    border-radius: 12px;
+    box-sizing: border-box;
+    font-family: 'Montserrat', sans-serif;
+    font-size: 1rem;
+    font-weight: 400;
+    color: var(--text-color);
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    box-shadow: 
+        inset 0 1px 2px rgba(255, 255, 255, 0.8), 
+        0 2px 4px rgba(15, 52, 96, 0.02);
+}
+
+/* Mejora de Legibilidad del Placeholder (Contraste 4.5:1 para accesibilidad) */
+::placeholder {
+    color: rgba(26, 26, 26, 0.5) !important; /* Gris Midnight equilibrado */
+    font-weight: 300;
+}
+
+/* Estado de Enfoque: Claridad Absoluta en la Escritura */
+input[type="text"]:focus, 
+input[type="email"]:focus, 
+input[type="number"]:focus, 
+input[type="date"]:focus, 
+textarea:focus, 
+select:focus {
+    outline: none;
+    background: #FFFFFF !important; /* Fondo sólido al escribir para máxima legibilidad */
+    border-color: var(--accent-gold) !important;
+    transform: translateY(-1px);
+    box-shadow: 
+        0 8px 20px rgba(15, 52, 96, 0.06),
+        0 0 0 4px rgba(149, 124, 61, 0.15); /* Halo de Oro sutil */
+}
+
+/* ========================================================================== */
+/* ESTILOS DEL REPRODUCTOR DE PODCAST (CON TRANSICIONES SUAVES) */
+/* ========================================================================== */
+
+#podcast-player {
+    /* Efecto Liquid Glass (Cristalización) */
+    background: rgba(255, 255, 255, 0.65) !important; 
+    backdrop-filter: blur(20px) saturate(160%) !important;
+    -webkit-backdrop-filter: blur(20px) saturate(160%) !important;
+    
+    /* Refinamiento de Superficie Prestige */
+    border: 1px solid rgba(255, 255, 255, 0.4) !important;
+    border-top: 1px solid rgba(255, 255, 255, 0.8) !important; /* Reflejo de luz superior */
+    border-radius: 24px 24px 0 0 !important;
+    
+    /* Soft Depth Shadow teñida */
+    box-shadow: 0 -20px 40px rgba(15, 52, 96, 0.08) !important;
+    
+    /* Dinámica de Movimiento Fluido */
+    transition: all 0.6s cubic-bezier(0.19, 1, 0.22, 1) !important;
+    transform-origin: bottom right;
+}
+
+#podcast-name {
+    color: var(--primary-color) !important;
+    letter-spacing: 0.5px;
+    font-size: 0.7rem;
+}
+
+#btn-close-podcast {
+    color: #999 !important;
+    transition: color 0.3s ease;
+}
+
+#btn-close-podcast:hover {
+    color: var(--accent-color) !important;
+}
+
+/* --- ESTILOS PARA LA BURBUJA DE RECUPERACIÓN (FAB) --- */
+#btn-show-podcast {
+    /* Geometría y Fondo de Orbe Midnight */
+    background: radial-gradient(circle at 30% 30%, rgba(22, 66, 117, 0.9), var(--primary-midnight)) !important;
+    border: 1px solid var(--accent-gold) !important; /* Marco de Oro */
+    width: 60px;
+    height: 60px;
+    border-radius: 50%;
+    
+    /* Efecto Liquid Glass */
+    backdrop-filter: blur(8px) !important;
+    -webkit-backdrop-filter: blur(8px) !important;
+    
+    /* Soft Depth: Sombra de Orbe */
+    box-shadow: 
+        0 8px 16px rgba(15, 52, 96, 0.2),
+        inset 0 2px 4px rgba(255, 255, 255, 0.2) !important; /* Reflejo interno superior */
+    
+    /* Dinámica de Elevación */
+    transition: all 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275) !important;
+    cursor: pointer;
+}
+
+#btn-show-podcast:hover {
+    transform: scale(1.15) rotate(12deg);
+    border-color: #FFFFFF !important; /* El borde brilla al contacto */
+    box-shadow: 
+        0 15px 30px rgba(15, 52, 96, 0.3),
+        0 0 15px rgba(149, 124, 61, 0.4) !important; /* Aura de Oro suave */
+}
+
+/* --- CLASE DE CONTROL DE VISIBILIDAD (EL "ALMA" DE LA ANIMACIÓN) --- */
+.podcast-hidden {
+    opacity: 0 !important;
+    visibility: hidden !important;
+    pointer-events: none !important;
+    transform: translateY(30px) scale(0.5) !important;
+}
+
+/* Personalización del Audio Nativo (Básico) */
+audio {
+    filter: drop-shadow(0 2px 3px rgba(0,0,0,0.1));
+}
+
+audio::-webkit-media-controls-panel {
+    background-color: #f8f9fa;
+}
+
+audio::-webkit-media-controls-play-button {
+    background-color: var(--secondary-color);
+    border-radius: 50%;
+}
+
+/* ========================================================================== */
+/* INTEGRACIÓN Y CORRECCIÓN DE REVEAL.JS (SIN ENCIMADO) */
+/* ========================================================================== */
+
+/* Contenedor de la Presentación (Rescate de Estilo Original: Fondo Claro) */
+.presentation-wrapper {
+    position: relative;
+    width: 100%;
+    height: 70vh;
+    min-height: 500px;
+    background: #fff; /* Regresamos al blanco para resaltar la paleta azul/coral */
+    border-radius: 12px;
+    overflow: hidden;
+    margin-bottom: 30px;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+    border: 1px solid #eee;
+}
+
+/* Estilos base para Reveal con Marca de Agua "Liquid Glass" */
+#view-presentation .reveal {
+    font-family: 'Montserrat', sans-serif;
+    color: var(--text-color);
+    /* Patrón Geométrico Liquid Glass: Líneas diagonales ultra-sutiles */
+    background-image: repeating-linear-gradient(
+        -45deg,
+        rgba(15, 52, 96, 0.03) 0px,
+        rgba(15, 52, 96, 0.03) 1px,
+        transparent 1px,
+        transparent 40px
+    );
+    background-color: #FFFFFF; /* Fondo base sólido para contraste */
+}
+
+/* Títulos de Diapositivas (Azul Institucional Recuperado) */
+#view-presentation .reveal h2 {
+    color: var(--primary-color) !important; 
+    font-weight: 700;
+    text-transform: none;
+    margin-bottom: 20px;
+}
+
+/* Subtítulos y texto general (Jerarquía de Color) */
+#view-presentation .reveal p,
+#view-presentation .reveal li {
+    color: var(--text-color);
+    font-size: 1.2rem;
+    line-height: 1.6;
+}
+
+/* Imágenes en Diapositivas - CORREGIDO */
+#view-presentation .slide-image {
+    max-width: 90%;
+    max-height: 450px; /* Altura máxima para evitar desbordes */
+    object-fit: contain; /* Asegura que la imagen se vea completa */
+    margin: 30px auto;
+    display: block;
+    border-radius: 8px;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+}
+
+/* Botón dentro de la presentación (Link al Workbook) */
+#view-presentation .reveal .btn-primary {
+    display: inline-block;
+    width: auto;
+    margin-top: 30px;
+    padding: 16px 32px;
+    font-size: 0.9rem;
+    background-color: var(--primary-midnight); /* Azul Medianoche */
+    color: #FFFFFF;
+    border: 1px solid var(--accent-gold); /* Detalle en Oro */
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    font-weight: 600;
+    /* Soft Depth Shadow teñida de Midnight */
+    box-shadow: 0 10px 25px rgba(15, 52, 96, 0.15);
+    transition: all 0.4s cubic-bezier(0.165, 0.84, 0.44, 1);
+}
+
+#view-presentation .reveal .btn-primary:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 15px 35px rgba(15, 52, 96, 0.25);
+    border-color: #FFFFFF;
+}
+
+/* Estilos Específicos de la Sesión A (Rescatados) */
+
+/* --- RECUPERACIÓN DE LAYOUTS DE DOBLE COLUMNA --- */
+#view-presentation .content-wrapper,
+#view-presentation .layout-two-columns .content-wrapper {
+    display: grid;
+    grid-template-columns: 1.2fr 0.8fr; /* Prioridad ligera al texto */
+    gap: 50px;
+    align-items: center;
+    text-align: left;
+    width: 100%;
+}
+
+/* Control de imágenes dentro de columnas para evitar desbordes */
+#view-presentation .content-wrapper img {
+    max-width: 100%;
+    max-height: 380px; 
+    object-fit: contain;
+    border-radius: 12px;
+    box-shadow: 0 10px 25px rgba(0,0,0,0.2);
+}
+
+/* Adaptación para pantallas pequeñas (Responsivo) */
+@media (max-width: 768px) {
+    #view-presentation .content-wrapper {
+        grid-template-columns: 1fr;
+        text-align: center;
+    }
+}
+
+/* --- RESCATE DE VIÑETAS PERSONALIZADAS (Lámina 6) --- */
+#view-presentation .lista-objetivos {
+    list-style-type: none !important;
+    padding-left: 0;
+    text-align: left;
+    margin-top: 40px !important; /* Espacio entre el texto y la lista */
+    font-size: 1.1em; /* Texto ligeramente más grande para legibilidad */
+}
+
+#view-presentation .lista-objetivos li {
+    margin-bottom: 20px;
+    display: flex;
+    align-items: flex-start; /* Alinea el icono con la primera línea de texto */
+}
+
+#view-presentation .lista-objetivos li::before {
+    content: '';
+    display: inline-block;
+    /* TRACEABILIDAD: Se elimina referencia local huérfana que causaba Error 404.
+       Sustituido por un glifo de marca (✓) para mantener la estética sin dependencias de archivos.
+    */
+    content: "✓";
+    color: var(--accent-gold);
+    font-weight: 900;
+    font-size: 1.2rem;
+    margin-right: 15px;
+    flex-shrink: 0;
+}
+
+/* --- RESCATE DE CITA DESTACADA (Legacy Style: Azul & Coral) --- */
+#view-presentation .highlight-quote {
+    background: rgba(0, 90, 156, 0.05); /* Fondo Azul primario casi imperceptible */
+    padding: 35px 45px;
+    border-left: 8px solid var(--accent-color); /* Borde grueso en Coral vibrante */
+    border-radius: 0 15px 15px 0; /* Bordes redondeados solo a la derecha */
+    margin-top: 50px;
+    font-style: italic;
+    box-shadow: 2px 2px 15px rgba(0, 90, 156, 0.05);
+}
+
+#view-presentation .highlight-quote p {
+    color: var(--primary-color) !important; /* Texto en Azul institucional */
+    margin: 0 !important;
+    font-size: 1.2rem !important;
+    line-height: 1.6 !important;
+}
+
+#view-presentation .highlight-quote strong {
+    color: var(--accent-color) !important; /* Palabras clave en Coral */
+    font-weight: 700;
+}
+
+/* --- REFINAMIENTO DE TARJETAS (CARDS) DE LA ACADEMIA --- */
+.card-content {
+    flex-grow: 1; /* Empuja los botones hacia abajo para mantener simetría */
+}
+
+.card h3 {
+    margin: 12px 0;
+    font-weight: 700; /* Más fuerza visual */
+    color: var(--primary-color);
+    font-size: 1.25rem; /* 20px: Estándar H3 */
+    line-height: 1.2;
+}
+
+.card p {
+    font-size: 1rem; /* 16px: Estándar Body para legibilidad */
+    color: #4A5568; /* Gris ligeramente más oscuro para contraste */
+    line-height: 1.6;
+    font-weight: 400; /* Regular: mejor para bloques de texto */
+}
+
+/* Clase para etiquetas de categoría dentro de las cards */
+.card-category {
+    font-size: 0.875rem !important; /* 14px: Estándar Label */
+    font-weight: 700 !important;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+}
+
+.btn-group {
+    display: flex;
+    gap: 12px;
+    margin-top: 20px;
+}
+
+/* --- ESTILOS DE LA BURBUJA DE PROPÓSITO (MODALES) --- */
+/* --- CÁPSULAS DE VISIÓN (MODALES PRESTIGE) --- */
+.purpose-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(15, 52, 96, 0.2); /* Tintura Midnight para inmersión */
+    backdrop-filter: blur(15px);        /* Enfoque selectivo profundo */
+    display: none;
+    justify-content: center;
+    align-items: center;
+    z-index: 2000;
+    padding: 20px;
+}
+
+.purpose-bubble {
+    /* Efecto Liquid Glass (Cápsula Esmerilada) */
+    background: rgba(255, 255, 255, 0.75) !important;
+    backdrop-filter: blur(30px) saturate(180%) !important;
+    -webkit-backdrop-filter: blur(30px) saturate(180%) !important;
+    
+    max-width: 550px;
+    width: 100%;
+    padding: 50px;
+    border-radius: 32px;
+    border: 1px solid rgba(255, 255, 255, 0.5);
+    
+    /* Soft Depth: Elevación de importancia estratégica */
+    box-shadow: 
+        0 40px 100px rgba(15, 52, 96, 0.15),
+        inset 0 0 20px rgba(255, 255, 255, 0.4);
+        
+    position: relative;
+    transform: scale(0.95) translateY(20px);
+    opacity: 0;
+    transition: all 0.6s cubic-bezier(0.19, 1, 0.22, 1);
+}
+
+.purpose-bubble h2 {
+    color: var(--primary-midnight) !important;
+    margin-bottom: 25px !important;
+    font-weight: 700 !important;
+    letter-spacing: -0.02em !important;
+}
+
+.purpose-bubble p {
+    font-weight: 300 !important;
+    color: var(--text-color) !important;
+    line-height: 1.8 !important;
+    font-size: 1.1rem !important;
+}
+
+.purpose-overlay.active { display: flex; }
+.purpose-overlay.active .purpose-bubble {
+    transform: scale(1);
+    opacity: 1;
+}
+
+.close-bubble {
+    position: absolute;
+    top: 25px;
+    right: 25px;
+    background: #f5f5f5;
+    border: none;
+    width: 35px;
+    height: 35px;
+    border-radius: 50%;
+    font-size: 1.2rem;
+    color: #999;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.2s;
+}
+
+.close-bubble:hover { background: #fee2e2; color: #ef4444; }
+
+/* BOTÓN DE REVELACIÓN (CAT PODEROSO) */
+.btn-reveal-purpose {
+    background: none;
+    border: 1.5px solid var(--secondary-color);
+    color: var(--secondary-color);
+    padding: 10px 18px;
+    border-radius: 12px;
+    font-size: 0.75rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    cursor: pointer;
+    margin-top: 15px;
+    transition: all 0.3s;
+    width: fit-content;
+}
+
+.btn-reveal-purpose:hover {
+    background: var(--secondary-color);
+    color: white;
+    box-shadow: 0 5px 15px rgba(0, 155, 119, 0.2);
+}
+
+/* MARCA DE AGUA DINÁMICA: Sello de Calidad "Mi Empresa Crece" */
+.presentation-wrapper::after {
+    content: "";
+    position: absolute;
+    bottom: 30px;
+    left: 40px; /* Ajustado a la esquina inferior izquierda según tu preferencia */
+    width: 120px;
+    height: 50px;
+    /* TRACEABILIDAD: Usamos una variable dinámica que JS alimentará desde la nube */
+    background-image: var(--dynamic-logo-url); 
+    background-size: contain;
+    background-repeat: no-repeat;
+    background-position: left bottom;
+    opacity: 0.15; /* Sutil pero visible para proteger la trazabilidad pedagógica */
+    z-index: 20; 
+    pointer-events: none;
+    filter: grayscale(1) brightness(0.8); 
+    transition: opacity 0.5s ease;
+}
+
+/* ========================================================================== */
+/* REFINAMIENTO: CÁPSULA DE CONTACTO (FASE 3) */
+/* ========================================================================== */
+
+/* Personalización del Selector de Interés */
+#contact-form select {
+    appearance: none;
+    -webkit-appearance: none;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' fill='%230F3460' viewBox='0 0 16 16'%3E%3Cpath d='M7.247 11.14 2.451 5.658C1.885 5.013 2.345 4 3.204 4h9.592a1 1 0 0 1 .753 1.659l-4.796 5.48a1 1 0 0 1-1.506 0z'/%3E%3C/svg%3E");
+    background-repeat: no-repeat;
+    background-position: right 20px center;
+    cursor: pointer;
+}
+
+/* Ajuste fino para el área de mensaje */
+#contact-message {
+    resize: none;
+    min-height: 100px;
+}
+
+/* Estados de Envío (Visual Feedback) */
+.sending-state {
+    opacity: 0.6;
+    pointer-events: none;
+    filter: grayscale(0.5);
+}
+
+#contact-status {
+    font-weight: 600;
+    letter-spacing: 0.02em;
+    transition: all 0.3s ease;
+    min-height: 20px;
+}
+
+/* Animación de entrada para el formulario */
+#contact-overlay.active .purpose-bubble {
+    animation: capsuleAppear 0.5s cubic-bezier(0.19, 1, 0.22, 1) forwards;
+}
+
+@keyframes capsuleAppear {
+    from { 
+        opacity: 0; 
+        transform: scale(0.9) translateY(30px); 
+    }
+    to { 
+        opacity: 1; 
+        transform: scale(1) translateY(0); 
+    }
+}
+
+/* ========================================================================== */
+/* BOTÓN DE ASISTENCIA GLOBAL (HEADER PRESTIGE) */
+/* ========================================================================== */
+#btn-open-contact {
+    background: var(--primary-midnight);
+    color: white;
+    padding: 10px 18px;
+    border-radius: 12px;
+    font-size: 0.7rem;
+    border: 1.5px solid var(--accent-gold);
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    box-shadow: 0 4px 12px rgba(15, 52, 96, 0.12);
+}
+
+#btn-open-contact:hover {
+    transform: translateY(-2px);
+    background-color: #164275;
+    box-shadow: 0 8px 20px rgba(15, 52, 96, 0.2);
+    border-color: #FFFFFF; /* Brillo de contacto premium */
+}
+
+#btn-open-contact:active {
+    transform: scale(0.95);
+}
+
+/* --- MEJORAS DE NAVEGACIÓN HOMOLOGADA --- */
+.btn-nav-back:hover {
+    color: var(--accent-gold) !important;
+    transform: translateX(-4px);
+}
+
+.btn-contact-fab:hover {
+    transform: scale(1.1) rotate(5deg);
+    background: #164275 !important;
+    box-shadow: 0 6px 16px rgba(15, 52, 96, 0.25) !important;
+}
+
+/* Equilibrio simétrico para el logo centralizado */
+.navbar {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 12px 40px;
+}
+
+/* ========================================================================== */
+/* MODO CINEMA: EXPANSIÓN PARA MAXIMIZAR VIDEO Y WORKBOOK */
+/* ========================================================================== */
+
+/* Cuando el body tenga esta clase, la navbar desaparece con suavidad */
+body.cinema-mode .navbar {
+    display: none !important;
+}
+
+/* Forzamos al contenedor a ocupar todo el ancho disponible y subir al tope */
+body.cinema-mode .container {
+    max-width: 98vw !important; /* Aprovecha el 98% del ancho de la pantalla */
+    margin-top: 10px !important; /* Reduce el espacio superior */
+    padding: 0 10px !important;
+    transition: all 0.3s ease;
+}
+
+/* Ajuste de altura para que el video y workbook se vean más grandes */
+body.cinema-mode #view-presentation > div {
+    height: 92vh !important; /* Aumenta del 82vh original al 92vh */
+}
+
+body.cinema-mode #view-workbook {
+    height: 95vh !important; /* Casi toda la altura de la pantalla */
+}
+
+/* ========================================================================== */
+/* DREAMS WORKBOOK | INFRAESTRUCTURA DE INTERFAZ (CORE) */
+/* ========================================================================== */
+
+/* Sincronización de Clases de Marca (Heredadas de :root) */
+.brand-blue { color: var(--primary-color); }
+.brand-orange { color: var(--accent-color); }
+.bg-brand-blue { background-color: var(--primary-color); }
+.bg-brand-orange { background-color: var(--accent-color); }
+.border-brand-blue { border-color: var(--primary-color); }
+.border-brand-orange { border-color: var(--accent-color); }
+
+/* Transiciones de Secciones (Optimización "Sin Parpadeos") */
+.section-content { 
+    display: none; 
+    opacity: 0;
+}
+.section-content.active { 
+    display: block; 
+    animation: fadeInWorkbookSection 0.4s ease-out forwards; 
+}
+
+@keyframes fadeInWorkbookSection { 
+    from { opacity: 0; transform: translateY(10px); } 
+    to { opacity: 1; transform: translateY(0); } 
+}
+
+/* Navegación del Cuaderno */
+.nav-link.active { 
+    background-color: #eef2ff !important; 
+    color: var(--primary-midnight) !important; 
+    font-weight: 700 !important; 
+    border-right: 4px solid var(--accent-gold) !important; 
+}
+
+/* Inputs Dinámicos y Feedback Visual */
+.autosave-input:focus { 
+    outline: 2px solid var(--primary-midnight) !important; 
+    border-color: transparent !important; 
+}
+
+.semaforo-radio:checked + label {
+    transform: scale(1.05);
+    box-shadow: 0 0 0 3px var(--accent-gold);
+}
+
+/* Barra de Desplazamiento Personalizada Dreams (Estilo Prestige) */
+::-webkit-scrollbar { width: 8px; }
+::-webkit-scrollbar-track { background: #f1f1f1; }
+::-webkit-scrollbar-thumb { 
+    background: var(--primary-midnight); 
+    border-radius: 10px; 
+}
+::-webkit-scrollbar-thumb:hover { background: #164275; }
+
+/* Soporte para Exportación (PDF) */
+@media print {
+  .avoid-break { page-break-inside: avoid; }
+  .section-content { display: block !important; opacity: 1 !important; }
+}
+
+/* ========================================================================== */
+/* COMPONENTES DE AYUDA Y MODALES INFORMATIVOS (ESTILO PRESTIGE) */
+/* ========================================================================== */
+
+/* --- DISPARADOR DE AYUDA (ICONO "i") --- */
+.btn-help-trigger {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 20px;
+    height: 20px;
+    background: var(--primary-midnight);
+    color: white;
+    border-radius: 50%;
+    font-size: 12px;
+    font-weight: 700;
+    cursor: pointer;
+    margin-left: 8px;
+    transition: all 0.3s ease;
+    border: 1px solid var(--accent-gold);
+    vertical-align: middle;
+}
+
+.btn-help-trigger:hover {
+    transform: scale(1.2);
+    box-shadow: 0 0 10px rgba(149, 124, 61, 0.4);
+    background: var(--accent-gold);
+}
+
+/* --- CONTENEDOR DE MODAL GENÉRICO (LIQUID GLASS) --- */
+/* Reutilizamos la lógica de purpose-overlay para consistencia */
+.help-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(15, 52, 96, 0.25);
+    backdrop-filter: blur(15px);
+    display: none; /* Controlado por JS */
+    justify-content: center;
+    align-items: center;
+    z-index: 3000;
+    padding: 20px;
+    opacity: 0;
+    transition: opacity 0.4s ease;
+}
+
+.help-overlay.active {
+    display: flex;
+    opacity: 1;
+}
+
+.help-bubble {
+    background: rgba(255, 255, 255, 0.85) !important;
+    backdrop-filter: blur(30px) saturate(180%) !important;
+    max-width: 600px;
+    width: 100%;
+    padding: 40px;
+    border-radius: 28px;
+    border: 1px solid rgba(255, 255, 255, 0.5);
+    box-shadow: 0 40px 100px rgba(15, 52, 96, 0.2);
+    position: relative;
+    transform: translateY(20px);
+    transition: transform 0.4s cubic-bezier(0.19, 1, 0.22, 1);
+}
+
+.help-overlay.active .help-bubble {
+    transform: translateY(0);
+}
+
+/* --- CALL TO ACTION (CAT) DE ASESORÍA INTERMEDIA --- */
+.cat-advisory-box {
+    background: linear-gradient(135deg, rgba(15, 52, 96, 0.03), rgba(149, 124, 61, 0.05));
+    border: 1.5px dashed var(--accent-gold);
+    border-radius: 20px;
+    padding: 25px;
+    margin-top: 30px;
+    display: flex;
+    align-items: center;
+    gap: 20px;
+    animation: pulseBorder 3s infinite ease-in-out;
+}
+
+@keyframes pulseBorder {
+    0%, 100% { border-color: rgba(149, 124, 61, 0.3); }
+    50% { border-color: var(--accent-gold); }
+}
+
+/* ========================================================================== */
+/* COMPONENTE GLOBAL: MINDSET ESTRATÉGICO (PRESTIGE) */
+/* ========================================================================== */
+
+.mindset-container {
+    position: relative;
+    display: inline-block;
+    width: 100%;
+}
+
+.btn-mindset {
+    background: rgba(15, 52, 96, 0.05);
+    border: 1px solid rgba(15, 52, 96, 0.15);
+    color: var(--primary-midnight);
+    padding: 12px 20px;
+    border-radius: 12px;
+    font-size: 0.75rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    transition: all 0.4s cubic-bezier(0.165, 0.84, 0.44, 1);
+}
+
+.btn-mindset:hover {
+    background: var(--primary-midnight);
+    color: white;
+    transform: translateY(-2px);
+    box-shadow: 0 5px 15px rgba(15, 52, 96, 0.2);
+}
+
+.mindset-bubble {
+    position: absolute;
+    top: calc(100% + 15px);
+    left: 0;
+    width: 100%;
+    max-width: 450px;
+    background: rgba(255, 255, 255, 0.9); /* Efecto Liquid Glass */
+    backdrop-filter: blur(20px) saturate(160%);
+    -webkit-backdrop-filter: blur(20px) saturate(160%);
+    border: 1px solid rgba(255, 255, 255, 0.5);
+    border-radius: 20px;
+    padding: 25px;
+    z-index: 100;
+    box-shadow: 0 20px 40px rgba(15, 52, 96, 0.12);
+    
+    /* Estado Inicial (Oculto) */
+    opacity: 0;
+    visibility: hidden;
+    transform: translateY(-10px) scale(0.95);
+    transition: all 0.5s cubic-bezier(0.19, 1, 0.22, 1);
+    pointer-events: none;
+}
+
+.mindset-bubble.active {
+    opacity: 1;
+    visibility: visible;
+    transform: translateY(0) scale(1);
+    pointer-events: all;
+}
+
+/* Decoración Premium del Triángulo (Caret) */
+.mindset-bubble::before {
+    content: '';
+    position: absolute;
+    top: -8px;
+    left: 30px;
+    border-left: 8px solid transparent;
+    border-right: 8px solid transparent;
+    border-bottom: 8px solid rgba(255, 255, 255, 0.8);
+}
+
+/* ========================================================================== */
+/* SEMÁFOROS DINÁMICOS: EJERCICIO 3 (MATRIZ DE RESPALDO) */
+/* ========================================================================== */
+
+.score-select-red { 
+    background-color: #FEE2E2 !important; 
+    color: #991B1B !important; 
+    border-color: #F87171 !important; 
+}
+
+.score-select-yellow { 
+    background-color: #FEF3C7 !important; 
+    color: #92400E !important; 
+    border-color: #FBBF24 !important; 
+}
+
+.score-select-green { 
+    background-color: #DCFCE7 !important; 
+    color: #166534 !important; 
+    border-color: #4ADE80 !important; 
+}
+
+/* Contenedor de Totales en la Matriz */
+.score-total-box {
+    background-color: var(--primary-midnight);
+    color: white;
+    font-weight: 900;
+    text-align: center;
+    border-radius: 12px;
+    padding: 10px;
+    box-shadow: 0 4px 10px rgba(15, 52, 96, 0.15);
+}
+
+.matrix-table th {
+    background-color: var(--primary-midnight);
+    color: white;
+    font-size: 10px;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    padding: 15px;
+    text-align: center;
+}

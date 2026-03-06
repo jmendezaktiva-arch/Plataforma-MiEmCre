@@ -1,0 +1,104 @@
+/*public/assets/css/bento
+/* ========================================================================== */
+/* DREAMS | SISTEMA DE BENTO GRIDS (GESTIÓN DE PROCESOS) */
+/* ========================================================================== */
+
+/* --- CONTENEDOR MAESTRO BENTO --- */
+.bento-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr); /* 4 Columnas base */
+    grid-template-rows: auto;
+    gap: 20px;
+    padding: 20px 0;
+}
+
+/* --- MÓDULOS (CUADRANTES) --- */
+.bento-item {
+    background: var(--card-bg);
+    border-radius: 24px;
+    padding: 30px;
+    border: 1px solid rgba(15, 52, 96, 0.05);
+    box-shadow: 0 10px 30px rgba(15, 52, 96, 0.04);
+    transition: all 0.4s cubic-bezier(0.165, 0.84, 0.44, 1);
+    display: flex;
+    flex-direction: column;
+}
+
+.bento-item:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 20px 40px rgba(15, 52, 96, 0.08);
+    border-color: var(--accent-gold);
+}
+
+/* --- CONFIGURACIÓN DE JERARQUÍA (KPIs) --- */
+.bento-main { grid-column: span 2; grid-row: span 2; } /* Cuadrante de Impacto */
+.bento-stat { grid-column: span 1; }                   /* Métricas Rápidas */
+.bento-wide { grid-column: span 2; }                   /* Listas o Flujos */
+
+/* --- ESTÉTICA DE DATOS (KPI) --- */
+.kpi-value {
+    font-size: 2.5rem;
+    font-weight: 700;
+    color: var(--primary-midnight);
+    letter-spacing: -0.03em;
+}
+
+.kpi-label {
+    font-size: 0.8rem;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    color: var(--accent-gold);
+    font-weight: 600;
+}
+
+/* --- ESTILOS DE LOBBY (MIGRACIÓN DESDE HTML) --- */
+.welcome-container { 
+    padding: 40px; 
+    max-width: 1200px; 
+    margin: 0 auto; 
+}
+
+.grid-recursos { 
+    display: grid; 
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); 
+    gap: 30px; 
+    margin-top: 40px; 
+}
+
+.card-recurso { 
+    background: var(--card-bg); 
+    border-radius: 24px; 
+    padding: 40px; 
+    border: 1px solid rgba(15, 52, 96, 0.05); 
+    display: flex; 
+    flex-direction: column;
+    transition: all 0.4s cubic-bezier(0.165, 0.84, 0.44, 1);
+    box-shadow: 0 10px 30px rgba(15, 52, 96, 0.04);
+}
+
+.card-recurso:hover {
+    transform: translateY(-8px);
+    box-shadow: 0 20px 40px rgba(15, 52, 96, 0.08);
+    border-color: var(--accent-gold);
+}
+
+.card-recurso h3 { 
+    font-size: 1.4rem; 
+    color: var(--primary-midnight);
+    margin-bottom: 15px;
+    font-weight: 700;
+}
+
+/* --- DISEÑO DE BLOQUE KPI (GESTIÓN DE PROCESOS) --- */
+.bento-kpi-card {
+    border-left: 4px solid var(--accent-terracotta); /* Identificador de color para Procesos */
+}
+
+.kpi-trend {
+    font-size: 0.85rem;
+    font-weight: 600;
+    margin-top: 10px;
+}
+
+.trend-up { color: #2e7d32; }
+.trend-down { color: var(--accent-terracotta); }

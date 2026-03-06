@@ -1,0 +1,60 @@
+/*public/src/academia/courses/consolida-360-sesion-a-workbook-css-workbook-local.css
+/* CONEXIÓN CON DREAMS: 
+   Eliminamos Open Sans para heredar Montserrat del Master CSS.
+   Vinculamos colores locales a las variables institucionales.
+*/
+
+.brand-blue { color: var(--primary-color); }
+.brand-orange { color: var(--accent-color); }
+.bg-brand-blue { background-color: var(--primary-color); }
+.bg-brand-orange { background-color: var(--accent-color); }
+.border-brand-blue { border-color: var(--primary-color); }
+.border-brand-orange { border-color: var(--accent-color); }
+
+/* Estilo para la barra de desplazamiento */
+::-webkit-scrollbar {
+    width: 8px;
+}
+::-webkit-scrollbar-track {
+    background: #f1f1f1;
+}
+::-webkit-scrollbar-thumb {
+    background: #00529B;
+    border-radius: 10px;
+}
+::-webkit-scrollbar-thumb:hover {
+    background: #003f7a;
+}
+
+.section-content {
+    display: none;
+    transition: opacity 0.5s ease-in-out;
+    opacity: 0;
+}
+
+.section-content.active {
+    display: block;
+    opacity: 1;
+}
+
+.nav-link.active {
+    background-color: #eef2ff;
+    color: #00529B;
+    font-weight: 700;
+}
+
+.completion-icon {
+    transition: all 0.3s ease;
+}
+
+.semaforo-radio:checked + label {
+    transform: scale(1.05);
+    box-shadow: 0 0 0 3px var(--tw-ring-color);
+}
+
+/* --- NUEVO: Estilos para la exportación a PDF --- */
+@media print {
+  .avoid-break {
+    page-break-inside: avoid;
+  }
+}
