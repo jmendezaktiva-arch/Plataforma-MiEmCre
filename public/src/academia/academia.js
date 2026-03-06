@@ -126,7 +126,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 ${slide.title ? `<h2>${slide.title}</h2>` : ''}
                 ${slide.subtitle ? `<p>${slide.subtitle}</p>` : ''}
                 ${slide.content ? `<div>${slide.content}</div>` : ''}
-                ${slide.image ? `<img src="${DREAMS_CONFIG.resolvePath(slide.image.src, currentSessionData.courseMetadata.sessionId)}" alt="${slide.image.alt || ''}" class="slide-image">` : ''}
+                ${slide.image ? `<img src="${window.DREAMS_CONFIG.resolvePath(slide.image.src, currentSessionData.courseMetadata.sessionId)}" alt="${slide.image.alt || ''}" class="slide-image">` : ''}
             `;
             
             if (slide.workbookLink) {
@@ -526,7 +526,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 // 3. Sincronización de Video (Tutorial de Sesión)
                 if (currentSessionData.multimedia.tutorialUrl) {
                     const youtubeElement = document.getElementById('tutorial-youtube');
-                    const resolvedUrl = DREAMS_CONFIG.resolvePath(currentSessionData.multimedia.tutorialUrl, sessionId);
+                    const resolvedUrl = window.DREAMS_CONFIG.resolvePath(currentSessionData.multimedia.tutorialUrl, sessionId);
 
                     if (resolvedUrl.includes('youtube.com/embed')) {
                         // MODO YOUTUBE: Activamos iframe, ocultamos video nativo
