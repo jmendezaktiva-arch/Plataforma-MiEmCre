@@ -21,37 +21,34 @@
         <button id="btn-open-contact" title="Soporte" style="background: var(--primary-midnight); color: white; width: 42px; height: 42px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 1.1rem; border: 1px solid var(--accent-gold); cursor: pointer; transition: all 0.3s ease; box-shadow: 0 4px 12px rgba(15, 52, 96, 0.15);">
             ✉️
         </button>
-        <button id="btn-logout" title="Cerrar Sesión" style="background: #fdf2f2; color: #dc2626; width: 42px; height: 42px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 1.1rem; border: 1px solid #fee2e2; cursor: pointer; transition: all 0.3s ease; box-shadow: 0 4px 12px rgba(220, 38, 38, 0.08);">
-            🚪
-        </button>
     </div>
 </header>
 
         <main class="welcome-container">
-            <h2>Panel de Crecimiento</h2>
-            <p style="color: #666;">Bienvenido a tu ecosistema tecnológico. Selecciona un área para comenzar.</p>
+            <h2 style="color: var(--primary-midnight); font-weight: 700;">Panel de Crecimiento</h2>
+            <p style="color: #555; max-width: 800px; line-height: 1.6;">Bienvenido a tu centro de mando empresarial. Este ecosistema ha sido diseñado para evolucionar tu crecimiento con el de tu negocio. Selecciona el pilar en el que deseas trabajar hoy:</p>
             
-            <div class="grid-recursos">
-                <section class="card-recurso">
-                    <h3>📚 Academia</h3>
-                    <p style="font-size: 0.9rem; color: #777;">Accede nuestra oferta de programas destinados a proporcionar los conocimientos y habilidades a los líderes de las empresas para hacer sus empresas resilientes ante las exigencias del mercado. Domina herramientas de autogestión y liderazgo integral para transformar tu PyME en una organización responsable y próspera.</p>
+            <div class="grid-recursos" style="margin-top: 30px;">
+                <section class="card-recurso" style="display: flex; flex-direction: column;">
+                    <h3 style="color: var(--primary-midnight);">Academia</h3>
+                    <p style="font-size: 0.9rem; color: #666; line-height: 1.5;">Impulsa tu formación con acceso a materiales de cursos, programas y talleres (tanto gratuitos como de especialización) diseñados para fortalecer tu liderazgo y la resiliencia de tu empresa ante el mercado orientada al crecimiento continuo.</p>
                     <button class="btn-primary" 
                             onclick="window.location.href='academia.html'" 
-                            style="margin-top: 10px; font-size: 0.8rem;">
-                        Acceder
+                            style="margin-top: auto; padding-top: 15px; font-size: 0.85rem; letter-spacing: 0.5px;">
+                        INGRESAR A CURSOS
                     </button>
                 </section>
 
-                <section class="card-recurso">
-                    <h3>⚙️ Apps de Gestión</h3>
-                    <p style="font-size: 0.9rem; color: #777;">Gestiona tu estrategia, sus KPIs asegurando una Operación estable con mediciones en tiempo real con herramientas tecnológicas de vanguardia que les permite a ti y a tu equipo implementar y optimiza sus procesos para reducir la dependencia del líder y estabilizar el crecimiento de tu empresa.</p>
-                    <button class="btn-primary" style="margin-top: 10px; font-size: 0.8rem;">Abrir</button>
+                <section class="card-recurso" style="display: flex; flex-direction: column;">
+                    <h3 style="color: var(--primary-midnight);">Apps de Gestión</h3>
+                    <p style="font-size: 0.9rem; color: #666; line-height: 1.5;">Toma el control total de tu operación seleccionando las apps que te permitan implementar el conocimiento adquirido en los programas de desarrollo. Configura tu ecosistema ERP y CRM integral conforme a tus necesidades integrando las aplicaciones personalizadas que ponemos a tu disposición.</p>
+                    <button class="btn-primary" style="margin-top: auto; padding-top: 15px; font-size: 0.85rem; letter-spacing: 0.5px; opacity: 0.8;">MIS APLICACIONES</button>
                 </section>
 
-                <section class="card-recurso">
-                    <h3>🤖 Consultoría IA</h3>
-                    <p style="font-size: 0.9rem; color: #777;">Consultoría 24/7 impulsada por IA para el análisis de tendencias y toma de decisiones estrategicas y éticas. Minimiza riesgos de reales de tu negocio que ponen en peligro tu patrimonio y el de todas las personas que contribuyen a lograr su propósito trascendente y sus objetivos.</p>
-                    <button class="btn-primary" style="margin-top: 10px; font-size: 0.8rem;">Consultar</button>
+                <section class="card-recurso" style="display: flex; flex-direction: column;">
+                    <h3 style="color: var(--primary-midnight);">Consultoría</h3>
+                    <p style="font-size: 0.9rem; color: #666; line-height: 1.5;">Optimiza tu toma de decisiones estratégicas. Interactúa con nuestro Consultor IA 24/7 o solicita sesiones personalizadas con tu staff de expertos para hacer crecer tu negocio de manera planifica.</p>
+                    <button class="btn-primary" style="margin-top: auto; padding-top: 15px; font-size: 0.85rem; letter-spacing: 0.5px;">SOLICITAR CONSULTORÍA</button>
                 </section>
             </div>
         </main>
@@ -70,7 +67,8 @@
     })();
 </script>
     
-    <script type="module" src="src/app.js"></script>
+   <script type="module" src="src/app.js"></script>
+    <script type="module" src="src/shared/sidebar-component.js"></script>
 
     <div id="contact-overlay" class="purpose-overlay">
         <div class="purpose-bubble" style="max-width: 500px;">

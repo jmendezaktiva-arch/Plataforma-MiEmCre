@@ -68,5 +68,22 @@ service cloud.firestore {
         allow delete: if request.auth != null && getRole() == 'Admin';
       }
     }
+
+    // --- COLECCIÓN DE CATÁLOGO (Academia) ---
+    match /config_ecosistema/{documentId} {
+      // Cualquier usuario autenticado puede leer el catálogo de cursos
+      allow read: if request.auth != null;
+      
+      // Solo el Admin puede modificar el catálogo (precio, títulos, orden)
+      allow write: if request.auth != null && getRole() == 'Admin';
+    }
+
+    // --- COLECCIÓN DE SOPORTE (Formulario de Contacto) ---
+    match /solicitudes_contacto/{solicitudId} {
+      // Los usuarios pueden crear solicitudes; el Admin puede leerlas todas
+      allow create: if request.auth != null;
+      allow read, write: if request.auth != null && getRole() == 'Admin';
+    }
+
   }
 }
