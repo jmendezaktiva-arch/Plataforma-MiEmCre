@@ -47,22 +47,30 @@ export const redirectByUserRole = async (uid) => {
         if (userDoc.exists()) {
             const userData = userDoc.data();
             
-            // Normalización: Aseguramos que el rol siempre empiece con Mayúscula (ej: "cliente" -> "Cliente")
-            const rawRole = userData.rol || '';
-            const role = rawRole.charAt(0).toUpperCase() + rawRole.slice(1).toLowerCase();
-            
-            // Verificación de existencia en el diccionario
-            if (!ROLE_REDIRECTS[role]) {
-                console.error(`Error de Trazabilidad: El rol '${rawRole}' no está mapeado en ROLE_REDIRECTS.`);
-                alert("Acceso Restringido: Tu perfil tiene un rol no reconocido. Contacta al administrador.");
-                return; // Detenemos la ejecución para evitar redirecciones erróneas
+            // TRAZABILIDAD: Verificamos que el campo 'rol' exista antes de procesar
+            if (!userData.rol) {
+                throw new Error(`El documento del usuario existe pero no tiene el campo 'rol' definido.`);
             }
 
-            console.log(`Logueado con éxito. Rol: ${role}. Destino: ${ROLE_REDIRECTS[role]}`);
-            window.location.href = ROLE_REDIRECTS[role];
+            // Normalización Robusta: Maneja espacios en blanco y variaciones de caja
+            const cleanRole = userData.rol.trim();
+            const roleKey = cleanRole.charAt(0).toUpperCase() + cleanRole.slice(1).toLowerCase();
+            
+            const targetPath = ROLE_REDIRECTS[roleKey];
+
+            if (targetPath) {
+                console.log(`🚀 Trazabilidad: Redirigiendo a [${roleKey}] -> ${targetPath}`);
+                window.location.replace(targetPath); // .replace es más seguro para evitar bucles de "atrás"
+            } else {
+                console.warn(`⚠️ Rol no mapeado: '${cleanRole}'. Redirigiendo a vista segura.`);
+                alert("Tu perfil está en proceso de configuración. Contacta a Soporte.");
+                await signOut(auth); // Cerramos sesión por seguridad si el rol es inválido
+            }
         } else {
-            alert("Acceso denegado: Tu usuario no tiene un perfil de rol configurado en Firestore.");
-            console.error("Error: No existe documento en la colección 'usuarios' para el UID:", uid);
+            // Caso: El usuario existe en Auth pero no se creó su perfil en Firestore
+            console.error(`❌ Error Crítico: No se encontró el expediente en /usuarios/${uid}`);
+            alert("Error de Registro: Tu expediente de usuario no ha sido creado. Por favor, regístrate de nuevo o contacta al administrador.");
+            await signOut(auth);
         }
     } catch (error) {
         alert("Error crítico al verificar permisos de usuario.");

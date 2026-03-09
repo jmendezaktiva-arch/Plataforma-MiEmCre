@@ -2362,16 +2362,45 @@ document.addEventListener('DOMContentLoaded', function() {
             }
         }
 
-        // 2. Promedios y Totales
-        const avgFCL = (grandTotalIncomes - grandTotalExpenses) / months;
+        // 2. PROMEDIOS Y LÓGICA MAESTRA (EL FILTRO 4+1)
+        const avgIncomes = grandTotalIncomes / months;
+        const avgExpenses = grandTotalExpenses / months;
+        const avgFCL = avgIncomes - avgExpenses;
         const annualFCL = avgFCL * 12;
+
+        // Separación de Gastos para Punto de Equilibrio
+        const totalVar = categoryTotals['egreso_costoventa'] + categoryTotals['egreso_comisiones'];
+        const totalFixed = categoryTotals['egreso_nomina'] + categoryTotals['egreso_renta'] + categoryTotals['egreso_servicios'] + categoryTotals['egreso_otros'];
         
-        document.getElementById('fcl-promedio').innerText = formatter.format(avgFCL);
-        document.getElementById('fcl-promedio').style.color = (avgFCL < 0) ? '#e74c3c' : '#0F3460';
+        const avgSales = categoryTotals['ingreso_ventas'] / months;
+        const avgVar = totalVar / months;
+        const avgFixed = totalFixed / months;
+
+        // A. Margen de Contribución % = (Ventas - Costos Variables) / Ventas
+        const marginPercent = avgSales > 0 ? ((avgSales - avgVar) / avgSales) : 0;
+        // B. Punto de Equilibrio = Gastos Fijos / Margen %
+        const breakEven = marginPercent > 0 ? (avgFixed / marginPercent) : 0;
+        
+        // Actualización Segura del DOM (Blindaje contra null)
+        const displayFCL = document.getElementById('fcl-promedio');
+        if (displayFCL) {
+            displayFCL.innerText = formatter.format(avgFCL);
+            displayFCL.style.color = (avgFCL < 0) ? '#e74c3c' : '#0F3460';
+        }
+
         Object.keys(categoryTotals).forEach(c => {
             const el = document.getElementById(`${c}-promedio`);
             if (el) el.innerText = formatter.format(categoryTotals[c] / months);
         });
+
+        // PERSISTENCIA DE TRAZABILIDAD (Filtro 4+1)
+        if (window.WorkbookCore) {
+            WorkbookCore.saveProgress('ej4_margen_contribucion', (marginPercent * 100).toFixed(1));
+            WorkbookCore.saveProgress('ej4_punto_equilibrio', breakEven.toFixed(2));
+            WorkbookCore.saveProgress('avg-monthly-fcl-2-2', avgFCL.toFixed(2));
+            WorkbookCore.saveProgress('annual-fcl-2-2', annualFCL.toFixed(2));
+        }
+
 
         // 3. ACTUALIZACIÓN DEL DIAGNÓSTICO (REVELACIÓN QUIRÚRGICA)
         const diagContainer = document.getElementById('fcl-results-container-2-2');
