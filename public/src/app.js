@@ -38,9 +38,9 @@ document.addEventListener('DOMContentLoaded', () => {
      * MOTOR DE IDENTIDAD UNIFICADO: Escanea todo el DOM en busca de activos 
      * marcados para sincronización con la nube (data-asset).
      */
-    const initGlobalAssets = () => {
-        // TRACEABILIDAD: Usamos querySelectorAll para capturar múltiples logos
-        // presentes en Login, Dashboard y Academia simultáneamente.
+    // TRACEABILIDAD: Exponemos el motor a window para que componentes dinámicos (Sidebar) 
+    // puedan re-hidratar sus activos tras ser inyectados.
+    window.initGlobalAssets = () => {
         const assets = document.querySelectorAll('[data-asset]');
         
         assets.forEach(el => {

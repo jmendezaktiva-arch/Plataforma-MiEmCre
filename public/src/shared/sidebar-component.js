@@ -9,9 +9,16 @@ const SidebarPrestige = {
         try {
             this.injectStyles();
             this.render();
+            
+            // TRACEABILIDAD: Invocamos al motor de identidad global justo después de inyectar el HTML.
+            // Esto garantiza que el logo con [data-asset] sea resuelto por Firebase Storage.
+            if (window.initGlobalAssets) {
+                console.log("🎨 Sidebar: Hidratando activos de marca...");
+                window.initGlobalAssets();
+            }
+
             this.setupEventListeners();
         } catch (e) {
-            // Log silencioso solo en caso de error crítico para no romper la trazabilidad
             console.error("🚨 DREAMS LOG: Error en Sidebar:", e);
         }
     },
@@ -30,8 +37,12 @@ const SidebarPrestige = {
     render() {
         const sidebarHTML = `
             <nav id="dreams-sidebar" class="sidebar-prestige sidebar-hidden">
+                <div class="sidebar-brand-peek" title="Mi Empresa Crece">
+                    <img data-asset="logo.png" alt="Marca">
+                </div>
+
                 <div class="sidebar-nav">
-                    <a href="javascript:history.back()" class="sidebar-link" title="Regresar">
+                    <a href="javascript:history.back()" class="sidebar-link" title="Regresar" id="link-back-main">
                         <span class="label">← Regresar</span>
                     </a>
                     

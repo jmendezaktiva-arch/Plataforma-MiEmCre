@@ -89,3 +89,44 @@
     background: #ef4444; /* Rojo crítico para logout */
     border-color: #ef4444;
 }
+
+/* --- AJUSTE QUIRÚRGICO: PEEK LOGO (MEDIO CÍRCULO) --- */
+
+.sidebar-brand-peek {
+    position: absolute;
+    right: -30px; /* Desborda la mitad de su ancho (60px) */
+    top: 55px;    /* Alineación visual con el botón 'Regresar' */
+    width: 60px;
+    height: 60px;
+    background: var(--primary-midnight, #0F3460);
+    border: 1.5px solid var(--accent-gold, #957C3D);
+    border-radius: 50%;
+    display: flex;
+    justify-content: flex-end; /* Empuja el logo hacia la parte visible (derecha) */
+    align-items: center;
+    padding-right: 8px;
+    cursor: pointer;
+    box-shadow: 5px 0 15px rgba(0, 0, 0, 0.2);
+    z-index: -1; /* Se posiciona detrás del sidebar para que la unión sea limpia */
+    transition: all 0.3s ease;
+}
+
+/* Ajuste del logo dentro del medio círculo */
+.sidebar-brand-peek img {
+    width: 25px;
+    height: 25px;
+    object-fit: contain;
+    filter: brightness(1.2); /* Realce sutil para visibilidad */
+}
+
+/* Efecto Hover: El círculo 'late' ligeramente al pasar el mouse */
+.sidebar-prestige.sidebar-hidden:hover .sidebar-brand-peek {
+    right: -35px;
+    box-shadow: 8px 0 20px rgba(149, 124, 61, 0.3);
+}
+
+/* Ocultar la pestaña cuando el sidebar está totalmente abierto para limpiar la interfaz */
+.sidebar-prestige:not(.sidebar-hidden) .sidebar-brand-peek {
+    opacity: 0;
+    pointer-events: none;
+}
