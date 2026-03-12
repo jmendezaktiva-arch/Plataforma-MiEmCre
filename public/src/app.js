@@ -1,7 +1,37 @@
 // public/src/app.js
 
 import { login, logout, redirectByUserRole } from './auth/auth.js';
-import { db, auth, doc, setDoc, getDoc } from './shared/firebase-config.js';
+import { db, auth, doc, setDoc, getDoc, checkAccess } from './shared/firebase-config.js';
+
+/**
+ * CONTROLADOR QUIRÚRGICO DE BOTONES INTELIGENTES
+ * Gestiona la mutación de los botones del Dashboard según el acceso real.
+ */
+const syncDashboardAccess = async () => {
+    const btnApps = document.getElementById('btn-apps-access');
+    
+    if (btnApps) {
+        // Consultamos al motor de resiliencia
+        const hasAccess = await checkAccess('apps', 'bloque-general');
+        
+        if (hasAccess) {
+            // ESTADO: DESBLOQUEADO (Prestige Gold)
+            btnApps.innerText = "MIS APLICACIONES";
+            btnApps.style.opacity = "1";
+            btnApps.onclick = () => window.location.href = 'apps.html';
+        } else {
+            // ESTADO: BLOQUEADO (Estrategia de Conversión)
+            btnApps.innerText = "Para mayor información agenda tu cita";
+            btnApps.style.background = "var(--primary-midnight)";
+            btnApps.style.border = "1px solid var(--accent-gold)";
+            btnApps.onclick = (e) => {
+                e.preventDefault();
+                // Usamos el sistema de mensajes que ya tienes para abrir el contacto
+                window.postMessage({ type: 'OPEN_CONTACT_MODAL' }, '*');
+            };
+        }
+    }
+};
 import { onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
 
 // --- PERSISTENCIA DE SESIÓN (CENTINELA GLOBAL) ---
@@ -14,6 +44,11 @@ onAuthStateChanged(auth, (user) => {
         // lo enviamos directo a su área de trabajo según su rol.
         if (window.location.pathname.endsWith('index.html') || window.location.pathname === '/') {
             redirectByUserRole(user.uid);
+        }
+        
+        // Disparo quirúrgico de sincronización de botones al detectar sesión
+        if (window.location.pathname.includes('dashboard.html')) {
+            syncDashboardAccess();
         }
     } else {
         // SEGURIDAD: Si no hay sesión y el usuario intenta entrar a una página privada, 

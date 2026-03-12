@@ -4,8 +4,30 @@
     "courseName": "Consolida 360°",
     "sessionId": "sesion-b",
     "sessionTitle": "Impulsa tu PyME: Ecosistema Digital de Ventas",
-    "version": "1.1",
-    "lastUpdated": "2026-02-27"
+    "version": "1.2",
+    "lastUpdated": "2026-03-11"
+  },
+  "guideLabels": {
+    "video": {
+      "title": "Visión del Ecosistema",
+      "desc": "Cápsula estratégica sobre la ruta digital de ventas."
+    },
+    "pres": {
+      "title": "Mapa de Ventas Digitales",
+      "desc": "Estructura del ecosistema y puntos de captura."
+    },
+    "workbook": {
+      "title": "Plan de Configuración Digital",
+      "desc": "Herramienta para implementar tu flujo consultivo."
+    },
+    "audio": {
+      "title": "Inmersión: Ecosistema",
+      "desc": "Profundiza en la estrategia de canales mientras operas."
+    },
+    "support": {
+      "title": "Soporte Estratégico",
+      "desc": "Consultoría directa para tu implementación digital."
+    }
   },
   "multimedia": {
     "tutorialUrl": "tmVeeIbp7xo", 

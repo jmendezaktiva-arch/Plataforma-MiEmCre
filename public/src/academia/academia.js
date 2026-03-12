@@ -1,51 +1,110 @@
 //public/src/academia/academia.js
-import { auth, db, collection, getDocs, query, orderBy, doc, setDoc } from '../shared/firebase-config.js';
+import { auth, db, collection, getDocs, query, orderBy, doc, getDoc, setDoc, checkAccess } from '../shared/firebase-config.js';
 
 // --- ESTADO GLOBAL DE SESIÓN ---
 let autosaveTimer; 
-let COURSES_CONFIG = []; // Se poblará dinámicamente desde Firestore (Fase 3)
+let COURSES_CONFIG = []; 
 
 document.addEventListener('DOMContentLoaded', () => {
-    // 1. SELECTORES DE NAVEGACIÓN
+    // 1. SELECTORES DE NAVEGACIÓN (JERARQUÍA SMART STAGE)
     const viewLobby = document.getElementById('view-lobby');
-    const viewPresentation = document.getElementById('view-presentation'); // El contenedor de Reveal.js
+    const viewLearningStage = document.getElementById('view-learning-stage');
+    const viewPresentation = document.getElementById('view-presentation'); 
     const viewWorkbook = document.getElementById('view-workbook');
     
-    // 1. MOTOR DE RENDERIZADO DEL LOBBY (DINÁMICO)
-    const renderLobby = () => {
+    // 1. MOTOR DE RENDERIZADO DEL LOBBY (FILTRADO POR CATEGORÍA)
+    const renderLobby = (filterCategory = null) => {
         const lobbyContainer = document.getElementById('course-lobby');
+        const lobbyTitle = document.getElementById('lobby-category-title');
         if (!lobbyContainer) return;
 
-        lobbyContainer.innerHTML = COURSES_CONFIG.map(course => `
+        // Actualización dinámica del título de la sección para feedback Prestige
+        if (lobbyTitle && filterCategory) {
+            lobbyTitle.innerText = `Programas: ${filterCategory}`;
+        }
+
+        // Filtramos la data de Firestore siguiendo la Regla de Negocio
+        const filteredCourses = COURSES_CONFIG.filter(course => {
+            // Si no hay filtro, mostramos todo el catálogo
+            if (!filterCategory) return true;
+            
+            // TRACEABILIDAD: Identificamos si el curso pertenece al ecosistema "Consolida 360"
+            // Corrección: Usamos .title en lugar de .id, ya que los IDs de Firebase son UIDs generados (hashes).
+            const isConsolida = course.title && course.title.toLowerCase().includes('consolida');
+
+            // REGLA DE NEGOCIO: Los cursos Consolida 360 se integran exclusivamente en "Generales"
+            if (filterCategory === 'Generales' && isConsolida) return true;
+            
+            // Para el resto de categorías, buscamos coincidencia y excluimos Consolida para evitar duplicidad
+            return course.category && course.category.includes(filterCategory) && !isConsolida;
+        });
+
+        // Alerta visual si la categoría aún no tiene programas asignados
+        if (filteredCourses.length === 0) {
+            lobbyContainer.innerHTML = `
+                <div style="grid-column: 1/-1; text-align: center; padding: 60px 20px; background: rgba(0,0,0,0.02); border-radius: 20px; border: 1px dashed #ddd;">
+                    <p style="color: #999; font-weight: 400; font-size: 1rem;">Estamos preparando nuevos programas para la categoría <strong>${filterCategory}</strong>. <br>Vuelve pronto para descubrir nuevas rutas de crecimiento.</p>
+                </div>`;
+            return;
+        }
+
+        lobbyContainer.innerHTML = filteredCourses.map(course => {
+            // Trazabilidad de Acceso: Si el curso es de pago y no se tiene acceso, mostramos el precio
+            const priceDisplay = (!course.esGratis && !course.hasAccess) 
+                ? `<div style="font-size: 0.85rem; font-weight: 800; color: var(--accent-gold); margin-bottom: 12px;">INVERSIÓN: $${course.price?.toLocaleString()} MXN</div>` 
+                : '';
+
+            return `
             <article class="card" style="${course.isComingSoon ? 'opacity: 0.6; border: 1px dashed #ccc;' : `border-top: 4px solid ${course.accentColor || 'var(--accent-gold)'};`}; display: flex; flex-direction: column; height: 100%;">
                 <header class="card-header" style="margin-bottom: 15px;">
                     <span class="card-category" style="color: ${course.accentColor || '#999'}; font-size: 0.65rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.05em;">
-                        ${course.category}
+                        ${course.category} | ${course.modality || 'ONLINE'}
                     </span>
                     <h3 style="margin: 5px 0 0; font-size: 1.15rem; ${course.isComingSoon ? 'color: #999;' : ''}">${course.title}</h3>
                 </header>
 
                 <div class="card-body" style="flex-grow: 1;">
-                    <p style="font-size: 0.85rem; line-height: 1.5; color: #4A5568; margin-bottom: 20px;">${course.description}</p>
+                    <p style="font-size: 0.85rem; line-height: 1.5; color: #4A5568; margin-bottom: 15px;">${course.description}</p>
+                    ${priceDisplay}
                 </div>
 
                 <footer class="btn-group" style="display: flex; gap: 10px; align-items: center; margin-top: auto;">
                     ${!course.isComingSoon ? `
-                        <button class="btn-primary" data-action="purpose" data-id="${course.id}" style="margin-top: 0; flex: 1; font-size: 0.65rem; padding: 8px 5px; white-space: nowrap; text-align: center; background: none; color: var(--primary-midnight); border: 1.5px solid var(--primary-midnight);">
-                            PROPOSITO
+                        <button class="btn-primary" data-action="purpose" data-id="${course.id}" style="margin-top: 0; flex: 1; font-size: 0.65rem; padding: 8px 5px; background: none; color: var(--primary-midnight); border: 1.5px solid var(--primary-midnight);">
+                            PROPÓSITO
                         </button>
                     ` : ''}
                     <button class="btn-primary" 
-                        ${course.isComingSoon ? 'disabled style="background: #e2e8f0; color: #94a3b8; cursor: not-allowed; box-shadow: none;"' : ''}
-                        data-action="open" 
-                        data-id="${course.id}"
+                        ${course.isComingSoon ? 'disabled style="background: #e2e8f0; color: #94a3b8; cursor: not-allowed;"' : ''} 
+                        data-action="${course.hasAccess || course.esGratis ? 'open' : 'buy'}" 
+                        data-id="${course.id}" 
                         style="flex: 1.5; font-size: 0.7rem; padding: 12px 8px;">
-                        ${course.isComingSoon ? 'Próximamente' : course.buttonText}
+                        ${course.isComingSoon ? 'Próximamente' : (course.hasAccess || course.esGratis ? (course.buttonText || 'INGRESAR') : 'COMPRAR')}
                     </button>
                 </footer>
-            </article>
-        `).join('');
+            </article>`;
+        }).join('');
     };
+
+    // 2. ESCUCHADORES DE INTERACCIÓN PARA PILARES
+    document.addEventListener('click', (e) => {
+        // A. Al hacer clic en una tarjeta de categoría
+        const catBtn = e.target.closest('.card-category-btn');
+        if (catBtn) {
+            const selectedCategory = catBtn.dataset.category;
+            document.getElementById('view-categories').style.display = 'none';
+            document.getElementById('view-lobby').style.display = 'block';
+            renderLobby(selectedCategory);
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+
+        // B. Al hacer clic en el botón de "Volver a Pilares"
+        if (e.target.closest('#btn-back-to-categories')) {
+            document.getElementById('view-lobby').style.display = 'none';
+            document.getElementById('view-categories').style.display = 'block';
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+    });
 
     // 0. MOTOR DE CARGA DINÁMICA (FASE 3: DINAMIZACIÓN)
     /**
@@ -66,17 +125,28 @@ document.addEventListener('DOMContentLoaded', () => {
             const q = query(collection(db, "config_ecosistema"), orderBy("orden", "asc"));
             const querySnapshot = await getDocs(q);
             
-            // Reiniciamos el registro maestro con los datos frescos de la nube
-            COURSES_CONFIG = [];
+            // Reiniciamos el registro maestro y procesamos accesos quirúrgicamente
+            const rawCourses = [];
             querySnapshot.forEach((doc) => {
-                COURSES_CONFIG.push({ 
-                    id: doc.id, 
-                    ...doc.data() 
-                });
+                rawCourses.push({ id: doc.id, ...doc.data() });
             });
 
-            console.log(`✅ Dreams Cloud: ${COURSES_CONFIG.length} cursos sincronizados.`);
-            renderLobby(); 
+            // TRACEABILIDAD: Sincronización real con campos de Firebase (esGratis)
+            COURSES_CONFIG = await Promise.all(rawCourses.map(async (course) => {
+                const hasAccess = await checkAccess('cursos', course.id);
+                
+                // Mapeo corregido: 'esGratis' es el campo oficial en el Admin
+                const esGratis = course.esGratis === true; 
+                
+                return { 
+                    ...course, 
+                    hasAccess, 
+                    esGratis 
+                };
+            }));
+
+            console.log(`✅ Dreams Cloud: ${COURSES_CONFIG.length} cursos validados y sincronizados.`);
+            renderLobby();
 
             // --- REFUERZO DE JERARQUÍA (SEGURIDAD DE FLUJO) ---
             // TRACEABILIDAD: Para asegurar que el usuario siempre pase por el Lobby y el Selector 
@@ -192,8 +262,45 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     };
 
-    // Listeners del Dashboard de Control (Navegación Online)
-    document.getElementById('btn-toggle-video')?.addEventListener('click', () => toggleBubble('video-tutorial'));
+    // Listeners del Dashboard de Control (Smart Stage: Slides vs Video)
+    document.getElementById('btn-toggle-presentation')?.addEventListener('click', () => {
+        // 1. Normalización de Vistas
+        if (viewWorkbook) viewWorkbook.style.display = 'none';
+        if (viewPresentation) viewPresentation.style.display = 'block';
+
+        // 2. Conmutación Exclusiva: Mostramos Slides, Apagamos Video
+        document.getElementById('stage-reveal').style.display = 'block';
+        toggleBubble('video-tutorial', false);
+        
+        // 3. Sincronización de Motor Visual
+        if (window.Reveal) {
+            setTimeout(() => Reveal.layout(), 50);
+        }
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+    });
+
+    document.getElementById('btn-toggle-video')?.addEventListener('click', () => {
+        // 1. Normalización de Vistas
+        if (viewWorkbook) viewWorkbook.style.display = 'none';
+        if (viewPresentation) viewPresentation.style.display = 'block';
+
+        // 2. Conmutación Exclusiva: Apagamos Slides, Activamos Video Stage
+        document.getElementById('stage-reveal').style.display = 'none';
+        toggleBubble('video-tutorial', true);
+        
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+    });
+
+    // Receptor del evento de cierre desde el botón interno del Stage de Video
+    window.addEventListener('closeVideoStage', () => {
+        document.getElementById('btn-toggle-presentation').click();
+    });
+
+    // RECEPTOR QUIRÚRGICO: Conexión del botón "Salir al Curso" del Workbook
+    window.addEventListener('returnToSessionSelector', () => {
+        console.log("🔄 Dreams Nav: Solicitud de retorno al selector recibida.");
+        returnToLobby(); // Reutilizamos la lógica maestra de retorno
+    });
     document.getElementById('btn-toggle-podcast')?.addEventListener('click', () => toggleBubble('podcast-player'));
     document.getElementById('btn-toggle-workbook')?.addEventListener('click', () => {
         // En Online, el workbook es una burbuja. En Live, es la vista principal.
@@ -244,12 +351,25 @@ document.addEventListener('DOMContentLoaded', () => {
             const { action, id } = btn.dataset;
 
             if (action === 'open') {
-                // Mantenemos el ID original (Case Sensitive) para asegurar la trazabilidad con Firestore
                 startModule(id);
             }
             else if (action === 'purpose') {
-                // Ahora llamamos a la función dinámica en lugar de buscar un ID estático
                 showPurpose(id);
+            }
+            else if (action === 'buy') {
+                // ESTRATEGIA DE CONVERSIÓN: Disparamos el carrito con el ID del curso
+                console.log(`🛒 Iniciando intención de compra para: ${id}`);
+                
+                // Buscamos el curso para pasarle el título y precio al carrito si es necesario
+                const course = COURSES_CONFIG.find(c => c.id === id);
+                
+                // Disparo de evento global para que la burbuja del carrito reaccione
+                window.dispatchEvent(new CustomEvent('OPEN_SHOPPING_CART', { 
+                    detail: { 
+                        courseId: id,
+                        courseTitle: course?.title || 'Programa de Crecimiento'
+                    } 
+                }));
             }
         });
     }
@@ -276,14 +396,34 @@ document.addEventListener('DOMContentLoaded', () => {
             statusMessage.innerText = "⏳ Sincronizando entorno modular...";
             iframe.src = workbookPath;
 
-            // --- INICIO DE MODIFICACIÓN QUIRÚRGICA ---
-            // Escuchamos cuando el contenido interno del iframe termine de cargar
-            iframe.onload = () => {
+            // --- DNA PRESTIGE: Sincronización de Identidad y Entorno ---
+            iframe.onload = async () => {
                 statusMessage.innerText = "✅ Entorno sincronizado.";
-                // Enviamos la señal al workbook de que el "padre" (Academia) está listo
+                
+                // 1. Handshake de Sincronización de Datos (Firestore del Workbook)
                 iframe.contentWindow.postMessage({ type: 'SYNC_REQUEST' }, '*');
+
+                // 2. INYECCIÓN DE PERFIL (Automatización del Líder)
+                if (auth.currentUser) {
+                    try {
+                        const userSnap = await getDoc(doc(db, "usuarios", auth.currentUser.uid));
+                        if (userSnap.exists()) {
+                            const userData = userSnap.data();
+                            console.log("👤 Dreams Sync: Inyectando perfil oficial...");
+                            
+                            iframe.contentWindow.postMessage({ 
+                                type: 'injectProfile', 
+                                profile: {
+                                    nombre: userData.nombre || '',
+                                    empresa: userData.empresa || ''
+                                }
+                            }, '*');
+                        }
+                    } catch (error) {
+                        console.error("🚨 Dreams Error: Fallo al recuperar perfil para el cuaderno:", error);
+                    }
+                }
             };
-            // --- FIN DE MODIFICACIÓN QUIRÚRGICA ---
         }
     });
 
@@ -296,28 +436,40 @@ document.addEventListener('DOMContentLoaded', () => {
     const btnNavBack = document.querySelector('.btn-nav-back'); // Botón del Header
     
     const returnToLobby = (e) => {
-        // Fase 4: Cancelamos cualquier guardado pendiente antes de cambiar de vista
         if (autosaveTimer) clearTimeout(autosaveTimer);
-
         const sessionSelector = document.getElementById('view-session-selector');
 
-        // Solo intervenimos si el Lobby está oculto (estamos dentro de un curso o sesión)
         if (viewLobby && viewLobby.style.display === 'none') {
             if (e) e.preventDefault(); 
 
-            // CASO A: Si estamos viendo contenido (Presentación o Cuaderno), volvemos al Selector de Sesiones
-            if (viewPresentation.style.display === 'block' || viewWorkbook.style.display === 'block') {
+            // CASO A: Salida desde el Smart Learning Stage o Guía Intro
+            const introGuide = document.getElementById('view-intro-guide');
+            const isAtStage = viewLearningStage && viewLearningStage.style.display === 'block';
+            const isAtGuide = introGuide && introGuide.style.display === 'block';
+
+            if (isAtStage || isAtGuide) {
+                // 1. Limpieza de procesos y medios activos
                 ['podcast-player', 'video-tutorial'].forEach(id => toggleBubble(id, false));
                 
+                // 2. RESTAURACIÓN CRÍTICA DE SCROLL (Libera el bloqueo Cinema)
+                document.body.classList.remove('reveal-viewport', 'cinema-mode');
+                document.documentElement.style.overflow = 'auto'; // Limpia el HTML
+                document.body.style.overflow = 'auto';           // Limpia el Body
+                document.body.style.height = 'auto';             // Restaura altura natural
+                
+                // 3. Desmontaje Atómico de capas de curso
+                if (viewLearningStage) viewLearningStage.style.display = 'none';
+                if (introGuide) introGuide.style.display = 'none';
                 viewPresentation.style.display = 'none';
                 viewWorkbook.style.display = 'none';
-                if (sessionSelector) sessionSelector.style.display = 'block';
-
-                // Restauramos la interfaz (quitamos modo cinema) para ver el selector correctamente
-                document.body.classList.remove('reveal-viewport', 'cinema-mode');
-                document.body.removeAttribute('style');
-            } 
-            // CASO B: Si ya estamos en el Selector de Sesiones, volvemos al Catálogo (Lobby)
+                
+                // 4. Regreso al Selector de Sesiones y Reset de posición
+                if (sessionSelector) {
+                    sessionSelector.style.display = 'block';
+                    setTimeout(() => window.scrollTo({ top: 0, behavior: 'instant' }), 10);
+                }
+            }
+            // CASO B: Salida desde el Selector de Sesiones hacia el Lobby
             else if (sessionSelector && sessionSelector.style.display === 'block') {
                 sessionSelector.style.display = 'none';
                 viewLobby.style.display = 'block';
@@ -482,7 +634,57 @@ document.addEventListener('DOMContentLoaded', () => {
             
             currentSessionData = jsonData;
 
-            // --- RECONEXIÓN QUIRÚRGICA DE MULTIMEDIA (SESIÓN A/B/C) ---
+            // --- ORQUESTACIÓN CLOUD: FILTRADO DE MATERIALES, ZOOM Y PROPÓSITO ---
+            const courseConfig = COURSES_CONFIG.find(c => c.id === (e.detail.courseId));
+            const labels = currentSessionData.guideLabels || {};
+            
+            // Función auxiliar para sincronizar visibilidad en Guía Intro Y Barra Lateral simultáneamente
+            const syncMaterialUI = (idIntro, idSidebar, isVisible) => {
+                const elIntro = document.getElementById(idIntro);
+                const elSidebar = document.getElementById(idSidebar);
+                if (elIntro) elIntro.closest('.card-guide').style.display = isVisible ? 'flex' : 'none';
+                if (elSidebar) elSidebar.style.display = isVisible ? 'flex' : 'none';
+            };
+
+            if (courseConfig) {
+                // 1. Sincronización de Materiales (Intro + Sidebar)
+                syncMaterialUI('guide-title-video', 'btn-toggle-video', courseConfig.hasVideo);
+                syncMaterialUI('guide-title-pres', 'btn-toggle-presentation', courseConfig.hasPresentation);
+                syncMaterialUI('guide-title-workbook', 'btn-toggle-workbook', courseConfig.hasWorkbook);
+                syncMaterialUI('guide-title-audio', 'btn-toggle-podcast', courseConfig.hasPodcast);
+
+                // 2. Hidratación de Etiquetas (Guía)
+                const setLabel = (id, text) => { if(document.getElementById(id)) document.getElementById(id).innerText = text || ''; };
+                setLabel('guide-title-video', labels.video?.title);
+                setLabel('guide-desc-video', labels.video?.desc);
+                setLabel('guide-title-pres', labels.pres?.title);
+                setLabel('guide-desc-pres', labels.pres?.desc);
+                setLabel('guide-title-workbook', labels.workbook?.title);
+                setLabel('guide-desc-workbook', labels.workbook?.desc);
+                setLabel('guide-title-audio', labels.audio?.title);
+                setLabel('guide-desc-audio', labels.audio?.desc);
+
+                // 3. Inteligencia Zoom (Barra Lateral)
+                const btnZoom = document.getElementById('btn-toggle-zoom');
+                if (btnZoom) {
+                    if (courseConfig.modality === 'LIVE' && courseConfig.zoomLink) {
+                        btnZoom.style.display = 'flex';
+                        btnZoom.onclick = () => window.open(courseConfig.zoomLink, '_blank');
+                    } else { btnZoom.style.display = 'none'; }
+                }
+
+                // 4. Propósito Dinámico
+                window.showPurpose = (id) => {
+                    const overlay = document.getElementById('purpose-overlay-universal');
+                    if (overlay && courseConfig.id === id) {
+                        document.getElementById('universal-purpose-title').innerText = courseConfig.purposeTitle || "Visión Estratégica";
+                        document.getElementById('universal-purpose-content').innerHTML = courseConfig.purposeDesc || courseConfig.description;
+                        overlay.classList.add('active');
+                    }
+                };
+            }
+
+            // --- RECONEXIÓN MULTIMEDIA ---
             if (currentSessionData.multimedia) {
                 const podcastPlayer = document.getElementById('podcast-player');
                 const selector = document.getElementById('podcast-selector');
@@ -490,28 +692,17 @@ document.addEventListener('DOMContentLoaded', () => {
                 const audioElement = document.getElementById('audio-element');
                 const videoElement = document.getElementById('tutorial-video');
 
-                // 1. Visibilidad y Confort (Volumen)
                 if (podcastPlayer) podcastPlayer.style.display = 'block';
                 if (audioElement) audioElement.volume = 0.3;
 
-                // 2. Sincronización de Playlist (Podcast)
                 if (currentSessionData.multimedia.playlist && selector) {
                     selector.innerHTML = '';
                     currentSessionData.multimedia.playlist.forEach(track => {
                         const option = document.createElement('option');
-                        // Usamos el motor central para obtener la URL de Firebase
-                        // Validación preventiva para evitar colapso del sistema
-                        if (window.DREAMS_CONFIG && typeof window.DREAMS_CONFIG.resolvePath === 'function') {
-                            option.value = window.DREAMS_CONFIG.resolvePath(track.url, sessionId);
-                        } else {
-                            console.error("🚨 Error Crítico: Motor de rutas no inicializado.");
-                            option.value = track.url; // Fallback al nombre del archivo
-                        }
+                        option.value = window.DREAMS_CONFIG.resolvePath(track.url, sessionId);
                         option.textContent = track.title;
                         selector.appendChild(option);
                     });
-
-                    // Carga inicial y Restauración de interactividad (onchange)
                     if (currentSessionData.multimedia.playlist.length > 0) {
                         podcastSource.src = selector.value;
                         audioElement.load();
@@ -519,66 +710,93 @@ document.addEventListener('DOMContentLoaded', () => {
                     selector.onchange = () => {
                         podcastSource.src = selector.value;
                         audioElement.load();
-                        audioElement.play().catch(() => console.log("Interacción requerida para audio"));
+                        audioElement.play().catch(() => console.log("Interacción requerida"));
                     };
                 }
 
-                // 3. Sincronización de Video (Tutorial de Sesión)
                 if (currentSessionData.multimedia.tutorialUrl) {
                     const youtubeElement = document.getElementById('tutorial-youtube');
                     const resolvedUrl = window.DREAMS_CONFIG.resolvePath(currentSessionData.multimedia.tutorialUrl, sessionId);
-
                     if (resolvedUrl.includes('youtube.com/embed')) {
-                        // MODO YOUTUBE: Activamos iframe, ocultamos video nativo
-                        if (youtubeElement) {
-                            youtubeElement.src = resolvedUrl;
-                            youtubeElement.style.display = 'block';
-                        }
-                        if (videoElement) {
-                            videoElement.style.display = 'none';
-                            videoElement.pause(); // Seguridad: Evita audio duplicado
-                        }
+                        if (youtubeElement) { youtubeElement.src = resolvedUrl; youtubeElement.style.display = 'block'; }
+                        if (videoElement) { videoElement.style.display = 'none'; videoElement.pause(); }
                     } else {
-                        // MODO FIREBASE/MP4: Activamos video nativo, ocultamos iframe
-                        if (videoElement) {
-                            videoElement.src = resolvedUrl;
-                            videoElement.load();
-                            videoElement.style.display = 'block';
-                        }
-                        if (youtubeElement) {
-                            youtubeElement.style.display = 'none';
-                            youtubeElement.src = ''; // Limpiamos para detener carga de YT
-                        }
+                        if (videoElement) { videoElement.src = resolvedUrl; videoElement.load(); videoElement.style.display = 'block'; }
+                        if (youtubeElement) { youtubeElement.style.display = 'none'; youtubeElement.src = ''; }
                     }
                 }
             }
 
-            // 4. LIMPIEZA Y ENRUTAMIENTO 
-            // Ocultamos tanto el Lobby como el Selector de Sesiones para evitar el solapamiento visual
-            if (viewLobby) viewLobby.style.display = 'none';
+            // --- FLUJO DE ENTRADA INTELIGENTE (SMART START) ---
             const sessionSelector = document.getElementById('view-session-selector');
-            if (sessionSelector) sessionSelector.style.display = 'none';
-            
-            // ACTIVACIÓN DE MODO CINEMA (Quirúrgico): Oculta Navbar y expande contenedores
-            document.body.classList.add('cinema-mode');
+            const introGuide = document.getElementById('view-intro-guide');
+            const btnContinue = document.getElementById('btn-guide-continue');
 
-            if (modality === 'ONLINE') {
-                viewPresentation.style.display = 'block';
-                renderSlides(currentSessionData);
-                
-                // Forzamos a Reveal a recalcular dimensiones después de que el contenedor es visible
-                setTimeout(() => {
-                    if (window.Reveal) {
-                        Reveal.layout();
+            if (viewLobby) viewLobby.style.display = 'none';
+            if (sessionSelector) sessionSelector.style.display = 'none';
+            if (introGuide) {
+                introGuide.style.display = 'block';
+                window.scrollTo({ top: 0, behavior: 'smooth' });
+            }
+
+            if (btnContinue) {
+                btnContinue.onclick = () => {
+                    introGuide.style.display = 'none';
+                    document.body.classList.add('cinema-mode');
+                    if (viewLearningStage) viewLearningStage.style.display = 'block';
+
+                    // Lógica de arranque basada en lo que esté activo en el Admin
+                    if (courseConfig.hasPresentation) {
+                        viewPresentation.style.display = 'block';
+                        viewWorkbook.style.display = 'none';
+                        renderSlides(currentSessionData);
+                        setTimeout(() => { if (window.Reveal) Reveal.layout(); }, 100);
+                    } else if (courseConfig.hasWorkbook) {
+                        viewPresentation.style.display = 'none';
+                        window.dispatchEvent(new CustomEvent('openWorkbook'));
+                    } else if (courseConfig.hasVideo) {
+                        document.getElementById('btn-toggle-video').click();
                     }
-                }, 100); 
-            } else {
-                window.dispatchEvent(new CustomEvent('openWorkbook'));
+                };
             }
         } catch (error) {
-            console.error("Falla de conexión de sesión:", error);
-            alert("Aviso: El contenido de esta sesión aún no está disponible en el servidor.");
+            console.error("🚨 Error Crítico de Carga:", error);
+            alert(`Error de Configuración: No se encontró el archivo en la ruta:\n${jsonPath}\n\nVerifica que la carpeta exista en tu proyecto.`);
         }
-    });
+    }); // <--- Cierre de loadSessionContent
 
+}); // <--- Cierre de DOMContentLoaded
+
+/**
+ * RECEPTOR QUIRÚRGICO DEL CARRITO
+ * Escucha el evento de compra y prepara la pasarela.
+ */
+window.addEventListener('OPEN_SHOPPING_CART', (e) => {
+    const { courseId, courseTitle } = e.detail;
+    const overlay = document.getElementById('cart-overlay');
+    const titleEl = document.getElementById('cart-course-title');
+    const btnPay = document.getElementById('btn-proceed-to-payment');
+
+    if (overlay && titleEl) {
+        titleEl.innerText = courseTitle;
+        overlay.style.display = 'flex';
+        overlay.classList.add('active');
+
+        btnPay.onclick = () => {
+            console.log(`🚀 Redirigiendo a pasarela para el curso: ${courseId}`);
+            ejecutarProcesoDePago(courseId);
+        };
+    }
+});
+
+function ejecutarProcesoDePago(courseId) {
+    alert(`Iniciando checkout para el ID: ${courseId}. (Aquí conectaremos tu pasarela de pago actual)`);
+}
+
+document.getElementById('btn-close-cart')?.addEventListener('click', () => {
+    const overlay = document.getElementById('cart-overlay');
+    if(overlay) {
+        overlay.style.display = 'none';
+        overlay.classList.remove('active');
+    }
 });

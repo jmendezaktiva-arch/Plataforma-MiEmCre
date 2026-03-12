@@ -44,9 +44,9 @@
 }
 
 .kpi-label {
-    font-size: 0.8rem;
+    font-size: 0.938rem; /* Elevado a 15px para consistencia con la Navbar Prestige */
     text-transform: uppercase;
-    letter-spacing: 0.1em;
+    letter-spacing: 0.08em; /* Ligera reducción de tracking para mejorar la cohesión de la palabra */
     color: var(--accent-gold);
     font-weight: 600;
 }
@@ -83,10 +83,19 @@
 }
 
 .card-recurso h3 { 
-    font-size: 1.4rem; 
+    font-size: 1.5rem; /* Aumento ligero para mayor autoridad en el título */
     color: var(--primary-midnight);
-    margin-bottom: 15px;
+    margin-bottom: 18px;
     font-weight: 700;
+    letter-spacing: -0.01em;
+}
+
+.card-recurso p {
+    font-size: 1rem; /* 16px fijos para asegurar legibilidad en la rejilla */
+    font-weight: 400; /* Peso Regular para que la letra no "desaparezca" */
+    line-height: 1.6;
+    color: #4A5568; /* Gris profundo para contraste suave pero legible */
+    margin-bottom: 0;
 }
 
 /* --- DISEÑO DE BLOQUE KPI (GESTIÓN DE PROCESOS) --- */
@@ -95,9 +104,9 @@
 }
 
 .kpi-trend {
-    font-size: 0.85rem;
-    font-weight: 600;
-    margin-top: 10px;
+    font-size: 0.938rem; /* Elevado a 15px para lectura rápida de variaciones */
+    font-weight: 700;    /* Incrementado a Bold para que el color de tendencia (verde/rojo) sea más vibrante y visible */
+    margin-top: 12px;   /* Un poco más de aire respecto al valor numérico para evitar saturación */
 }
 
 .trend-up { color: #2e7d32; }

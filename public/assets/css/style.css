@@ -1,3 +1,4 @@
+/*public/assets/css/style.css
 /* ========================================================================== */
 /* DREAMS ACADEMIA | ESTILOS INSTITUCIONALES "MI EMPRESA CRECE" */
 /* ========================================================================== */
@@ -96,11 +97,12 @@ h3, .reveal h3 {
 /* Cuerpo de Texto: Lujo Silencioso y Legibilidad Extendida */
 p, li, .reveal p, .reveal li {
     font-family: 'Montserrat', sans-serif !important;
-    font-weight: 300 !important; /* Peso light para sofisticación */
-    font-size: 1rem; /* 16px base */
-    line-height: 1.8 !important; /* Espaciado generoso para reducir fatiga visual */
+    font-weight: 400 !important; /* Incremento a Regular para contraste sólido */
+    font-size: 1.063rem; /* 17px: Estándar de lectura premium */
+    line-height: 1.8 !important; 
     color: var(--text-color);
-    margin-bottom: 1.25rem;
+    margin-bottom: 1.5rem;
+    letter-spacing: 0.01em; /* Micro-ajuste para evitar amontonamiento */
 }
 
 /* Énfasis y Datos Críticos: Blindaje de Trazabilidad */
@@ -179,9 +181,10 @@ strong, b, .calculation-label {
 .navbar a {
     text-decoration: none;
     color: var(--text-color);
-    font-size: 0.85rem;
+    font-size: 0.938rem; /* Elevado a 15px para nitidez en navegación */
     font-weight: 600;
     text-transform: uppercase;
+    letter-spacing: 0.05em; /* Tracking optimizado para mayúsculas */
     transition: color 0.3s ease;
 }
 
@@ -696,10 +699,10 @@ audio::-webkit-media-controls-play-button {
 
 /* Clase para etiquetas de categoría dentro de las cards */
 .card-category {
-    font-size: 0.875rem !important; /* 14px: Estándar Label */
+    font-size: 0.938rem !important; /* Elevado a 15px para jerarquía clara */
     font-weight: 700 !important;
     text-transform: uppercase;
-    letter-spacing: 0.05em;
+    letter-spacing: 0.06em;
 }
 
 .btn-group {
@@ -756,10 +759,10 @@ audio::-webkit-media-controls-play-button {
 }
 
 .purpose-bubble p {
-    font-weight: 300 !important;
+    font-weight: 400 !important; /* Peso Regular para estabilidad visual sobre el cristal */
     color: var(--text-color) !important;
     line-height: 1.8 !important;
-    font-size: 1.1rem !important;
+    font-size: 1.15rem !important; /* Incremento a ~18.5px para lectura inmersiva */
 }
 
 .purpose-overlay.active { display: flex; }
@@ -793,12 +796,12 @@ audio::-webkit-media-controls-play-button {
     background: none;
     border: 1.5px solid var(--secondary-color);
     color: var(--secondary-color);
-    padding: 10px 18px;
+    padding: 12px 20px; /* Más área de interacción */
     border-radius: 12px;
-    font-size: 0.75rem;
-    font-weight: 600;
+    font-size: 0.875rem; /* Elevado a 14px: Estándar funcional para micro-copy */
+    font-weight: 700; /* Más peso para diferenciarlo del texto de la burbuja */
     text-transform: uppercase;
-    letter-spacing: 0.5px;
+    letter-spacing: 0.05em;
     cursor: pointer;
     margin-top: 15px;
     transition: all 0.3s;
@@ -887,9 +890,9 @@ audio::-webkit-media-controls-play-button {
 #btn-open-contact {
     background: var(--primary-midnight);
     color: white;
-    padding: 10px 18px;
+    padding: 12px 22px; /* Incremento de padding para compensar el tamaño de fuente */
     border-radius: 12px;
-    font-size: 0.7rem;
+    font-size: 0.875rem; /* Elevado a 14px para legibilidad funcional */
     border: 1.5px solid var(--accent-gold);
     cursor: pointer;
     display: flex;
@@ -1123,9 +1126,9 @@ body.cinema-mode #view-workbook {
     background: rgba(15, 52, 96, 0.05);
     border: 1px solid rgba(15, 52, 96, 0.15);
     color: var(--primary-midnight);
-    padding: 12px 20px;
+    padding: 12px 24px;
     border-radius: 12px;
-    font-size: 0.75rem;
+    font-size: 0.875rem; /* Elevado a 14px para facilitar la lectura técnica */
     font-weight: 700;
     text-transform: uppercase;
     letter-spacing: 0.05em;
@@ -1220,9 +1223,9 @@ body.cinema-mode #view-workbook {
 .matrix-table th {
     background-color: var(--primary-midnight);
     color: white;
-    font-size: 10px;
+    font-size: 0.813rem; /* Elevado de 10px a 13px (Seguridad visual) */
     text-transform: uppercase;
-    letter-spacing: 0.1em;
+    letter-spacing: 0.05em;
     padding: 15px;
     text-align: center;
 }

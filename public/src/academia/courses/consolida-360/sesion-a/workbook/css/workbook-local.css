@@ -19,11 +19,11 @@
     background: #f1f1f1;
 }
 ::-webkit-scrollbar-thumb {
-    background: #00529B;
+    background: var(--primary-midnight); /* Sincronizado con Prestige */
     border-radius: 10px;
 }
 ::-webkit-scrollbar-thumb:hover {
-    background: #003f7a;
+    background: #164275; /* Variante dinámica del Azul Medianoche */
 }
 
 .section-content {
@@ -37,10 +37,19 @@
     opacity: 1;
 }
 
+/* Ajuste de enlaces de navegación lateral */
+.nav-link {
+    font-size: 0.938rem !important; /* Elevado a 15px para lectura clara de los pasos */
+    font-weight: 500;
+    padding: 12px 16px;
+    transition: all 0.3s ease;
+}
+
 .nav-link.active {
     background-color: #eef2ff;
-    color: #00529B;
+    color: var(--primary-midnight); /* Vinculado a la variable oficial */
     font-weight: 700;
+    border-right: 4px solid var(--accent-gold); /* Refuerzo visual de ubicación */
 }
 
 .completion-icon {
@@ -49,7 +58,7 @@
 
 .semaforo-radio:checked + label {
     transform: scale(1.05);
-    box-shadow: 0 0 0 3px var(--tw-ring-color);
+    box-shadow: 0 0 0 3px var(--accent-gold); /* Sincronizado con el lenguaje de acentos */
 }
 
 /* --- NUEVO: Estilos para la exportación a PDF --- */
@@ -57,4 +66,69 @@
   .avoid-break {
     page-break-inside: avoid;
   }
+}
+
+/* --- COMPONENTES DE ASISTENCIA: TOOLTIPS Y AYUDA --- */
+
+/* Icono disparador de ayuda (el circulo con la "i") */
+.btn-help-trigger {
+    width: 24px !important;  /* Aumentado de 20px para mejor click/tap */
+    height: 24px !important;
+    font-size: 14px !important; /* Elevado de 12px para que la "i" sea nítida */
+    font-weight: 800 !important;
+}
+
+/* Contenido de la burbuja de ayuda (Help Bubble) */
+.help-bubble p, .mindset-bubble p {
+    font-size: 1rem !important; /* 16px estandarizados */
+    font-weight: 400 !important;
+    line-height: 1.6 !important;
+    color: var(--text-color) !important;
+}
+
+/* Títulos dentro de las burbujas de ayuda */
+.help-bubble h4, .mindset-bubble h4 {
+    font-size: 1.125rem !important; /* 18px para encabezados de ayuda */
+    font-weight: 700 !important;
+    color: var(--primary-midnight);
+    margin-bottom: 12px;
+}
+
+/* Etiquetas técnicas dentro de tooltips */
+.help-content span, .tooltip-label {
+    font-size: 0.875rem !important; /* 14px mínimo para etiquetas técnicas */
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.03em;
+}
+
+/* --- CONTROL DE ENTRADA Y VISUALIZACIÓN DE RESULTADOS --- */
+
+/* Campos donde el usuario escribe (Inputs, Textareas) */
+input[type="text"], 
+input[type="number"], 
+textarea, 
+select,
+.autosave-input {
+    font-size: 1.063rem !important; /* 17px para evitar el zoom automático en móviles y mejorar nitidez */
+    font-weight: 400 !important;
+    padding: 14px !important; /* Más respiro interno para el texto */
+    color: var(--primary-midnight) !important;
+}
+
+/* Etiquetas de Resultados y Cálculos (ROI, Totales, etc.) */
+.calculation-label, .result-label, .score-total-box {
+    font-size: 1rem !important; 
+    font-weight: 700 !important;
+    text-transform: uppercase;
+    letter-spacing: 0.03em;
+}
+
+/* Valores numéricos resultantes (Donde el sistema entrega el cálculo) */
+.result-value, .total-amount, #resultado-final {
+    font-size: 1.25rem !important; /* 20px para que el resultado sea el protagonista */
+    font-weight: 800 !important;
+    color: var(--primary-midnight);
+    display: inline-block;
+    margin-top: 5px;
 }

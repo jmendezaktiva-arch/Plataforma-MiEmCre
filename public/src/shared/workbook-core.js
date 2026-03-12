@@ -130,43 +130,65 @@ document.addEventListener('input', (e) => {
 });
 
 window.addEventListener('message', (e) => {
+    // 1. HIDRATACIÓN DE PROGRESO (Datos de ejercicios guardados)
     if (e.data.type === 'hydrateWorkbook' && e.data.payload) {
         console.log("📦 Dreams Core: Hidratando UI con datos de la nube...");
-        
         Object.entries(e.data.payload).forEach(([key, val]) => {
             localStorage.setItem('cuaderno_' + key, val);
-            
-            // Búsqueda Inteligente: Primero por data-id (Modular), luego por ID/Name (Legacy)
-            const el = document.querySelector(`[data-id="${key}"]`) || 
-                       document.getElementById(key) || 
-                       document.getElementsByName(key)[0];
-            
+            const el = document.querySelector(`[data-id="${key}"]`) || document.getElementById(key) || document.getElementsByName(key)[0];
             if (el) {
                 if (el.type === 'checkbox' || el.type === 'radio') {
                     el.checked = (val === true || val === 'true');
-                } else {
-                    el.value = val;
-                }
-                
-                /**
-                 * TRAZABILIDAD FINANCIERA: Disparamos un evento 'change' manual. 
-                 * Esto asegura que las fórmulas de cálculo del Filtro 4+1 se activen 
-                 * e impriman los resultados (ROI, Gastos, etc.) automáticamente al cargar.
-                 */
+                } else { el.value = val; }
                 el.dispatchEvent(new Event('change', { bubbles: true }));
             }
         });
-        
         window.dispatchEvent(new CustomEvent('coreHydrated'));
+    }
+
+    // 2. HIDRATACIÓN DE IDENTIDAD (Inyección automática de Perfil)
+    if (e.data.type === 'injectProfile' && e.data.profile) {
+        console.log("👤 Dreams Core: Sincronizando identidad del líder...");
+        const profileMap = {
+            'nombre_participante': e.data.profile.nombre,
+            'nombre_empresa': e.data.profile.empresa
+        };
+
+        Object.entries(profileMap).forEach(([id, value]) => {
+            if (!value) return;
+            const el = document.querySelector(`[data-id="${id}"]`);
+            if (el) {
+                el.value = value;
+                el.readOnly = true; // Protegemos el dato oficial
+                el.style.backgroundColor = "#F9FAFB"; // Fondo sutil de "solo lectura"
+                el.style.cursor = "not-allowed";
+                el.dispatchEvent(new Event('input', { bubbles: true })); // Guardamos en el progreso local
+            }
+        });
     }
 });
 
 window.addEventListener('online', () => WorkbookCore.syncQueue.process());
 
 // Handshake Inicial
-// Inicialización Sincronizada
+// Inicialización Sincronizada (DNA 3.0 Prestige)
 document.addEventListener('DOMContentLoaded', () => {
     WorkbookCore.initWorkbookAssets();
+
+    // DREAMS PRESTIGE: Sensor de proximidad para Sidebar del Workbook
+    const workbookSidebar = document.getElementById('workbook-sidebar');
+    
+    if (workbookSidebar) {
+        // Al entrar el mouse (Proximidad detectada)
+        workbookSidebar.addEventListener('mouseenter', () => {
+            workbookSidebar.classList.remove('sidebar-collapsed');
+        });
+
+        // Al salir el mouse (Regreso al enfoque de trabajo)
+        workbookSidebar.addEventListener('mouseleave', () => {
+            workbookSidebar.classList.add('sidebar-collapsed');
+        });
+    }
 });
 
 // Handshake Inicial

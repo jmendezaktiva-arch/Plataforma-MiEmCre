@@ -16,6 +16,64 @@
     <script src="../../../../../shared/workbook-core.js"></script>
     
     <link rel="stylesheet" href="/assets/css/style.css">
+    <style>
+        /* DREAMS PRESTIGE: Comportamiento Dinámico del Sidebar del Workbook */
+        #workbook-sidebar {
+            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+            z-index: 100;
+            overflow-x: hidden;
+            position: sticky;
+            top: 0;
+            height: 100vh;
+        }
+
+        /* Estado Colapsado: La "Manija de Oro" (8px) */
+        #workbook-sidebar.sidebar-collapsed {
+            width: 8px !important;
+            min-width: 8px !important;
+            padding: 0 !important;
+            border-right: 4px solid #957C3D; /* Oro Bronceado */
+            background: rgba(15, 52, 96, 0.05); /* Azul Medianoche con transparencia */
+            backdrop-filter: blur(15px); /* Efecto Liquid Glass */
+        }
+
+        /* Ocultar contenido internamente cuando está colapsado */
+        #workbook-sidebar.sidebar-collapsed * {
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.2s ease;
+        }
+
+        /* Estado Expandido */
+        #workbook-sidebar:not(.sidebar-collapsed) {
+            width: 260px; 
+        }
+
+        /* PESTAÑA DE IDENTIDAD (The Prestige Tab) */
+        .sidebar-tab {
+            position: absolute;
+            right: -24px; /* Sobresale de la manija */
+            top: 50%;
+            transform: translateY(-50%);
+            background: #957C3D; /* Oro Bronceado */
+            color: white;
+            width: 24px;
+            height: 50px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 0 8px 8px 0;
+            cursor: pointer;
+            box-shadow: 4px 0 8px rgba(0,0,0,0.1);
+            transition: all 0.3s ease;
+        }
+
+        /* La pestaña se oculta elegantemente cuando el sidebar está abierto */
+        #workbook-sidebar:not(.sidebar-collapsed) .sidebar-tab {
+            opacity: 0;
+            pointer-events: none;
+        }
+    </style>
     
 </head>
 
@@ -23,7 +81,14 @@
 
     <div class="flex flex-col md:flex-row min-h-screen">
         
-        <aside class="w-full md:w-64 bg-white shadow-lg p-6 sticky top-0 h-screen overflow-y-auto flex flex-col border-r border-gray-100">
+        <aside id="workbook-sidebar" class="sidebar-collapsed w-full md:w-64 bg-white shadow-lg p-6 sticky top-0 h-screen overflow-y-auto flex flex-col border-r border-gray-100">
+            
+            <div class="sidebar-tab">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
+                </svg>
+            </div>
+
             <div class="flex items-center justify-center mb-10">
                 <img src="data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7" 
                 data-asset="logo.png" 
@@ -64,16 +129,8 @@
                     <h1 id="workbook-course-name" class="text-brand-blue font-black text-2xl uppercase tracking-tighter">Cuaderno de Trabajo Interactivo</h1>
                     <p id="workbook-session-title" class="text-lg text-gray-500 mt-1 font-light italic">"De Tareas a Resultados: Transforma la forma de delegar y liderar"</p>
                     
-                    <div class="mt-8 grid grid-cols-1 md:grid-cols-2 gap-6">
-                        <div class="group">
-                            <label class="text-[10px] font-bold text-gray-400 uppercase ml-1">Líder / Participante</label>
-                            <input type="text" placeholder="Tu nombre completo" class="autosave-input w-full p-3 bg-gray-50 border-none rounded-xl focus:ring-2 focus:ring-brand-blue transition-all" data-id="nombre_participante">
-                        </div>
-                        <div class="group">
-                            <label class="text-[10px] font-bold text-gray-400 uppercase ml-1">Organización / PyME</label>
-                            <input type="text" placeholder="Nombre de tu empresa" class="autosave-input w-full p-3 bg-gray-50 border-none rounded-xl focus:ring-2 focus:ring-brand-blue transition-all" data-id="nombre_empresa">
-                        </div>
-                    </div>
+                    <input type="hidden" data-id="nombre_participante">
+                    <input type="hidden" data-id="nombre_empresa">
                 </div>
                 <div class="absolute right-[-20px] bottom-[-20px] opacity-[0.03] rotate-12">
                     <img src="data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7" 

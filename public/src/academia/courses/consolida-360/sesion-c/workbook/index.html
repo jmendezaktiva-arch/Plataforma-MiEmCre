@@ -17,12 +17,77 @@
     
     <link rel="stylesheet" href="/assets/css/style.css">
     <link rel="stylesheet" href="css/workbook-local.css">
+    <style>
+        /* DREAMS PRESTIGE: Comportamiento Dinámico del Sidebar del Workbook */
+        #workbook-sidebar {
+            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+            z-index: 100;
+            overflow-x: hidden;
+            position: sticky;
+            top: 0;
+            height: 100vh;
+        }
+
+        /* Estado Colapsado: La "Manija de Oro" (8px) con efecto Liquid Glass */
+        #workbook-sidebar.sidebar-collapsed {
+            width: 8px !important;
+            min-width: 8px !important;
+            padding: 0 !important;
+            border-right: 4px solid #957C3D;
+            background: rgba(15, 52, 96, 0.05);
+            backdrop-filter: blur(15px);
+        }
+
+        /* Ocultar contenido interno en colapso */
+        #workbook-sidebar.sidebar-collapsed * {
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.2s ease;
+        }
+
+        /* Estado Expandido */
+        #workbook-sidebar:not(.sidebar-collapsed) {
+            width: 260px;
+        }
+
+        /* PESTAÑA DE IDENTIDAD PRESTIGE */
+        .sidebar-tab {
+            position: absolute;
+            right: -24px;
+            top: 50%;
+            transform: translateY(-50%);
+            background: #957C3D;
+            color: white;
+            width: 24px;
+            height: 50px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 0 8px 8px 0;
+            cursor: pointer;
+            box-shadow: 4px 0 8px rgba(0,0,0,0.1);
+            transition: all 0.3s ease;
+        }
+
+        /* Ocultar pestaña cuando el menú está abierto */
+        #workbook-sidebar:not(.sidebar-collapsed) .sidebar-tab {
+            opacity: 0;
+            pointer-events: none;
+        }
+    </style>
 </head>
 
 <body class="text-gray-800 bg-[#F5F5F0]">
     <div class="flex flex-col md:flex-row min-h-screen">
         
-        <aside class="w-full md:w-64 bg-white shadow-xl p-6 sticky top-0 h-screen overflow-y-auto flex flex-col z-40">
+        <aside id="workbook-sidebar" class="sidebar-collapsed w-full md:w-64 bg-white shadow-xl p-6 sticky top-0 h-screen overflow-y-auto flex flex-col z-40">
+            
+            <div class="sidebar-tab">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
+                </svg>
+            </div>
+
             <div class="flex items-center justify-center mb-8 logo-container">
                 <img id="workbook-logo" src="" alt="Logo Mi Empresa Crece" class="h-16 object-contain logo-header">
             </div>
@@ -44,8 +109,36 @@
                     <p class="text-[10px] font-bold tracking-widest text-[#0F3460] uppercase">Cargando Inteligencia Financiera...</p>
                 </div>
             </div>
-            
-            </main>
+
+            <header class="bg-white shadow-sm rounded-3xl p-8 mb-10 border-l-[12px] border-[#0F3460] relative overflow-hidden">
+                <div class="relative z-10">
+                    <h1 id="workbook-course-name" class="text-[#0F3460] font-black text-2xl uppercase tracking-tighter">Cuaderno de Inteligencia Financiera</h1>
+                    <p id="workbook-session-title" class="text-lg text-gray-500 mt-1 font-light italic">"Gasto Inteligente, Inversiones Efectivas: El camino al FCL"</p>
+                    
+                    <div class="mt-8 grid grid-cols-1 md:grid-cols-2 gap-6">
+                        <div class="group">
+                            <label class="text-[10px] font-bold text-gray-400 uppercase ml-1">Líder / Participante</label>
+                            <input type="text" placeholder="Cargando perfil..." class="autosave-input w-full p-3 bg-gray-50 border-none rounded-xl focus:ring-2 focus:ring-[#0F3460] transition-all" data-id="nombre_participante">
+                        </div>
+                        <div class="group">
+                            <label class="text-[10px] font-bold text-gray-400 uppercase ml-1">Organización / PyME</label>
+                            <input type="text" placeholder="Cargando empresa..." class="autosave-input w-full p-3 bg-gray-50 border-none rounded-xl focus:ring-2 focus:ring-[#0F3460] transition-all" data-id="nombre_empresa">
+                        </div>
+                    </div>
+                </div>
+                <div class="absolute right-[-20px] bottom-[-20px] opacity-[0.03] rotate-12">
+                    <img src="data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7" 
+                         data-asset="logo.png" 
+                         alt="" 
+                         class="h-40" 
+                         crossorigin="anonymous">
+                </div>
+            </header>
+
+            <div id="workbook-sections-container" class="space-y-12">
+                </div>
+
+        </main>
     </div>
 
     <div id="help-overlay" class="help-overlay">

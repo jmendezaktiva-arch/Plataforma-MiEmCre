@@ -1,3 +1,4 @@
+/*public/assets/css/sidebar-prestige.css
 /* ========================================================================== */
 /* DREAMS | SIDEBAR PRESTIGE (MINIMALISMO Y AUTORIDAD) */
 /* ========================================================================== */
@@ -129,4 +130,28 @@
 .sidebar-prestige:not(.sidebar-hidden) .sidebar-brand-peek {
     opacity: 0;
     pointer-events: none;
+}
+
+/* ========================================================================== */
+/* SINCRONIZACIÓN DE LAYOUT (EXPANSIÓN DINÁMICA DEL WORKBOOK) */
+/* ========================================================================== */
+
+/* TRACER: Esta regla busca el contenedor principal. 
+   Asegúrate de que tu contenido esté dentro de un <main> o clase similar.
+*/
+main, .main-content, .workbook-container {
+    margin-left: 260px; /* Espacio igual al ancho del sidebar */
+    transition: margin-left 0.4s cubic-bezier(0.19, 1, 0.22, 1), width 0.4s cubic-bezier(0.19, 1, 0.22, 1);
+    width: calc(100% - 260px);
+    min-height: 100vh;
+}
+
+/* ESTADO EXPANDIDO: Cuando el body detecta el colapso, 
+   el contenido ocupa el 100% menos los 8px de la Manija de Oro.
+*/
+body.sidebar-is-collapsed main, 
+body.sidebar-is-collapsed .main-content, 
+body.sidebar-is-collapsed .workbook-container {
+    margin-left: 8px; 
+    width: calc(100% - 8px);
 }

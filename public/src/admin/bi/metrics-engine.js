@@ -3,6 +3,7 @@
  * Procesa fórmulas maestras: Punto de Equilibrio y ROI Publicitario.
  */
 
+// TRACEABILIDAD: Subimos dos niveles para alcanzar la carpeta shared desde /bi/
 import { db } from '../../shared/firebase-config.js';
 import { collection, getDocs } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
 

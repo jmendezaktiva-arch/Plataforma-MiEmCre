@@ -2,25 +2,50 @@
  * DREAMS PLATFORM | Sidebar Prestige Component
  * Objetivo: Navegación minimalista con Logout Determinístico.
  */
-import { logout } from '../auth/auth.js'; // TRACEABILIDAD: Importación del motor central de Auth
+import { logout } from '../auth/auth.js';
+import { auth, db, doc, getDoc } from './firebase-config.js'; // Conexión con el núcleo de identidad
 
 const SidebarPrestige = {
-    init() {
+    async init() {
         try {
             this.injectStyles();
-            this.render();
             
-            // TRACEABILIDAD: Invocamos al motor de identidad global justo después de inyectar el HTML.
-            // Esto garantiza que el logo con [data-asset] sea resuelto por Firebase Storage.
-            if (window.initGlobalAssets) {
-                console.log("🎨 Sidebar: Hidratando activos de marca...");
-                window.initGlobalAssets();
-            }
+            // TRACEABILIDAD: El Sentinel de Auth decide qué versión del Sidebar inyectar
+            auth.onAuthStateChanged(async (user) => {
+                let role = 'cliente'; 
+                
+                if (user) {
+                    try {
+                        const userDoc = await getDoc(doc(db, "usuarios", user.uid));
+                        if (userDoc.exists()) {
+                            // NORMALIZACIÓN QUIRÚRGICA: Evita fallos por mayúsculas o variaciones de nombre
+                            const rawRole = (userDoc.data().rol || 'cliente').toLowerCase();
+                            
+                            // Mapeo de Superpoderes (God Mode)
+                            if (rawRole === 'admin' || rawRole === 'administrador') {
+                                role = 'admin';
+                            } else {
+                                role = 'cliente';
+                            }
+                        }
+                    } catch (error) {
+                        console.error("🚨 DREAMS LOG: Error recuperando identidad:", error);
+                    }
+                }
+                
+                console.log(`🎭 Modo de navegación: ${role.toUpperCase()}`);
+                this.render(role); 
+                this.setupAfterRender();
+            });
 
-            this.setupEventListeners();
         } catch (e) {
-            console.error("🚨 DREAMS LOG: Error en Sidebar:", e);
+            console.error("🚨 DREAMS LOG: Error crítico en inicialización de Sidebar:", e);
         }
+    },
+
+    setupAfterRender() {
+        if (window.initGlobalAssets) window.initGlobalAssets();
+        this.setupEventListeners();
     },
 
     injectStyles() {
@@ -28,13 +53,16 @@ const SidebarPrestige = {
             const link = document.createElement('link');
             link.id = 'sidebar-prestige-css';
             link.rel = 'stylesheet';
-            // TRACEABILIDAD: Se elimina '/' inicial para compatibilidad con Localhost y Netlify
             link.href = 'assets/css/sidebar-prestige.css'; 
             document.head.appendChild(link);
         }
     },
 
-    render() {
+    render(role) {
+        // TRACEABILIDAD: Eliminamos sidebars previos si existen para evitar duplicidad en cambios de rol
+        const oldSidebar = document.getElementById('dreams-sidebar');
+        if (oldSidebar) oldSidebar.remove();
+
         const sidebarHTML = `
             <nav id="dreams-sidebar" class="sidebar-prestige sidebar-hidden">
                 <div class="sidebar-brand-peek" title="Mi Empresa Crece">
@@ -42,12 +70,16 @@ const SidebarPrestige = {
                 </div>
 
                 <div class="sidebar-nav">
-                    <a href="javascript:history.back()" class="sidebar-link" title="Regresar" id="link-back-main">
-                        <span class="label">← Regresar</span>
-                    </a>
-                    
-                    <hr style="border: 0; border-top: 1px solid rgba(149, 124, 61, 0.2); margin: 20px 0;">
+                    ${role === 'admin' ? `
+                        <a href="admin.html" class="sidebar-link" style="border-left: 3px solid var(--accent-gold); background: rgba(149, 124, 61, 0.05);">
+                            <span class="label" style="color: var(--accent-gold); font-weight: 700;">PANEL MAESTRO</span>
+                        </a>
+                        <hr style="border: 0; border-top: 1px solid rgba(149, 124, 61, 0.2); margin: 10px 0;">
+                    ` : ''}
 
+                    <a href="dashboard.html" class="sidebar-link">
+                        <span class="label">Dashboard</span>
+                    </a>
                     <a href="academia.html" class="sidebar-link">
                         <span class="label">Academia</span>
                     </a>
@@ -56,10 +88,6 @@ const SidebarPrestige = {
                     </a>
                     <a href="consultoria.html" class="sidebar-link">
                         <span class="label">Consultoría</span>
-                    </a>
-
-                    <a href="#" class="sidebar-link disabled" title="Desarrollo en curso">
-                        <span class="label">Test de Salud</span>
                     </a>
                 </div>
 
@@ -77,14 +105,22 @@ const SidebarPrestige = {
         const sidebar = document.getElementById('dreams-sidebar');
         const logoutBtn = document.getElementById('btn-logout-dreams');
 
-        // Comportamiento de Despliegue Automático (Hover)
-        sidebar.addEventListener('mouseenter', () => {
-            sidebar.classList.remove('sidebar-hidden');
-        });
+        // TRACEABILIDAD: Sincronización de estado global para expansión de Workbooks
+        const syncSidebarState = (isHidden) => {
+            if (isHidden) {
+                sidebar.classList.add('sidebar-hidden');
+                document.body.classList.add('sidebar-is-collapsed');
+            } else {
+                sidebar.classList.remove('sidebar-hidden');
+                document.body.classList.remove('sidebar-is-collapsed');
+            }
+        };
 
-        sidebar.addEventListener('mouseleave', () => {
-            sidebar.classList.add('sidebar-hidden');
-        });
+        // Estado inicial al renderizar (por defecto colapsado)
+        syncSidebarState(true);
+
+        sidebar.addEventListener('mouseenter', () => syncSidebarState(false));
+        sidebar.addEventListener('mouseleave', () => syncSidebarState(true));
 
         // Logout Determinístico (Sincronizado con Firebase)
         logoutBtn.addEventListener('click', async (e) => {
