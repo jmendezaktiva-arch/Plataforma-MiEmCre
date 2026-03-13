@@ -703,25 +703,87 @@ document.addEventListener('DOMContentLoaded', () => {
                         option.textContent = track.title;
                         selector.appendChild(option);
                     });
+
+                    // FUNCIÓN QUIRÚRGICA: Recuperar y aplicar persistencia
+                    const restoreAudioPos = () => {
+                        const savedPos = localStorage.getItem(`dreams_pos_${sessionId}_${selector.value}`);
+                        if (savedPos) {
+                            audioElement.currentTime = parseFloat(savedPos);
+                            console.log(`⏳ Dreams Media: Reanudando podcast en ${savedPos}s`);
+                        }
+                    };
+
                     if (currentSessionData.multimedia.playlist.length > 0) {
                         podcastSource.src = selector.value;
                         audioElement.load();
+                        restoreAudioPos(); // Intento de recuperación inicial
                     }
+
                     selector.onchange = () => {
                         podcastSource.src = selector.value;
                         audioElement.load();
+                        restoreAudioPos(); // Intento de recuperación al cambiar de track
                         audioElement.play().catch(() => console.log("Interacción requerida"));
+                    };
+
+                    // ESCUCHADOR DE PERSISTENCIA: Guarda la posición cada 5 segundos de reproducción
+                    audioElement.ontimeupdate = () => {
+                        // Guardamos solo si hay un progreso significativo para no saturar el storage
+                        if (Math.floor(audioElement.currentTime) % 5 === 0) {
+                            localStorage.setItem(`dreams_pos_${sessionId}_${selector.value}`, audioElement.currentTime);
+                        }
+                    };
+
+                    // LÓGICA DE LIMPIEZA: Si el audio termina, eliminamos el registro para que inicie de cero la próxima vez
+                    audioElement.onended = () => {
+                        localStorage.removeItem(`dreams_pos_${sessionId}_${selector.value}`);
+                        console.log("🧹 Dreams Media: Podcast finalizado. Registro de persistencia limpiado.");
                     };
                 }
 
                 if (currentSessionData.multimedia.tutorialUrl) {
                     const youtubeElement = document.getElementById('tutorial-youtube');
-                    const resolvedUrl = window.DREAMS_CONFIG.resolvePath(currentSessionData.multimedia.tutorialUrl, sessionId);
+                    let resolvedUrl = window.DREAMS_CONFIG.resolvePath(currentSessionData.multimedia.tutorialUrl, sessionId);
+                    
+                    // LLAVE DE PERSISTENCIA: Única por curso, sesión y URL
+                    const videoStorageKey = `dreams_vid_${sessionId}_${currentSessionData.multimedia.tutorialUrl}`;
+                    const savedVideoPos = localStorage.getItem(videoStorageKey);
+
                     if (resolvedUrl.includes('youtube.com/embed')) {
+                        // LÓGICA YOUTUBE: Retomamos usando el parámetro 'start' de la API de YouTube
+                        if (savedVideoPos && parseFloat(savedVideoPos) > 5) {
+                            const startAt = Math.floor(parseFloat(savedVideoPos));
+                            resolvedUrl += (resolvedUrl.includes('?') ? '&' : '?') + `start=${startAt}`;
+                            console.log(`📺 Dreams Video: Retomando YouTube en seg: ${startAt}`);
+                        }
+
                         if (youtubeElement) { youtubeElement.src = resolvedUrl; youtubeElement.style.display = 'block'; }
                         if (videoElement) { videoElement.style.display = 'none'; videoElement.pause(); }
                     } else {
-                        if (videoElement) { videoElement.src = resolvedUrl; videoElement.load(); videoElement.style.display = 'block'; }
+                        // LÓGICA NATIVA (MP4/Firebase): Retomamos vía currentTime
+                        if (videoElement) {
+                            videoElement.src = resolvedUrl;
+                            videoElement.load();
+                            if (savedVideoPos) {
+                                videoElement.currentTime = parseFloat(savedVideoPos);
+                                console.log(`📺 Dreams Video: Retomando video nativo en ${savedVideoPos}s`);
+                            }
+                            videoElement.style.display = 'block';
+
+                            // ESCUCHADOR DE POSICIÓN (Solo para video nativo)
+                            videoElement.ontimeupdate = () => {
+                                if (Math.floor(videoElement.currentTime) % 5 === 0) {
+                                    localStorage.setItem(videoStorageKey, videoElement.currentTime);
+                                }
+                            };
+
+                            // LÓGICA DE LIMPIEZA: Si el video llega al final, borramos la persistencia 
+                            // para que la siguiente vez que entre, inicie desde el segundo 0.
+                            videoElement.onended = () => {
+                                localStorage.removeItem(videoStorageKey);
+                                console.log("🧹 Dreams Video: Contenido finalizado. Registro de persistencia limpiado.");
+                            };
+                        }
                         if (youtubeElement) { youtubeElement.style.display = 'none'; youtubeElement.src = ''; }
                     }
                 }

@@ -9,7 +9,8 @@ import {
     collection, getDocs, query, orderBy 
 } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
 import { 
-    onAuthStateChanged, createUserWithEmailAndPassword, signOut 
+    onAuthStateChanged, createUserWithEmailAndPassword, signOut,
+    sendPasswordResetEmail 
 } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
 
 // TRACEABILIDAD: Motor de Inteligencia de Negocio (BI) - Versión Real
@@ -84,6 +85,7 @@ const UserManager = {
                 nombre: data.nombre || '',
                 empresa: data.empresa || 'Dreams Platform',
                 status: 'activo',
+                requiereCambioPassword: true, // Trazabilidad: Forza al usuario a definir su clave en el primer acceso
                 fechaCreacion: serverTimestamp(),
                 accesos: {
                     cursos: data.cursos || [],
@@ -431,8 +433,14 @@ document.addEventListener('DOMContentLoaded', async () => {
                 apps: []
             };
 
-            // TRACEABILIDAD: Registro en Firestore y Limpieza de Instancia Secundaria
+            // TRACEABILIDAD: Registro en Firestore, Disparo de Correo y Limpieza
             await UserManager.createUserProfile(uid, userData);
+            
+            // MOTOR DE COMUNICACIÓN: Se envía el link para que el usuario defina su clave real
+            // Se utiliza la instancia secundaria para no interferir con la sesión del admin
+            await sendPasswordResetEmail(secondaryAuth, email);
+            console.log(`✉️ Correo de configuración de contraseña enviado a: ${email}`);
+            
             await signOut(secondaryAuth);
 
             alert("✅ Cliente creado con éxito. El perfil se ha sincronizado con la colección 'usuarios'.");

@@ -1,6 +1,33 @@
 //public/src/auth
 import { auth, db, doc, getDoc } from '../shared/firebase-config.js';
-import { signInWithEmailAndPassword, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
+import { 
+    signInWithEmailAndPassword, 
+    onAuthStateChanged, 
+    signOut,
+    sendPasswordResetEmail 
+} from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
+
+/**
+ * RECUPERACIÓN DE CONTRASEÑA (RESET): Dispara el flujo de seguridad de Firebase.
+ * TRACEABILIDAD: El correo llega desde el dominio institucional configurado en la consola.
+ */
+export const resetPassword = async (email) => {
+    if (!email) {
+        alert("Por favor, ingresa tu correo electrónico para enviarte el enlace.");
+        return;
+    }
+    try {
+        await sendPasswordResetEmail(auth, email);
+        alert("✅ Enlace de recuperación enviado. Revisa tu correo institucional.");
+    } catch (error) {
+        console.error("🚨 Error en Reset de Contraseña:", error.message);
+        if (error.code === 'auth/user-not-found') {
+            alert("No existe una cuenta registrada con este correo.");
+        } else {
+            alert("Hubo un problema al enviar el enlace. Intenta más tarde.");
+        }
+    }
+};
 
 /**
  * CIERRE DE SESIÓN (LOGOUT): Finaliza la persistencia del token en Firebase.

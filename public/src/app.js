@@ -1,6 +1,6 @@
 // public/src/app.js
 
-import { login, logout, redirectByUserRole } from './auth/auth.js';
+import { login, logout, redirectByUserRole, resetPassword } from './auth/auth.js';
 import { db, auth, doc, setDoc, getDoc, checkAccess } from './shared/firebase-config.js';
 
 /**
@@ -32,23 +32,38 @@ const syncDashboardAccess = async () => {
         }
     }
 };
-import { onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
+import { onAuthStateChanged, updatePassword } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
 
 // --- PERSISTENCIA DE SESIÓN (CENTINELA GLOBAL) ---
-// Este observador se dispara automáticamente al cargar cualquier página del ecosistema
-onAuthStateChanged(auth, (user) => {
+onAuthStateChanged(auth, async (user) => {
     if (user) {
         console.log(`✅ Sesión activa detectada: ${user.email}`);
-        
-        // PROTECCIÓN DE RUTAS: Si el usuario ya está logueado e intenta entrar al login (index), 
-        // lo enviamos directo a su área de trabajo según su rol.
-        if (window.location.pathname.endsWith('index.html') || window.location.pathname === '/') {
-            redirectByUserRole(user.uid);
-        }
-        
-        // Disparo quirúrgico de sincronización de botones al detectar sesión
-        if (window.location.pathname.includes('dashboard.html')) {
-            syncDashboardAccess();
+
+        try {
+            // TRAZABILIDAD: Validación de Seguridad (Password Obligatorio)
+            const userRef = doc(db, "usuarios", user.uid);
+            const userSnap = await getDoc(userRef);
+            const userData = userSnap.data();
+
+            if (userData?.requiereCambioPassword) {
+                console.warn("🔐 Protocolo Prestige: Cambio de contraseña obligatorio detectado.");
+                // Bloqueamos redirecciones y disparamos el evento para el modal (Paso 5)
+                window.dispatchEvent(new CustomEvent('SHOW_PASSWORD_CHANGE_MODAL', { 
+                    detail: { uid: user.uid, email: user.email } 
+                }));
+                return; // Detenemos el flujo aquí hasta que cumpla el requisito
+            }
+
+            // PROTECCIÓN DE RUTAS: Si no requiere cambio, procede con el flujo normal de la SPA
+            if (window.location.pathname.endsWith('index.html') || window.location.pathname === '/') {
+                redirectByUserRole(user.uid);
+            }
+            
+            if (window.location.pathname.includes('dashboard.html')) {
+                syncDashboardAccess();
+            }
+        } catch (error) {
+            console.error("🚨 Error en la verificación de trazabilidad de usuario:", error);
         }
     } else {
         // SEGURIDAD: Si no hay sesión y el usuario intenta entrar a una página privada, 
@@ -125,13 +140,23 @@ document.addEventListener('DOMContentLoaded', () => {
     // Localizamos el formulario de inicio de sesión por su ID
     const loginForm = document.getElementById('login-form');
 
-    // 1. LÓGICA DE AUTENTICACIÓN (ACCESO Y SALIDA)
+    // 1. LÓGICA DE AUTENTICACIÓN (ACCESO, SALIDA Y RECUPERACIÓN)
     if (loginForm) {
         loginForm.addEventListener('submit', async (e) => {
             e.preventDefault(); 
             const email = document.getElementById('email').value;
             const password = document.getElementById('password').value;
             await login(email, password);
+        });
+
+        // DISPARADOR DE RECUPERACIÓN (RESET PASSWORD)
+        const btnForgot = document.getElementById('forgot-password');
+        btnForgot?.addEventListener('click', async (e) => {
+            e.preventDefault();
+            const emailField = document.getElementById('email');
+            
+            // Trazabilidad: Usamos el email ya escrito en el formulario
+            await resetPassword(emailField.value);
         });
     }
 
@@ -300,4 +325,72 @@ document.addEventListener('DOMContentLoaded', () => {
             }
         }
     });
+
+    // --- MOTOR DE SEGURIDAD PRESTIGE: CAMBIO DE CONTRASEÑA OBLIGATORIO ---
+    window.addEventListener('SHOW_PASSWORD_CHANGE_MODAL', (e) => {
+        const { uid, email } = e.detail;
+        renderPasswordChangeModal(uid, email);
+    });
+
+    const renderPasswordChangeModal = (uid, email) => {
+        // Evitar duplicados
+        if (document.getElementById('modal-password-change')) return;
+
+        const modalHtml = `
+            <div id="modal-password-change" style="position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(15, 52, 96, 0.98); backdrop-filter:blur(20px); z-index:10000; display:flex; align-items:center; justify-content:center; font-family:'Montserrat', sans-serif;">
+                <div style="background:#fff; width:90%; max-width:400px; padding:40px; border-radius:16px; box-shadow:0 25px 50px rgba(0,0,0,0.5); border-top:8px solid var(--accent-gold); text-align:center;">
+                    <div style="color:var(--accent-gold); font-size:2rem; margin-bottom:20px;">🔐</div>
+                    <h2 style="color:var(--primary-midnight); margin:0 0 10px 0; font-weight:900; font-size:1.2rem;">SEGURIDAD DE CUENTA</h2>
+                    <p style="font-size:0.85rem; color:#666; margin-bottom:30px; line-height:1.5;">Bienvenido a <strong>Dreams Platform</strong>. Por su protección, es necesario que defina una nueva contraseña personal para activar su acceso.</p>
+                    
+                    <form id="form-change-password">
+                        <input type="password" id="new-pass" placeholder="Nueva Contraseña" required minlength="6" style="width:100%; padding:14px; margin-bottom:12px; border:1.5px solid #eee; border-radius:8px; box-sizing:border-box;">
+                        <input type="password" id="confirm-pass" placeholder="Confirmar Contraseña" required minlength="6" style="width:100%; padding:14px; margin-bottom:25px; border:1.5px solid #eee; border-radius:8px; box-sizing:border-box;">
+                        
+                        <button type="submit" id="btn-save-pass" style="width:100%; background:var(--primary-midnight); color:white; border:none; padding:16px; border-radius:8px; font-weight:700; cursor:pointer; letter-spacing:1px;">ACTIVAR MI CUENTA</button>
+                    </form>
+                    <p id="pass-error" style="color:#d32f2f; font-size:0.75rem; margin-top:15px; font-weight:600;"></p>
+                </div>
+            </div>
+        `;
+
+        document.body.insertAdjacentHTML('beforeend', modalHtml);
+
+        document.getElementById('form-change-password').addEventListener('submit', async (formEv) => {
+            formEv.preventDefault();
+            const newPass = document.getElementById('new-pass').value;
+            const confirmPass = document.getElementById('confirm-pass').value;
+            const errorEl = document.getElementById('pass-error');
+            const btn = document.getElementById('btn-save-pass');
+
+            if (newPass !== confirmPass) {
+                errorEl.innerText = "⚠️ Las contraseñas no coinciden.";
+                return;
+            }
+
+            try {
+                btn.disabled = true;
+                btn.innerText = "SINCRONIZANDO...";
+
+                // 1. Actualización en Firebase Auth
+                await updatePassword(auth.currentUser, newPass);
+
+                // 2. Trazabilidad en Firestore: Eliminamos el flag de cambio obligatorio
+                const userRef = doc(db, "usuarios", uid);
+                await setDoc(userRef, { requiereCambioPassword: false }, { merge: true });
+
+                console.log("✅ Contraseña actualizada y flag removido.");
+                
+                // 3. Liberación y Redirección
+                document.getElementById('modal-password-change').remove();
+                redirectByUserRole(uid);
+
+            } catch (error) {
+                console.error("Error al cambiar pass:", error);
+                errorEl.innerText = "🚨 Error de seguridad. Por favor re-ingrese su contraseña actual e intente de nuevo.";
+                btn.disabled = false;
+                btn.innerText = "ACTIVAR MI CUENTA";
+            }
+        });
+    };
 });
