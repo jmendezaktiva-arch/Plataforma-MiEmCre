@@ -1,0 +1,456 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Nuestro ADN | Dreams Platform</title>
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;600;700;900&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="assets/css/style.css">
+    <link rel="stylesheet" href="assets/css/bento.css">
+    <style>
+        .dna-container {
+            padding: 60px 40px;
+            max-width: 1100px;
+            margin: 0 auto;
+            display: flex;
+            flex-direction: column;
+            align-items: center; /* Centrado horizontal real */
+            text-align: center;
+            transition: margin-left 0.3s ease; /* Sincronía con el Sidebar */
+            margin-left: 70px; /* Espacio base para el Sidebar Prestige */
+        }
+
+        /* Ajuste para pantallas grandes: Evita que el margin-left rompa el centrado absoluto */
+        @media (min-width: 1400px) {
+            .dna-container {
+                margin-left: auto;
+                padding-left: 70px;
+            }
+        }
+
+        /* 1. CONTENEDOR MAESTRO (Layout de 3 Columnas) */
+        .golden-circle-wrapper {
+            display: flex;
+            justify-content: center;
+            align-items: flex-start;
+            gap: 80px; 
+            margin-top: 50px;
+            width: 100%;
+            min-height: 650px;
+        }
+
+        /* COLUMNA 1: SÍMBOLO (Círculos) */
+        .circle-column {
+            position: relative;
+            width: 550px;
+            height: 550px;
+            flex-shrink: 0;
+        }
+
+        /* COLUMNA 2: CONTROL (Cápsulas de Título) */
+        .panels-column {
+            display: flex;
+            flex-direction: column;
+            gap: 25px; /* Espacio fijo entre botones */
+            width: 200px;
+            padding-top: 250px; /* Alinea el centro de la primera cápsula con el centro del círculo */
+            text-align: left;
+        }
+
+        /* ESTILO DE CÁPSULA (Botón) */
+        .info-panel {
+            position: relative;
+            width: 180px;
+            height: 50px;
+            display: flex;
+            align-items: center;
+            padding: 0 20px;
+            background: rgba(255, 255, 255, 0.9);
+            backdrop-filter: blur(10px);
+            border-radius: 25px;
+            border: 0.5px solid rgba(149, 124, 61, 0.2);
+            box-shadow: 0 4px 15px rgba(0,0,0,0.05);
+            cursor: pointer;
+            transition: all 0.4s cubic-bezier(0.23, 1, 0.32, 1);
+            z-index: 10;
+        }
+
+        .info-panel h4 { 
+            margin: 0; 
+            font-size: 0.75rem; 
+            color: var(--primary-midnight); 
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            pointer-events: none;
+        }
+
+        /* COLUMNA 3: NARRATIVA (Texto Descriptivo Absoluto) */
+        .info-panel p {
+            position: absolute;
+            left: 210px; /* Se proyecta a la derecha sin empujar nada */
+            top: 50%;
+            transform: translateY(-50%) translateX(20px);
+            width: 350px; 
+            padding: 20px;
+            background: white;
+            border-radius: 15px;
+            border-left: 4px solid var(--accent-gold);
+            box-shadow: 15px 15px 40px rgba(0,0,0,0.08);
+            opacity: 0;
+            visibility: hidden;
+            transition: all 0.5s ease;
+            color: #444;
+            font-size: 0.85rem;
+            line-height: 1.6;
+            white-space: normal;
+            pointer-events: none;
+        }
+
+        /* LÓGICA DE ACTIVACIÓN */
+        .info-panel:hover, .info-panel.is-active {
+            border-color: var(--accent-gold);
+            background: #fff;
+            transform: translateX(5px);
+        }
+
+        .info-panel:hover p, .info-panel.is-active p {
+            opacity: 1;
+            visibility: visible;
+            transform: translateY(-50%) translateX(0);
+        }
+
+        /* CONECTORES (Líneas fijas) */
+        .info-panel::before {
+            content: '';
+            position: absolute;
+            top: 50%;
+            height: 1px;
+            z-index: -1;
+            opacity: 0.3;
+        }
+
+        /* CONECTORES PRESTIGE: DEFINICIÓN Y FLUJO */
+        .panel-why::before { width: 268px; left: -268px; background: linear-gradient(90deg, var(--accent-gold), rgba(149, 124, 61, 0.2)); height: 2px; }
+        .panel-how::before { width: 185px; left: -185px; background: linear-gradient(90deg, rgba(230, 126, 34, 0.8), rgba(230, 126, 34, 0.2)); height: 2px; }
+        .panel-what::before { width: 100px; left: -100px; background: linear-gradient(90deg, var(--primary-midnight), rgba(15, 52, 96, 0.1)); height: 2px; }
+
+        /* Efecto de activación de conectores */
+        .info-panel:hover::before, .info-panel.is-active::before { opacity: 1; height: 3px; filter: drop-shadow(0 0 5px rgba(149, 124, 61, 0.4)); }
+
+        /* REGLAS DE CÍRCULOS: JERARQUÍA DE MARCA */
+        .circle { border-radius: 50%; display: flex; justify-content: center; align-items: center; position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); transition: all 0.6s cubic-bezier(0.23, 1, 0.32, 1); }
+        
+        .circle-what { 
+            width: 550px; height: 550px; 
+            border: 2px solid rgba(15, 52, 96, 0.15); 
+            background: radial-gradient(circle, rgba(255,255,255,0) 70%, rgba(149, 124, 61, 0.05) 100%); 
+            box-shadow: inset 0 0 40px rgba(15, 52, 96, 0.03); 
+            z-index: 1; 
+        }
+
+        .circle-how { 
+            width: 380px; height: 380px; 
+            border: 2px solid rgba(230, 126, 34, 0.4); 
+            background: rgba(255, 255, 255, 0.05); 
+            z-index: 2; 
+        }
+
+        .circle-why { 
+            width: 215px; height: 215px; 
+            background: var(--primary-midnight); 
+            color: var(--accent-gold); 
+            border: 3px solid var(--accent-gold); 
+            box-shadow: 0 25px 70px rgba(15, 52, 96, 0.5); 
+            z-index: 10; 
+            overflow: hidden;
+        }
+
+        /* ETIQUETA CENTRAL: EL ALMA (WHY) */
+        .label-why { 
+            font-weight: 900; 
+            font-size: 1.6rem; 
+            letter-spacing: 4px; 
+            text-shadow: 0 0 20px rgba(149, 124, 61, 0.4);
+            animation: pulseWhy 4s infinite ease-in-out;
+        }
+
+        @keyframes pulseWhy {
+            0%, 100% { transform: scale(1); opacity: 1; }
+            50% { transform: scale(1.05); opacity: 0.8; }
+        }
+
+        .info-panel:hover p,
+        .info-panel.is-active p {
+            opacity: 1;
+            transform: translateX(0);
+        }
+
+        /* Eliminamos el salto visual del contenedor */
+        html { scroll-behavior: smooth; }
+
+        /* ALINEACIÓN MILIMÉTRICA POR NIVEL (Offset vertical) */
+        .panels-column {
+            display: flex;
+            flex-direction: column;
+            gap: 15px; /* Gap reducido para permitir el offset */
+            width: auto;
+            text-align: left;
+            padding-top: 150px; /* Punto de inicio ajustado */
+        }
+
+        /* Posicionamiento relativo al radio de cada anillo */
+        .panel-why { border-left: 4px solid var(--accent-gold); margin-top: 90px; }
+        .panel-how { border-left: 4px solid rgba(230, 126, 34, 0.8); margin-top: 30px; }
+        .panel-what { border-left: 4px solid var(--primary-midnight); margin-top: 60px; }
+
+        /* CONECTORES DINÁMICOS UNIFICADOS */
+        .info-panel::before {
+            content: '';
+            position: absolute;
+            top: 50%;
+            height: 1px;
+            z-index: -1;
+            transition: all 0.4s ease;
+            opacity: 0.4;
+        }
+
+        .panel-why::before { width: 268px; left: -268px; background: var(--accent-gold); }
+        .panel-how::before { width: 185px; left: -185px; background: rgba(230, 126, 34, 0.6); }
+        .panel-what::before { width: 100px; left: -100px; background: var(--primary-midnight); }
+
+        h4 { margin: 0 0 10px 0; color: var(--primary-midnight); font-weight: 700; text-transform: uppercase; font-size: 0.8rem; letter-spacing: 1px; }
+        p { margin: 0; font-size: 0.85rem; color: #555; line-height: 1.6; }
+
+        /* --- SECCIÓN STORYTELLING: IMPACTO Y AUTORIDAD --- */
+        .storytelling-header { 
+            margin: 0 auto 80px auto; 
+            text-align: center; 
+            max-width: 900px; 
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            animation: prestigeFadeIn 0.8s ease-out; 
+        }
+        .prestige-title { color: var(--primary-midnight); font-weight: 900; font-size: 2.5rem; margin-bottom: 30px; letter-spacing: 2px; }
+        .authority-hook { background: rgba(15, 52, 96, 0.03); padding: 40px; border-radius: 30px; border-left: 6px solid var(--accent-gold); margin-bottom: 40px; box-shadow: 0 10px 30px rgba(0,0,0,0.02); }
+        .hook-quote { font-weight: 700; font-size: 1.6rem; color: var(--primary-midnight); margin-bottom: 20px; line-height: 1.3; }
+        .hook-description { font-weight: 300; color: #555; line-height: 1.8; font-size: 1rem; }
+        .sinek-context { font-size: 0.95rem; color: #777; max-width: 700px; margin: 0 auto; line-height: 1.6; }
+        .sinek-video-btn { 
+            display: inline-flex; align-items: center; margin-top: 25px; padding: 14px 30px; 
+            background: white; color: var(--primary-midnight); text-decoration: none; border-radius: 50px; 
+            border: 1px solid rgba(149, 124, 61, 0.3); font-weight: 600; font-size: 0.8rem; 
+            text-transform: uppercase; letter-spacing: 1.5px; transition: all 0.4s cubic-bezier(0.23, 1, 0.32, 1);
+            box-shadow: 0 5px 15px rgba(0,0,0,0.05);
+        }
+        .sinek-video-btn:hover { background: var(--accent-gold); color: white; transform: translateY(-3px); box-shadow: 0 12px 25px rgba(149, 124, 61, 0.2); }
+        
+        @keyframes prestigeFadeIn { from { opacity: 0; transform: translateY(-15px); } to { opacity: 1; transform: translateY(0); } }
+
+        /* --- SECCIÓN DE VALORES: EL SUSTENTO DEL ADN --- */
+        .values-section { 
+            margin-top: 100px; 
+            width: 100%; 
+            max-width: 1000px; 
+            animation: prestigeFadeIn 1.2s ease-out; 
+            padding-bottom: 80px;
+        }
+        .values-header { margin-bottom: 45px; position: relative; }
+        .values-header h3 { 
+            color: var(--primary-midnight); 
+            font-weight: 700; 
+            font-size: 1.2rem; 
+            text-transform: uppercase; 
+            letter-spacing: 3px; 
+        }
+        .values-header::after {
+            content: ''; display: block; width: 50px; height: 3px; 
+            background: var(--accent-gold); margin: 15px auto 0;
+        }
+
+        /* --- OPTIMIZACIÓN PRESTIGE: CENTRADO DE PILARES --- */
+        .values-grid { 
+            display: flex; 
+            flex-wrap: wrap; 
+            justify-content: center; 
+            gap: 20px; 
+            width: 100%;
+        }
+        .value-item { 
+            flex: 0 1 235px; /* Base fija para alinear con la fila de 4 */
+            border-left: 5px solid var(--accent-gold) !important;
+            text-align: left; 
+            min-height: 140px; /* Incremento ligero para albergar descripciones largas */
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            animation: prestigeFadeIn 1s ease-out;
+        }
+        .value-item .kpi-label { 
+            margin-bottom: 12px; 
+            display: block; 
+            font-size: 0.85rem; 
+            color: var(--accent-gold); 
+            font-weight: 800;
+            letter-spacing: 1.5px;
+            text-transform: uppercase;
+        }
+        .value-item .value-text { 
+            font-size: 1.05rem; 
+            font-weight: 700; 
+            color: var(--primary-midnight); 
+            line-height: 1.3;
+        }
+    </style>
+</head>
+<body>
+    <div id="app">
+        <header class="navbar" style="padding: 12px 40px; border-bottom: 1px solid rgba(15, 52, 96, 0.08); display: flex; justify-content: space-between; align-items: center; background: rgba(255, 255, 255, 0.85); backdrop-filter: blur(12px); position: sticky; top: 0; z-index: 1000;">
+            <div style="width: 140px;" class="hidden md:block"></div> 
+            <div class="logo-container">
+                <img id="main-logo" data-asset="logo.png" alt="Mi Empresa Crece" class="logo-header">
+            </div>
+            <div style="width: 160px;"></div>
+        </header>
+
+        <main class="dna-container">
+            <header class="storytelling-header">
+                <h2 class="prestige-title">EL ORIGEN DE LA TRASCENDENCIA</h2>
+                
+                <div class="authority-hook">
+                    <p class="hook-quote">"No construimos solo empresas; forjamos el vehículo de tu legado."</p>
+                    <p class="hook-description">
+                        En Mi Empresa Crece, entendemos que el éxito económico es la consecuencia natural de un propósito humano profundo. 
+                        Creemos firmemente que solo un breve empujón nos puede llevar a superar el primer escalón para emprender un camino de impacto social y ético.
+                    </p>
+                </div>
+
+                <div class="sinek-context">
+                    <p>
+                        Adoptamos la metodología que transformó a <strong>Apple y Pixar</strong> para aplicarla al crecimiento de tu PyME. 
+                        A través del Círculo Dorado de Simon Sinek, aseguramos que cada acción de tu organización nazca de una convicción inquebrantable.
+                    </p>
+                    <a href="https://www.ted.com/talks/simon_sinek_how_great_leaders_inspire_action" target="_blank" class="sinek-video-btn">
+                        Ver Masterclass de Sinek
+                    </a>
+                </div>
+            </header>
+
+            <div class="golden-circle-wrapper">
+                <div class="circle-column">
+                    <div class="circle circle-what"></div>
+                    <div class="circle circle-how"></div>
+                    <div class="circle circle-why">
+                        <span class="label-why">WHY</span>
+                    </div>
+                </div>
+
+                <div class="panels-column">
+                    <div class="info-panel panel-why">
+                        <h4>El Propósito (WHY)</h4>
+                        <p>Cargando propósito...</p>
+                    </div>
+
+                    <div class="info-panel panel-how">
+                        <h4>La Metodología (HOW)</h4>
+                        <p>Cargando metodología...</p>
+                    </div>
+
+                    <div class="info-panel panel-what">
+                        <h4>El Resultado (WHAT)</h4>
+                        <p>Cargando resultados...</p>
+                    </div>
+                </div>
+            </div>
+
+            <section class="values-section">
+                <div class="values-header">
+                    <h3>Nuestros Pilares</h3>
+                </div>
+                <div id="values-bento-container" class="values-grid">
+                    </div>
+            </section>
+        </main>
+    </div>
+
+    <script>
+        (function() {
+            var mainScript = document.createElement('script');
+            mainScript.src = '/src/shared/env-config.js';
+            mainScript.onerror = function() {
+                var backupScript = document.createElement('script');
+                backupScript.src = '/src/shared/env-config.template.js';
+                document.head.appendChild(backupScript);
+            };
+            document.head.appendChild(mainScript);
+        })();
+    </script>
+    <script type="module" src="src/app.js"></script>
+    <script type="module" src="src/shared/sidebar-component.js"></script>
+
+    <script type="module">
+        async function loadPrestigeDNA() {
+            try {
+                // Trazabilidad: Leemos la fuente única de verdad
+                const response = await fetch('src/shared/cultura-dna.json');
+                const dna = await response.json();
+
+                // Inyección quirúrgica en el DOM (Círculo Dorado)
+                const panelWhy = document.querySelector('.panel-why p');
+                const panelHow = document.querySelector('.panel-how p');
+                const panelWhat = document.querySelector('.panel-what p');
+
+                if (panelWhy) panelWhy.innerText = dna.why;
+                if (panelHow) panelHow.innerText = dna.how;
+                if (panelWhat) panelWhat.innerText = dna.what;
+
+                // Renderizado dinámico de Valores (Bento Grid) con Segmentación de Autoridad
+                const valuesContainer = document.getElementById('values-bento-container');
+                if (valuesContainer && dna.valores) {
+                    valuesContainer.innerHTML = dna.valores.map(item => {
+                        // Trazabilidad: Separamos el título de la descripción mediante el divisor ":"
+                        const parts = item.split(':');
+                        const titulo = parts[0].trim();
+                        const descripcion = parts.slice(1).join(':').trim();
+
+                        return `
+                            <div class="bento-item value-item">
+                                <span class="kpi-label">${titulo}</span>
+                                <span class="value-text">${descripcion}</span>
+                            </div>
+                        `;
+                    }).join('');
+                }
+
+                console.log("🧬 Dreams Identity: ADN y Valores cargados dinámicamente.");
+                
+                // INYECCIÓN DE INTERACCIÓN PRESTIGE
+                setupCapsuleInteractions();
+            } catch (e) {
+                console.error("🚨 Error al sincronizar el ADN visual:", e);
+            }
+        }
+
+        function setupCapsuleInteractions() {
+            const panels = document.querySelectorAll('.info-panel');
+            
+            panels.forEach(panel => {
+                panel.addEventListener('click', (e) => {
+                    // Trazabilidad: Si clickeamos una, cerramos las otras para mantener el orden
+                    const isAlreadyActive = panel.classList.contains('is-active');
+                    
+                    panels.forEach(p => p.classList.remove('is-active'));
+                    
+                    if (!isAlreadyActive) {
+                        panel.classList.add('is-active');
+                        // Suavizado: Centramos la cápsula en la vista si queda muy fuera
+                        panel.scrollIntoView({ behavior: 'smooth', block: 'nearest', inline: 'center' });
+                    }
+                });
+            });
+        }
+
+        document.addEventListener('DOMContentLoaded', loadPrestigeDNA);
+    </script>
+</body>
+</html>
