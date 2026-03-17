@@ -3,7 +3,7 @@ import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebas
 import { getAuth } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
 import { 
     getFirestore, doc, getDoc, setDoc, 
-    collection, getDocs, query, orderBy 
+    collection, getDocs, query, orderBy, where 
 } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
 
 const firebaseConfig = {
@@ -58,4 +58,4 @@ export const checkAccess = async (itemType, itemId) => {
     }
 };
 
-export { doc, getDoc, setDoc, collection, getDocs, query, orderBy };
+export { doc, getDoc, setDoc, collection, getDocs, query, orderBy, where };

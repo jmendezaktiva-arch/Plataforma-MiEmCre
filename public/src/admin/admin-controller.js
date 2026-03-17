@@ -349,6 +349,7 @@ document.addEventListener('DOMContentLoaded', async () => {
                 <tr style="border-bottom: 1px solid #f4f4f4; transition: background 0.2s;" onmouseover="this.style.background='#fafafa'" onmouseout="this.style.background='transparent'">
                     <td style="padding: 15px;">
                         <div style="font-weight: 600; color: var(--primary-midnight);">${user.nombre}</div>
+                        <div style="font-size: 0.7rem; color: var(--accent-gold); font-weight: 700; text-transform: uppercase; margin-bottom: 2px;">${user.empresa || 'Empresa No Definida'}</div>
                         <div style="font-size: 0.75rem; color: #999;">${user.email}</div>
                     </td>
                     <td style="padding: 15px;">
@@ -427,6 +428,7 @@ document.addEventListener('DOMContentLoaded', async () => {
             const userData = {
                 nombre: document.getElementById('new-nombre').value,
                 email: email,
+                empresa: document.getElementById('new-empresa').value, // Trazabilidad: Captura el valor del nuevo input
                 rol: document.getElementById('new-rol').value,
                 cursos: selectedCursos,
                 consultor: hasConsultor ? ['ia-expert'] : [],
@@ -640,12 +642,127 @@ document.addEventListener('DOMContentLoaded', async () => {
         }
     };
 
-    // Registro del motor en el Admin Guard
-    // Buscamos donde llamas a loadUsersList() y añadimos loadCoursesList()
+    // --- MOTOR DE GESTIÓN DE CONSULTORÍA (CMS SERVICES) ---
+    const ServiceManager = {
+        async saveService(data, serviceId = null) {
+            try {
+                // Trazabilidad: Generamos un ID basado en el título o usamos el existente para edición
+                const id = serviceId || data.title.toLowerCase().trim().replace(/\s+/g, '-').replace(/[^\w-]+/g, '');
+                const serviceRef = doc(db, "config_consultoria", id);
+                
+                await setDoc(serviceRef, {
+                    ...data,
+                    ultimaModificacion: serverTimestamp()
+                }, { merge: true });
+                
+                console.log(`✅ Dreams Cloud: Servicio [${id}] sincronizado.`);
+            } catch (error) {
+                console.error("🚨 Error en ServiceManager.saveService:", error);
+                throw error;
+            }
+        }
+    };
+
+    // ESCUCHADORES DEL MODAL DE SERVICIOS
+    const btnOpenAltaServicio = document.getElementById('btn-open-alta-servicio');
+    const modalServicio = document.getElementById('modal-servicio');
+    const formServicio = document.getElementById('form-config-servicio');
+
+    btnOpenAltaServicio?.addEventListener('click', () => {
+        formServicio.reset();
+        formServicio.dataset.editingId = ""; 
+        modalServicio.style.display = 'block';
+    });
+
+    formServicio?.addEventListener('submit', async (e) => {
+        e.preventDefault();
+        const btnSubmit = e.target.querySelector('button[type="submit"]');
+        btnSubmit.disabled = true;
+        btnSubmit.innerText = "SINCRONIZANDO...";
+
+        const serviceData = {
+            title: document.getElementById('service-title').value,
+            description: document.getElementById('service-description').value,
+            purposeDesc: document.getElementById('service-purpose-desc').value,
+            type: document.getElementById('service-type').value,
+            price: parseFloat(document.getElementById('service-price').value) || 0,
+            isActive: document.getElementById('service-is-active').checked,
+            isHighlighted: document.getElementById('service-highlight').checked
+        };
+
+        try {
+            const editingId = formServicio.dataset.editingId;
+            await ServiceManager.saveService(serviceData, editingId);
+            alert("✅ Servicio de Consultoría guardado con éxito.");
+            modalServicio.style.display = 'none';
+            loadServicesList(); // Refresco quirúrgico
+        } catch (error) {
+            alert("🚨 Error al guardar el servicio.");
+        } finally {
+            btnSubmit.disabled = false;
+            btnSubmit.innerText = "SINCRONIZAR SERVICIO";
+        }
+    });
+
+    /**
+     * MOTOR DE RENDERIZADO DE SERVICIOS (ADMIN UI)
+     */
+    const loadServicesList = async () => {
+        const grid = document.getElementById('service-admin-grid');
+        if (!grid) return;
+
+        try {
+            const querySnapshot = await getDocs(collection(db, "config_consultoria"));
+            
+            if (querySnapshot.empty) {
+                grid.innerHTML = `<div style="grid-column: 1/-1; text-align: center; padding: 40px; color: #999;">No hay servicios de consultoría configurados.</div>`;
+                return;
+            }
+
+            grid.innerHTML = querySnapshot.docs.map(docSnap => {
+                const s = docSnap.data();
+                return `
+                <article class="card" style="padding: 20px; border-top: 4px solid ${s.type === 'IA' ? 'var(--accent-gold)' : 'var(--primary-midnight)'};">
+                    <div style="display: flex; justify-content: space-between; align-items: flex-start;">
+                        <span style="font-size: 0.6rem; font-weight: 800; text-transform: uppercase; color: #999;">${s.type}</span>
+                        ${s.isActive ? '🟢' : '🔴'}
+                    </div>
+                    <h4 style="margin: 10px 0; font-size: 1rem; color: var(--primary-midnight);">${s.title}</h4>
+                    <p style="font-size: 0.7rem; color: #666; line-height: 1.4; min-height: 3em;">${s.description?.substring(0, 80)}...</p>
+                    <div style="display: flex; justify-content: space-between; align-items: center; margin-top: 15px; padding-top: 15px; border-top: 1px solid #eee;">
+                        <span style="font-size: 0.8rem; font-weight: 900;">$${s.price.toLocaleString()}</span>
+                        <div style="display: flex; gap: 8px;">
+                            <button onclick="prepareEditService('${docSnap.id}')" style="background: #f0f4f8; border: none; padding: 8px; border-radius: 6px; cursor: pointer;">⚙️</button>
+                        </div>
+                    </div>
+                </article>`;
+            }).join('');
+        } catch (error) {
+            console.error("🚨 Error al cargar servicios:", error);
+        }
+    };
+
+    window.prepareEditService = async (id) => {
+        const docSnap = await getDoc(doc(db, "config_consultoria", id));
+        if (docSnap.exists()) {
+            const s = docSnap.data();
+            formServicio.dataset.editingId = id;
+            document.getElementById('service-title').value = s.title;
+            document.getElementById('service-description').value = s.description;
+            document.getElementById('service-purpose-desc').value = s.purposeDesc;
+            document.getElementById('service-type').value = s.type;
+            document.getElementById('service-price').value = s.price;
+            document.getElementById('service-is-active').checked = s.isActive;
+            document.getElementById('service-highlight').checked = s.isHighlighted;
+            modalServicio.style.display = 'block';
+        }
+    };
+
+    // Actualización del registro maestro de datos
     window.initAdminData = () => {
         loadAdminStats();
         loadUsersList();
         loadCoursesList();
+        loadServicesList(); // Inclusión del pilar de consultoría
     };
-
 });

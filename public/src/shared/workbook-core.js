@@ -111,6 +111,75 @@ const WorkbookCore = {
         }
     },
 
+    // --- MOTOR DE VIRALIDAD MULTI-CANAL v2.0 ---
+    sharing: {
+        config: {
+            title: "Recomendación: Programa Consolida 360°",
+            text: "¡Hola! Te recomiendo el Programa Consolida 360° de Mi Empresa Crece. Estoy usando su plataforma 'Dreams' para profesionalizar mi PyME y el contenido es extraordinario.",
+            url: window.location.origin // Detecta automáticamente la URL base
+        },
+        async trigger() {
+            // Si el dispositivo soporta compartir nativo (iPhone/Android), usamos el menú del sistema
+            if (navigator.share && /Android|iPhone|iPad|iPod/i.test(navigator.userAgent)) {
+                try {
+                    await navigator.share(this.config);
+                } catch (e) { console.log("Compartir omitido."); }
+            } else {
+                // En escritorio, inyectamos el Menú Prestige de opciones
+                this.showMenu();
+            }
+        },
+        showMenu() {
+            const menuId = 'dreams-share-overlay';
+            if (document.getElementById(menuId)) return;
+
+            const overlay = document.createElement('div');
+            overlay.id = menuId;
+            overlay.className = "fixed inset-0 z-[200] flex items-center justify-center bg-[#0F3460]/40 backdrop-blur-md p-4";
+            overlay.innerHTML = `
+                <div class="bg-white rounded-[2rem] p-8 max-w-sm w-full shadow-2xl border border-gray-100 animate-in fade-in zoom-in duration-300">
+                    <h3 class="text-[#0F3460] font-black text-xl uppercase mb-6 text-center tracking-tighter">Recomendar programa</h3>
+                    <div class="space-y-3">
+                        <button onclick="WorkbookCore.sharing.whatsapp()" class="w-full flex items-center justify-between p-4 bg-green-50 rounded-2xl hover:bg-green-100 transition-all group">
+                            <span class="font-bold text-green-700 text-sm">WhatsApp</span>
+                            <span class="text-green-500 group-hover:translate-x-1 transition-transform">→</span>
+                        </button>
+                        <button onclick="WorkbookCore.sharing.email()" class="w-full flex items-center justify-between p-4 bg-blue-50 rounded-2xl hover:bg-blue-100 transition-all group">
+                            <span class="font-bold text-blue-700 text-sm">Email Profesional</span>
+                            <span class="text-blue-500 group-hover:translate-x-1 transition-transform">→</span>
+                        </button>
+                        <button onclick="WorkbookCore.sharing.copyLink(this)" class="w-full flex items-center justify-between p-4 bg-gray-50 rounded-2xl hover:bg-gray-100 transition-all group">
+                            <span class="font-bold text-gray-700 text-sm">Copiar Vínculo</span>
+                            <span class="text-gray-400 group-hover:scale-110 transition-transform">📋</span>
+                        </button>
+                    </div>
+                    <button onclick="document.getElementById('${menuId}').remove()" class="w-full mt-6 text-gray-400 font-bold text-[10px] uppercase tracking-[0.2em] hover:text-[#957C3D] transition-colors">Cerrar</button>
+                </div>
+            `;
+            document.body.appendChild(overlay);
+        },
+        whatsapp() {
+            window.open(`https://wa.me/?text=${encodeURIComponent(this.config.text + " " + this.config.url)}`, '_blank');
+        },
+        email() {
+            const subject = encodeURIComponent(this.config.title);
+            const body = encodeURIComponent(`${this.config.text}\n\nAccede aquí: ${this.config.url}`);
+            window.location.href = `mailto:?subject=${subject}&body=${body}`;
+        },
+        copyLink(btn) {
+            navigator.clipboard.writeText(this.config.url).then(() => {
+                const label = btn.querySelector('span');
+                const originalText = label.innerText;
+                label.innerText = "¡Copiado!";
+                label.classList.add('text-blue-600');
+                setTimeout(() => {
+                    label.innerText = originalText;
+                    label.classList.remove('text-blue-600');
+                }, 2000);
+            });
+        }
+    },
+
     async exportToPDF(elementId, filename) {
         // ... (Código original de html2canvas y jsPDF conservado íntegramente)
     }

@@ -77,9 +77,14 @@ const SidebarPrestige = {
                         <hr style="border: 0; border-top: 1px solid rgba(149, 124, 61, 0.2); margin: 10px 0;">
                     ` : ''}
 
+                    <a href="identidad.html" class="sidebar-link" style="border-left: 2px solid var(--accent-gold); margin-top: 5px; background: rgba(149, 124, 61, 0.03);">
+                        <span class="label" style="font-weight: 600;">Nuestro ADN</span>
+                    </a>
+
                     <a href="dashboard.html" class="sidebar-link">
                         <span class="label">Dashboard</span>
                     </a>
+                    
                     <a href="academia.html" class="sidebar-link">
                         <span class="label">Academia</span>
                     </a>

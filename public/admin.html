@@ -92,6 +92,23 @@
                     </div>
                 </div>
             </section>
+        <section class="card" style="margin-top: 30px; width: 100%; border-top: 4px solid var(--accent-gold);">
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 25px;">
+                    <div>
+                        <h3 style="color: var(--primary-midnight); margin: 0;">Catálogo de Servicios de Consultoría</h3>
+                        <p style="font-size: 0.75rem; color: #888; margin-top: 5px;">Gestiona paquetes estratégicos, sesiones de staff y acceso al Consultor IA.</p>
+                    </div>
+                    <button id="btn-open-alta-servicio" class="btn-primary" style="width: auto; padding: 10px 25px; background: var(--primary-midnight); font-size: 0.75rem;">
+                        + AGREGAR SERVICIO
+                    </button>
+                </div>
+
+                <div id="service-admin-grid" style="display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 20px;">
+                    <div style="grid-column: 1/-1; text-align: center; padding: 40px; color: #999; background: #f9f9f9; border-radius: 12px; border: 1px dashed #ddd;">
+                        Sincronizando servicios con Dreams Cloud...
+                    </div>
+                </div>
+            </section>
         </main>
     </div>
 
@@ -119,6 +136,7 @@
             <input type="text" id="new-nombre" placeholder="Nombre Completo" class="form-control" required>
             <input type="email" id="new-email" placeholder="Email Corporativo" class="form-control" required>
             <input type="password" id="new-password" placeholder="Contraseña Temporal" class="form-control" required minlength="6">
+            <input type="text" id="new-empresa" placeholder="Nombre de la Empresa / Organización" class="form-control" required>
                         
             <label style="font-size: 0.8rem; color: #666; margin-top: 10px; display: block;">Rol del Sistema:</label>
             <select id="new-rol" class="form-control">
@@ -219,6 +237,58 @@
             <div style="grid-column: 1 / -1; display: flex; gap: 15px; margin-top: 20px;">
                 <button type="submit" class="btn-primary" style="flex: 2; padding: 15px; font-weight: 700;">GUARDAR CAMBIOS EN LA NUBE</button>
                 <button type="button" onclick="document.getElementById('modal-curso').style.display='none'" style="flex: 1; background:#eee; border:none; border-radius:12px; color:#666; cursor:pointer; font-weight:600;">CANCELAR</button>
+            </div>
+        </form>
+    </div>
+</div>
+<div id="modal-servicio" class="modal-overlay" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(15, 52, 96, 0.85); backdrop-filter: blur(10px); z-index:2002; overflow-y: auto;">
+    <div class="card" style="margin: 2% auto; width: 95%; max-width: 700px; border-top: 6px solid var(--accent-gold); padding: 35px;">
+        <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 20px;">
+            <div>
+                <h3 style="color: var(--primary-midnight); font-weight: 900; font-size: 1.4rem; margin: 0;">CONFIGURACIÓN DEL SERVICIO</h3>
+                <p style="font-size: 0.75rem; color: #777; margin-top: 5px;">Define el valor, alcance y modalidad de tus servicios de consultoría.</p>
+            </div>
+            <button onclick="document.getElementById('modal-servicio').style.display='none'" style="background:none; border:none; font-size: 1.5rem; cursor:pointer; color:#ccc;">&times;</button>
+        </div>
+
+        <form id="form-config-servicio" style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px;">
+            <div style="grid-column: 1 / -1; background: #f9f9f9; padding: 20px; border-radius: 12px; border-left: 4px solid var(--accent-gold);">
+                <label style="font-size: 0.7rem; font-weight: 700; color: #555; text-transform: uppercase;">Nombre del Servicio:</label>
+                <input type="text" id="service-title" class="form-control" placeholder="Ej: Diagnóstico de Escalabilidad 360" required style="margin-bottom: 15px;">
+                
+                <label style="font-size: 0.7rem; font-weight: 700; color: #555; text-transform: uppercase;">Descripción del Alcance:</label>
+                <textarea id="service-description" class="form-control" placeholder="Describe qué incluye este servicio..." style="min-height: 80px; margin-bottom: 15px;"></textarea>
+
+                <div style="background: #fff; padding: 15px; border-radius: 10px; border: 1.5px dashed var(--primary-midnight); margin-top: 5px;">
+                    <label style="font-size: 0.7rem; font-weight: 800; color: var(--primary-midnight); text-transform: uppercase; display: block; margin-bottom: 10px;">💎 Promesa de Valor (Prestige):</label>
+                    <textarea id="service-purpose-desc" class="form-control" placeholder="¿Cuál es el resultado transformador para la PyME?" style="min-height: 80px; border-color: #eee; font-size: 0.8rem;"></textarea>
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label style="font-size: 0.7rem; font-weight: 700;">TIPO DE SERVICIO:</label>
+                <select id="service-type" class="form-control" required>
+                    <option value="IA">Inteligencia Artificial (24/7)</option>
+                    <option value="Staff">Sesión con Expertos (1:1)</option>
+                    <option value="Proyecto">Proyecto Integral / Mentoría</option>
+                    <option value="Diagnostico">Diagnóstico Inicial</option>
+                </select>
+            </div>
+
+            <div class="form-group">
+                <label style="font-size: 0.7rem; font-weight: 700;">INVERSIÓN (MXN):</label>
+                <input type="number" id="service-price" class="form-control" placeholder="0.00" required>
+            </div>
+
+            <div style="grid-column: 1 / -1; background: #f0f4f8; padding: 15px; border-radius: 12px; display: flex; align-items: center; gap: 20px;">
+                <label style="font-size: 0.75rem; font-weight: 700; color: var(--primary-midnight);">ESTADO DEL SERVICIO:</label>
+                <label style="cursor: pointer; font-size: 0.8rem;"><input type="checkbox" id="service-is-active" checked> Activo en Catálogo</label>
+                <label style="cursor: pointer; font-size: 0.8rem;"><input type="checkbox" id="service-highlight"> Destacar (IA)</label>
+            </div>
+
+            <div style="grid-column: 1 / -1; display: flex; gap: 15px; margin-top: 10px;">
+                <button type="submit" class="btn-primary" style="flex: 2; padding: 15px; font-weight: 700; background: var(--primary-midnight);">SINCRONIZAR SERVICIO</button>
+                <button type="button" onclick="document.getElementById('modal-servicio').style.display='none'" style="flex: 1; background:#eee; border:none; border-radius:12px; color:#666; cursor:pointer; font-weight:600;">CANCELAR</button>
             </div>
         </form>
     </div>
