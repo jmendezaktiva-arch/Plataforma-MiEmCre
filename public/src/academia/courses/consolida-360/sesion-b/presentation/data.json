@@ -1,0 +1,169 @@
+{
+  "courseMetadata": {
+    "courseId": "consolida-360",
+    "courseName": "Consolida 360°",
+    "sessionId": "sesion-b",
+    "sessionTitle": "Impulsa tu PyME: Ecosistema Digital de Ventas",
+    "version": "1.2",
+    "lastUpdated": "2026-03-11"
+  },
+  "guideLabels": {
+    "video": {
+      "title": "Visión del Ecosistema",
+      "desc": "Cápsula estratégica sobre la ruta digital de ventas."
+    },
+    "pres": {
+      "title": "Mapa de Ventas Digitales",
+      "desc": "Estructura del ecosistema y puntos de captura."
+    },
+    "workbook": {
+      "title": "Plan de Configuración Digital",
+      "desc": "Herramienta para implementar tu flujo consultivo."
+    },
+    "audio": {
+      "title": "Inmersión: Ecosistema",
+      "desc": "Profundiza en la estrategia de canales mientras operas."
+    },
+    "support": {
+      "title": "Soporte Estratégico",
+      "desc": "Consultoría directa para tu implementación digital."
+    }
+  },
+  "multimedia": {
+    "tutorialUrl": "tmVeeIbp7xo", 
+    "playlist": [
+      {
+        "title": "🎙️ Sesión B: Ecosistema Digital",
+        "url": "podcast-sesion-b.mp3"
+      }
+    ]
+  },
+  "slides": [
+    {
+      "id": "slide-0",
+      "layout": "layout-center-focus",
+      "title": "Ecosistema Digital de Ventas",
+      "subtitle": "Construyendo tu ruta digital en acción",
+      "image": {
+        "src": "logo.png",
+        "alt": "Logo Consolida 360"
+      }
+    },
+    {
+      "id": "slide-1",
+      "layout": "layout-default",
+      "title": "¡Bienvenidos a Consolida 360°!",
+      "subtitle": "Juntos construimos tu ruta digital en acción.",
+      "content": "<p>Transformando tu PyME en un Ecosistema de Ventas</p>",
+      "image": {
+        "src": "slide-b1.png",
+        "alt": "Portada de Bienvenida a Consolida 360°"
+      }
+    },
+    {
+      "id": "slide-2",
+      "layout": "layout-default",
+      "title": "Mi Empresa Crece: Nuestra Esencia",
+      "subtitle": "Teorema, Metodología y Valor",
+      "image": {
+        "src": "Slide-b2.png",
+        "alt": "Diagrama de la esencia de Mi Empresa Crece"
+      }
+   },
+    {
+      "id": "slide-3",
+      "layout": "layout-infographic",
+      "title": "Programa de Transformación",
+      "image": {
+        "src": "recorrido.png",
+        "alt": "Infografía del programa de transformación"
+      }
+    },
+    {
+      "id": "slide-4",
+      "layout": "layout-center-focus",
+      "title": "Sus Guías en este Viaje",
+      "subtitle": "Aliados en tu Estrategia",
+      "image": {
+        "src": "guias.png",
+        "alt": "Imagen de los facilitadores"
+      }
+    },
+    {
+      "id": "slide-5",
+      "layout": "layout-default slide-5-custom",
+      "title": "Reglas del Juego y Dinámica",
+      "subtitle": "Fomentando la Responsabilidad y el Compromiso",
+      "image": {
+        "src": "reglas.png",
+        "alt": "Dinámica de la sesión"
+      }
+    },
+    {
+      "id": "slide-6",
+      "layout": "layout-two-columns",
+      "title": "Objetivos de Hoy: Tu Camino al Éxito",
+      "subtitle": "De la Estrategia al Plan",
+      "image": {
+        "src": "slide-b6.1.png",
+        "alt": "Iconos representando los objetivos de la sesión"
+      }
+    },
+    {
+      "id": "slide-7",
+      "layout": "layout-center-focus",
+      "title": "El Mapa de Conceptos",
+      "subtitle": "Anclas para tu Ecosistema de Ventas Digitales",
+      "image": {
+        "src": "slide-b7.png",
+        "alt": "Infografía del mapa de conceptos clave"
+      }
+    },
+    {
+      "id": "slide-8",
+      "layout": "layout-center-focus",
+      "title": "¿Qué es el Ecosistema de Ventas Digitales?",
+      "image": {
+        "src": "slide-b8.png",
+        "alt": "Diagrama del ecosistema de ventas digitales"
+      }
+    },
+    {
+      "id": "slide-9",
+      "layout": "layout-center-focus",
+      "title": "Nuestra Ruta de Implementación",
+      "subtitle": "El Flujo Consultivo para la acción",
+      "image": {
+        "src": "slide-b9.png",
+        "alt": "Diagrama de flujo de la ruta de implementación"
+      }
+    },
+    {
+      "id": "slide-17",
+      "layout": "layout-center-focus",
+      "title": "Conclusiones y Cierre Efectivo",
+      "subtitle": "Menos es Más, Más Resultados",
+      "image": {
+        "src": "slide-b17.png",
+        "alt": "Imagen de reflexión y conclusiones"
+      }
+    },
+    {
+      "id": "slide-18",
+      "layout": "layout-center-focus",
+      "title": "Tareas Asignadas y Siguientes Pasos",
+      "subtitle": "Tu compromiso con la acción",
+      "content": "<p>Asegura una implementación <strong>exitosa</strong>.</p><ul class='lista-objetivos'><li>Seleccionar canales.</li><li>Flujo Consultivo: Paso 2: Crear set de contenido.</li><li>Flujo Consultivo: Paso 3: Configurar punto de captura.</li><li>Flujo Consultivo: Paso 4: Definir métricas y Excel de control.</li><li>La sesión de feedback con el mentor es crucial para la Honestidad en la medición.</li><li>Da seguimiento a las sesiones semanales con tus colaboradores.</li><li>Configura tu ecosistema digital.</li><li>No faltes a la próxima sesión.</li><li>Programa tu reunión individual con el equipo de consultoría.</li></ul>"
+    },
+    {
+      "id": "slide-19",
+      "layout": "layout-center-focus",
+      "title": "¡No te quedes con dudas! Contáctanos para más información.",
+      "subtitle": "Gracias por participar",
+      "image": {
+        "src": "contacto.png",
+        "alt": "Información de contacto y cierre de soporte"
+      }
+    }
+  ]
+}

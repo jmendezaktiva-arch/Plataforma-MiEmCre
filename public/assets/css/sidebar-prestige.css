@@ -1,0 +1,157 @@
+/*public/assets/css/sidebar-prestige.css
+/* ========================================================================== */
+/* DREAMS | SIDEBAR PRESTIGE (MINIMALISMO Y AUTORIDAD) */
+/* ========================================================================== */
+
+.sidebar-prestige {
+    position: fixed;
+    left: 0;
+    top: 0;
+    height: 100vh;
+    width: 260px;
+    /* TRACEABILIDAD: Incremento de Z-index para superar capas de Liquid Glass y Navbar */
+    z-index: 9999 !important; 
+    display: block !important;
+    background: rgba(15, 52, 96, 0.92); /* Midnight con transparencia */
+    backdrop-filter: blur(15px);        /* Liquid Glass effect */
+    border-right: 1.5px solid var(--accent-gold);
+    color: var(--bg-base);
+    z-index: 2000;
+    transition: transform 0.4s cubic-bezier(0.19, 1, 0.22, 1);
+    display: flex;
+    flex-direction: column;
+    box-shadow: 10px 0 30px rgba(15, 52, 96, 0.15);
+}
+
+/* Estado oculto: Se deja una "Manija de Oro" de 8px visible para servir de disparador técnico y visual */
+.sidebar-prestige.sidebar-hidden {
+    transform: translateX(-252px); /* Ancho 260px - 8px de manija = 252px */
+}
+
+/* Micro-interacción: La manija se ilumina sutilmente al pasar el cursor antes de expandirse */
+.sidebar-prestige.sidebar-hidden:hover {
+    border-right-width: 4px;
+    background: rgba(15, 52, 96, 1);
+}
+
+/* Área de Navegación */
+.sidebar-nav {
+    flex-grow: 1;
+    padding: 40px 20px;
+}
+
+.sidebar-link {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+    padding: 15px;
+    color: var(--bg-base);
+    text-decoration: none;
+    font-size: 0.9rem;
+    font-weight: 300;
+    border-radius: 12px;
+    transition: all 0.3s ease;
+    margin-bottom: 8px;
+}
+
+.sidebar-link:hover {
+    background: rgba(149, 124, 61, 0.15);
+    color: var(--accent-gold);
+    padding-left: 20px;
+}
+
+.sidebar-link.disabled {
+    opacity: 0.4;
+    cursor: not-allowed;
+    filter: grayscale(1);
+}
+
+/* Footer y Logout */
+.sidebar-footer {
+    padding: 20px;
+    border-top: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.btn-logout-sidebar {
+    width: 100%;
+    padding: 12px;
+    background: transparent;
+    border: 1px solid rgba(246, 141, 46, 0.3); /* Brand Orange sutil */
+    color: #FFFFFF;
+    border-radius: 8px;
+    cursor: pointer;
+    font-size: 0.8rem;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    transition: all 0.3s;
+}
+
+.btn-logout-sidebar:hover {
+    background: #ef4444; /* Rojo crítico para logout */
+    border-color: #ef4444;
+}
+
+/* --- AJUSTE QUIRÚRGICO: PEEK LOGO (MEDIO CÍRCULO) --- */
+
+.sidebar-brand-peek {
+    position: absolute;
+    right: -30px; /* Desborda la mitad de su ancho (60px) */
+    top: 55px;    /* Alineación visual con el botón 'Regresar' */
+    width: 60px;
+    height: 60px;
+    background: var(--primary-midnight, #0F3460);
+    border: 1.5px solid var(--accent-gold, #957C3D);
+    border-radius: 50%;
+    display: flex;
+    justify-content: flex-end; /* Empuja el logo hacia la parte visible (derecha) */
+    align-items: center;
+    padding-right: 8px;
+    cursor: pointer;
+    box-shadow: 5px 0 15px rgba(0, 0, 0, 0.2);
+    z-index: -1; /* Se posiciona detrás del sidebar para que la unión sea limpia */
+    transition: all 0.3s ease;
+}
+
+/* Ajuste del logo dentro del medio círculo */
+.sidebar-brand-peek img {
+    width: 25px;
+    height: 25px;
+    object-fit: contain;
+    filter: brightness(1.2); /* Realce sutil para visibilidad */
+}
+
+/* Efecto Hover: El círculo 'late' ligeramente al pasar el mouse */
+.sidebar-prestige.sidebar-hidden:hover .sidebar-brand-peek {
+    right: -35px;
+    box-shadow: 8px 0 20px rgba(149, 124, 61, 0.3);
+}
+
+/* Ocultar la pestaña cuando el sidebar está totalmente abierto para limpiar la interfaz */
+.sidebar-prestige:not(.sidebar-hidden) .sidebar-brand-peek {
+    opacity: 0;
+    pointer-events: none;
+}
+
+/* ========================================================================== */
+/* SINCRONIZACIÓN DE LAYOUT (EXPANSIÓN DINÁMICA DEL WORKBOOK) */
+/* ========================================================================== */
+
+/* TRACER: Esta regla busca el contenedor principal. 
+   Asegúrate de que tu contenido esté dentro de un <main> o clase similar.
+*/
+main, .main-content, .workbook-container {
+    margin-left: 260px; /* Espacio igual al ancho del sidebar */
+    transition: margin-left 0.4s cubic-bezier(0.19, 1, 0.22, 1), width 0.4s cubic-bezier(0.19, 1, 0.22, 1);
+    width: calc(100% - 260px);
+    min-height: 100vh;
+}
+
+/* ESTADO EXPANDIDO: Cuando el body detecta el colapso, 
+   el contenido ocupa el 100% menos los 8px de la Manija de Oro.
+*/
+body.sidebar-is-collapsed main, 
+body.sidebar-is-collapsed .main-content, 
+body.sidebar-is-collapsed .workbook-container {
+    margin-left: 8px; 
+    width: calc(100% - 8px);
+}
