@@ -19,11 +19,22 @@
     --text-color: #1A1A1A;
     --card-bg: #FFFFFF;
 
-    /* --- WORKBOOK UI TOKENS (MI EMPRESA CRECE) --- */
-    --brand-blue: #00529B;         /* Azul Institucional (Confianza) */
-    --brand-orange: #F68D2E;       /* Naranja Institucional (Acción) */
-    --brand-blue-light: #eff6ff;   /* Fondo para instructions-box */
-    --brand-orange-light: #fffbeb; /* Fondo para pro-tip */
+    /* --- WORKBOOK UI TOKENS (HOMOLOGADOS PRESTIGE) --- */
+    --brand-blue: var(--primary-midnight); /* Sincronizado con Azul Medianoche [cite: 16] */
+    --brand-orange: var(--accent-gold);    /* Sincronizado con Oro Bronceado [cite: 17] */
+    --brand-blue-light: rgba(15, 52, 96, 0.05); /* Versión suave para fondos de cajas */
+    --brand-orange-light: rgba(149, 124, 61, 0.1); /* Versión suave para tips */
+
+    /* --- ESCALA DE LEGIBILIDAD DREAMS (ESTÁNDAR PRESTIGE) --- */
+    --font-size-h1: 2.125rem;     /* 34px: Autoridad Máxima */
+    --font-size-h2: 1.75rem;      /* 28px: Títulos de Sección */
+    --font-size-h3: 1.375rem;     /* 22px: Títulos de Módulo / Card */
+    --font-size-body: 1.063rem;   /* 17px: Cuerpo de texto (Lectura Premium) */
+    --font-size-label: 0.938rem;  /* 15px: Mínimo para etiquetas y micro-copy */
+    --font-size-button: 1rem;     /* 16px: Botones de acción */
+
+    /* --- SEMÁFORO INSTITUCIONAL (SINCRONIZACIÓN) --- */
+    --secondary-color: #2E7D32;   /* Verde para estados 'Live' y Éxito */
 
     /* --- INFRAESTRUCTURA DE ESPACIADO (FASE 1) --- */
     --container-max-width: 1400px; 
@@ -55,13 +66,18 @@ body, button, input, textarea, select {
 }
 
 body {
-    font-size: 16px;
-    background-color: var(--bg-base); /* Transición al Marfil de Lino */
+    font-size: var(--font-size-body); /* 17px: Sincronización con escala Prestige */
+    background-color: var(--bg-base);
     color: var(--text-color);
     margin: 0;
     min-height: 100vh;
     line-height: 1.6;
-    font-weight: 400; /* Peso base para estabilidad en la interfaz */
+    font-weight: 400;
+}
+
+/* Blindaje Global de Legibilidad para Etiquetas y Fragmentos */
+span {
+    font-size: var(--font-size-label); /* Suelo mínimo de 15px garantizado */
 }
 
 /* --- AJUSTE GLOBAL DE REVEAL PARA ACADEMIA --- */
@@ -72,37 +88,45 @@ body {
 }
 
 /* --- JERARQUÍA TIPOGRÁFICA PRESTIGE (MONTSERRAT CORE) --- */
-/* Encabezados Maestros: Autoridad y Claridad */
-h1, h2, .reveal h1, .reveal h2 {
+/* --- JERARQUÍA TIPOGRÁFICA PRESTIGE (SINCRONIZADA) --- */
+h1, .reveal h1 {
     font-family: 'Montserrat', sans-serif !important;
-    font-size: 1.875rem !important; /* 30px optimizado para lectura rápida */
+    font-size: var(--font-size-h1) !important; /* 34px: Autoridad Máxima */
     font-weight: 700 !important;
     color: var(--primary-midnight) !important;
-    letter-spacing: -0.02em !important; /* Tracking negativo para look editorial */
-    line-height: 1.3 !important;
+    letter-spacing: -0.02em !important;
+    line-height: 1.2 !important;
     margin-bottom: 1.5rem;
-    text-transform: none !important;
 }
 
-/* Títulos de Módulos y Cards: Distinción Visual */
+h2, .reveal h2 {
+    font-family: 'Montserrat', sans-serif !important;
+    font-size: var(--font-size-h2) !important; /* 28px: Títulos de Sección */
+    font-weight: 700 !important;
+    color: var(--primary-midnight) !important;
+    letter-spacing: -0.02em !important;
+    line-height: 1.3 !important;
+    margin-bottom: 1.5rem;
+}
+
 h3, .reveal h3 {
     font-family: 'Montserrat', sans-serif !important;
-    font-size: 1.25rem !important; /* 20px estandarizado */
+    font-size: var(--font-size-h3) !important; /* 22px: Títulos de Módulo */
     font-weight: 700 !important;
     color: var(--primary-midnight) !important;
     letter-spacing: -0.01em !important;
     margin-bottom: 1rem;
 }
 
-/* Cuerpo de Texto: Lujo Silencioso y Legibilidad Extendida */
+/* Cuerpo de Texto y Listas: Lujo Silencioso y Legibilidad Premium */
 p, li, .reveal p, .reveal li {
     font-family: 'Montserrat', sans-serif !important;
-    font-weight: 400 !important; /* Incremento a Regular para contraste sólido */
-    font-size: 1.063rem; /* 17px: Estándar de lectura premium */
+    font-weight: 400 !important;
+    font-size: var(--font-size-body) !important; /* Consistencia en 17px */
     line-height: 1.8 !important; 
     color: var(--text-color);
     margin-bottom: 1.5rem;
-    letter-spacing: 0.01em; /* Micro-ajuste para evitar amontonamiento */
+    letter-spacing: 0.01em;
 }
 
 /* Énfasis y Datos Críticos: Blindaje de Trazabilidad */
@@ -654,15 +678,15 @@ audio::-webkit-media-controls-play-button {
     flex-shrink: 0;
 }
 
-/* --- RESCATE DE CITA DESTACADA (Legacy Style: Azul & Coral) --- */
+/* --- CITA DESTACADA PRESTIGE (AUTORIDAD & ELEGANCIA) --- */
 #view-presentation .highlight-quote {
-    background: rgba(0, 90, 156, 0.05); /* Fondo Azul primario casi imperceptible */
+    background: rgba(15, 52, 96, 0.04); /* Sutil velo de Azul Medianoche */
     padding: 35px 45px;
-    border-left: 8px solid var(--accent-color); /* Borde grueso en Coral vibrante */
-    border-radius: 0 15px 15px 0; /* Bordes redondeados solo a la derecha */
+    border-left: 6px solid var(--accent-gold); /* Borde de autoridad en Oro Prestige */
+    border-radius: 0 16px 16px 0;
     margin-top: 50px;
     font-style: italic;
-    box-shadow: 2px 2px 15px rgba(0, 90, 156, 0.05);
+    box-shadow: 0 10px 30px rgba(15, 52, 96, 0.03); /* Sombra teñida de Midnight */
 }
 
 #view-presentation .highlight-quote p {
@@ -691,10 +715,10 @@ audio::-webkit-media-controls-play-button {
 }
 
 .card p {
-    font-size: 1rem; /* 16px: Estándar Body para legibilidad */
-    color: #4A5568; /* Gris ligeramente más oscuro para contraste */
-    line-height: 1.6;
-    font-weight: 400; /* Regular: mejor para bloques de texto */
+    font-size: var(--font-size-body); /* 17px (1.063rem): Sincronización Prestige */
+    color: var(--text-color); /* #1A1A1A: Contraste optimizado para accesibilidad */
+    line-height: 1.7; /* Mayor interlineado para facilitar el escaneo visual */
+    font-weight: 400;
 }
 
 /* Clase para etiquetas de categoría dentro de las cards */
@@ -791,15 +815,14 @@ audio::-webkit-media-controls-play-button {
 
 .close-bubble:hover { background: #fee2e2; color: #ef4444; }
 
-/* BOTÓN DE REVELACIÓN (CAT PODEROSO) */
 .btn-reveal-purpose {
     background: none;
     border: 1.5px solid var(--secondary-color);
     color: var(--secondary-color);
-    padding: 12px 20px; /* Más área de interacción */
+    padding: 14px 24px; /* Incremento de padding para equilibrar el nuevo tamaño */
     border-radius: 12px;
-    font-size: 0.875rem; /* Elevado a 14px: Estándar funcional para micro-copy */
-    font-weight: 700; /* Más peso para diferenciarlo del texto de la burbuja */
+    font-size: var(--font-size-button); /* 16px (1rem): Estándar Prestige de Legibilidad */
+    font-weight: 700;
     text-transform: uppercase;
     letter-spacing: 0.05em;
     cursor: pointer;
@@ -890,14 +913,14 @@ audio::-webkit-media-controls-play-button {
 #btn-open-contact {
     background: var(--primary-midnight);
     color: white;
-    padding: 12px 22px; /* Incremento de padding para compensar el tamaño de fuente */
+    padding: 14px 24px; /* Ajuste milimétrico para albergar el nuevo tamaño de fuente */
     border-radius: 12px;
-    font-size: 0.875rem; /* Elevado a 14px para legibilidad funcional */
+    font-size: var(--font-size-button); /* 16px (1rem): Homologación Prestige */
     border: 1.5px solid var(--accent-gold);
     cursor: pointer;
     display: flex;
     align-items: center;
-    gap: 8px;
+    gap: 10px; /* Mayor respiro entre el texto y el emoji/icono */
     font-weight: 600;
     text-transform: uppercase;
     letter-spacing: 0.05em;
@@ -1126,16 +1149,16 @@ body.cinema-mode #view-workbook {
     background: rgba(15, 52, 96, 0.05);
     border: 1px solid rgba(15, 52, 96, 0.15);
     color: var(--primary-midnight);
-    padding: 12px 24px;
+    padding: 14px 28px; /* Padding incrementado para dar aire al nuevo tamaño */
     border-radius: 12px;
-    font-size: 0.875rem; /* Elevado a 14px para facilitar la lectura técnica */
+    font-size: var(--font-size-button); /* 16px (1rem): Estándar Prestige de Legibilidad */
     font-weight: 700;
     text-transform: uppercase;
     letter-spacing: 0.05em;
     cursor: pointer;
     display: flex;
     align-items: center;
-    gap: 10px;
+    gap: 12px;
     transition: all 0.4s cubic-bezier(0.165, 0.84, 0.44, 1);
 }
 
@@ -1223,9 +1246,10 @@ body.cinema-mode #view-workbook {
 .matrix-table th {
     background-color: var(--primary-midnight);
     color: white;
-    font-size: 0.813rem; /* Elevado de 10px a 13px (Seguridad visual) */
+    font-size: var(--font-size-label); /* 15px (0.938rem): Suelo de Legibilidad Prestige */
+    font-weight: 700; /* Refuerzo de autoridad para encabezados */
     text-transform: uppercase;
-    letter-spacing: 0.05em;
-    padding: 15px;
+    letter-spacing: 0.06em; /* Micro-ajuste para mejorar la lectura en mayúsculas */
+    padding: 18px 15px; /* Incremento de respiro vertical para equilibrar el tamaño */
     text-align: center;
 }

@@ -301,6 +301,74 @@
             color: var(--primary-midnight); 
             line-height: 1.3;
         }
+
+        /* MODAL VIDEO PRESTIGE (LIQUID GLASS) */
+        .video-modal {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(15, 52, 96, 0.85); /* Azul Medianoche con transparencia Prestige */
+            backdrop-filter: blur(15px); /* Efecto Liquid Glass */
+            z-index: 2000;
+            display: none;
+            justify-content: center;
+            align-items: center;
+            opacity: 0;
+            transition: opacity 0.4s ease;
+        }
+
+        .video-modal.is-active {
+            display: flex;
+            opacity: 1;
+        }
+
+        .video-container {
+            position: relative;
+            width: 90%;
+            max-width: 1000px;
+            aspect-ratio: 16/9;
+            background: #000;
+            border-radius: 24px;
+            overflow: hidden;
+            box-shadow: 0 40px 100px rgba(0,0,0,0.6);
+            border: 1px solid rgba(149, 124, 61, 0.4); /* Borde Oro Bronceado */
+            transform: scale(0.95);
+            transition: transform 0.4s cubic-bezier(0.23, 1, 0.32, 1);
+        }
+
+        .video-modal.is-active .video-container {
+            transform: scale(1);
+        }
+
+        .video-container iframe {
+            width: 100%;
+            height: 100%;
+            border: none;
+        }
+
+        .close-video {
+            position: absolute;
+            top: -50px;
+            right: 0;
+            background: none;
+            border: none;
+            color: white;
+            font-size: 0.9rem;
+            font-weight: 400;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            transition: color 0.3s ease;
+        }
+
+        .close-video:hover {
+            color: var(--accent-gold);
+        }
     </style>
 </head>
 <body>
@@ -331,7 +399,7 @@
                         A través del Círculo Dorado de Simon Sinek, aseguramos que cada acción de tu organización nazca de una convicción inquebrantable.
                     </p>
                     <a href="https://www.ted.com/talks/simon_sinek_how_great_leaders_inspire_action" target="_blank" class="sinek-video-btn">
-                        Ver Masterclass de Sinek
+                        Ver video de Masterclass de Sinek
                     </a>
                 </div>
             </header>
@@ -371,6 +439,25 @@
                     </div>
             </section>
         </main>
+
+        <div id="videoModal" class="video-modal" aria-hidden="true">
+            <div class="video-container">
+                <button id="closeVideo" class="close-video" title="Cerrar Reproductor">
+                    <span>Cerrar Masterclass</span>
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <line x1="18" y1="6" x2="6" y2="18"></line>
+                        <line x1="6" y1="6" x2="18" y2="18"></line>
+                    </svg>
+                </button>
+                <iframe 
+                    id="sinekIframe" 
+                    src="" 
+                    title="Simon Sinek Masterclass" 
+                    allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" 
+                    allowfullscreen>
+                </iframe>
+            </div>
+        </div>
     </div>
 
     <script>
@@ -450,7 +537,44 @@
             });
         }
 
-        document.addEventListener('DOMContentLoaded', loadPrestigeDNA);
+        function setupVideoModal() {
+            const videoBtn = document.querySelector('.sinek-video-btn');
+            const videoModal = document.getElementById('videoModal');
+            const closeBtn = document.getElementById('closeVideo');
+            const iframe = document.getElementById('sinekIframe');
+            
+            // ID del video de la Masterclass (YouTube Embed por compatibilidad)
+            const videoId = "qp0HIF3SfI4"; 
+
+            if (videoBtn && videoModal) {
+                videoBtn.addEventListener('click', (e) => {
+                    e.preventDefault(); // Evita la redirección externa
+                    
+                    // Inyectamos el SRC solo al abrir (Ahorro de recursos)
+                    iframe.src = `https://www.youtube.com/embed/${videoId}?autoplay=1&rel=0`;
+                    videoModal.classList.add('is-active');
+                    document.body.style.overflow = 'hidden'; // Bloquea scroll de fondo
+                });
+
+                const closeVideo = () => {
+                    videoModal.classList.remove('is-active');
+                    iframe.src = ""; // "Matamos" el video para que deje de sonar
+                    document.body.style.overflow = ''; // Libera el scroll
+                };
+
+                closeBtn.addEventListener('click', closeVideo);
+
+                // Cierre de cortesía al hacer clic fuera de la burbuja (Fondo)
+                videoModal.addEventListener('click', (e) => {
+                    if (e.target === videoModal) closeVideo();
+                });
+            }
+        }
+
+        document.addEventListener('DOMContentLoaded', () => {
+            loadPrestigeDNA();
+            setupVideoModal();
+        });
     </script>
 </body>
 </html>

@@ -47,8 +47,8 @@
     padding: 15px;
     color: var(--bg-base);
     text-decoration: none;
-    font-size: 0.9rem;
-    font-weight: 300;
+    font-size: var(--font-size-label); /* 15px (0.938rem): Suelo Prestige de Legibilidad */
+    font-weight: 400; /* Incremento a Regular para evitar que el texto se "pierda" en el fondo oscuro */
     border-radius: 12px;
     transition: all 0.3s ease;
     margin-bottom: 8px;
@@ -74,15 +74,16 @@
 
 .btn-logout-sidebar {
     width: 100%;
-    padding: 12px;
+    padding: 14px; /* Incremento para equilibrar el nuevo tamaño de fuente */
     background: transparent;
-    border: 1px solid rgba(246, 141, 46, 0.3); /* Brand Orange sutil */
+    border: 1.5px solid rgba(149, 124, 61, 0.4); /* Sincronización con Oro Prestige (#957C3D) */
     color: #FFFFFF;
     border-radius: 8px;
     cursor: pointer;
-    font-size: 0.8rem;
+    font-size: var(--font-size-button); /* 16px (1rem): Estándar Prestige para botones */
+    font-weight: 600; /* Peso Semi-bold para garantizar legibilidad en el pie de página */
     text-transform: uppercase;
-    letter-spacing: 1px;
+    letter-spacing: 1.5px; /* Tracking ligeramente aumentado para mayor distinción */
     transition: all 0.3s;
 }
 

@@ -1,4 +1,4 @@
-/**
+/**public/src/consultoria/consultoria.js
  * DREAMS PLATFORM | Consultoría Prestige Controller
  * Objetivo: Gestionar la oferta de servicios y la activación del Consultor IA.
  */
@@ -8,7 +8,7 @@ let SERVICES_CONFIG = [];
 let USER_STRATEGIC_CONTEXT = {}; // Trazabilidad: Almacén del ADN empresarial
 
 document.addEventListener('DOMContentLoaded', async () => {
-    const productsContainer = document.getElementById('consulting-products-list');
+    const productsContainer = document.getElementById('consulting-cards-container');
 
     /**
      * MOTOR DE CARGA: Sincronización con config_consultoria
@@ -54,6 +54,9 @@ document.addEventListener('DOMContentLoaded', async () => {
     const renderServices = () => {
         if (!productsContainer) return;
 
+        // TRACER: Liberamos el contenedor para que el Bento Grid gestione la expansión
+        productsContainer.style.display = "contents";
+
         // Filtramos solo los que NO son tipo IA para el listado de Staff/Paquetes
         const staffServices = SERVICES_CONFIG.filter(s => s.type !== 'IA');
 
@@ -62,21 +65,68 @@ document.addEventListener('DOMContentLoaded', async () => {
             return;
         }
 
-        productsContainer.innerHTML = staffServices.map(service => `
-            <div class="service-item" style="margin-bottom: 20px; padding: 15px; border-radius: 12px; background: rgba(15, 52, 96, 0.03); border: 1px solid rgba(15, 52, 96, 0.05);">
-                <div style="display: flex; justify-content: space-between; align-items: flex-start;">
-                    <h4 style="margin: 0; color: var(--primary-midnight); font-size: 0.95rem;">${service.title}</h4>
-                    <span style="font-weight: 700; color: var(--primary-midnight); font-size: 0.85rem;">$${service.price.toLocaleString()}</span>
+        productsContainer.innerHTML = staffServices.map(service => {
+            // TRACEABILIDAD: Construcción dinámica del desglose de fases y actividades
+            const phasesHtml = (service.phases || []).map((phase, idx) => {
+                // Cálculo de horas por fase para transparencia total
+                const phaseHours = (phase.activities || []).reduce((sum, act) => sum + (act.duration || 0), 0);
+                
+                return `
+                <div style="margin-top: 12px; padding-left: 12px; border-left: 2px solid var(--accent-gold);">
+                    <div style="display: flex; justify-content: space-between; align-items: center;">
+                        <span style="font-size: 0.7rem; font-weight: 700; color: var(--primary-midnight); text-transform: uppercase; letter-spacing: 0.5px;">
+                            ${idx + 1}. ${phase.title}
+                        </span>
+                        <span style="font-size: 0.65rem; color: #999; font-weight: 600;">${phaseHours} hrs</span>
+                    </div>
+                    <ul style="margin: 6px 0 0 0; padding-left: 0; list-style: none;">
+                        ${(phase.activities || []).map(act => `
+                            <li style="font-size: 0.7rem; color: #777; margin-bottom: 4px; display: flex; justify-content: space-between;">
+                                <span>• ${act.title}</span>
+                                <span style="color: #bbb; font-style: italic;">${act.duration}h</span>
+                            </li>
+                        `).join('')}
+                    </ul>
+                </div>`;
+            }).join('');
+
+            return `
+            <section class="card-recurso" style="grid-row: span 2; display: flex; flex-direction: column; justify-content: space-between; background: #fff; border: 1px solid rgba(15, 52, 96, 0.08); padding: 25px; border-radius: 16px; position: relative; overflow: hidden; height: 100%; box-sizing: border-box;">
+                <div style="position: absolute; top: 0; left: 0; width: 100%; height: 4px; background: var(--primary-midnight); opacity: 0.1;"></div>
+                <div style="overflow-y: hidden; display: flex; flex-direction: column; flex-grow: 1;">
+                    <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 15px;">
+                        <div style="flex: 1;">
+                            <h4 style="margin: 0; color: var(--primary-midnight); font-size: 1.1rem; font-weight: 700;">${service.title}</h4>
+                            <div style="display: flex; gap: 8px; margin-top: 6px; flex-wrap: wrap;">
+                                <span style="background: rgba(149, 124, 61, 0.1); color: var(--accent-gold); padding: 3px 10px; border-radius: 6px; font-size: 0.6rem; font-weight: 800; text-transform: uppercase;">
+                                    ⏱️ ${service.totalHours || 0} Horas
+                                </span>
+                                <span style="background: #f4f4f4; color: #888; padding: 3px 10px; border-radius: 6px; font-size: 0.6rem; font-weight: 800; text-transform: uppercase;">
+                                    📁 ${(service.phases || []).length} Fases
+                                </span>
+                            </div>
+                        </div>
+                        <span style="font-weight: 800; color: var(--primary-midnight); font-size: 1.1rem; margin-left: 10px;">
+                            $${(service.price || 0).toLocaleString('es-MX')}
+                        </span>
+                    </div>
+                    
+                    <p style="font-size: 0.85rem; color: #666; line-height: 1.5; margin-bottom: 15px; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden;">${service.description}</p>
+                    
+                    <div class="project-roadmap" style="background: rgba(15, 52, 96, 0.02); border-radius: 12px; padding: 15px; border: 1px solid rgba(15, 52, 96, 0.04); flex-grow: 1; overflow-y: auto; margin-bottom: 10px; max-height: 160px;">
+                        <span style="font-size: 0.6rem; color: #999; font-weight: 800; text-transform: uppercase; letter-spacing: 1px; display: block; margin-bottom: 5px;">Roadmap de Intervención:</span>
+                        ${phasesHtml || '<p style="font-size: 0.7rem; color: #bbb; font-style: italic;">Consultar desglose con el asesor.</p>'}
+                    </div>
                 </div>
-                <p style="font-size: 0.75rem; color: #666; margin: 8px 0;">${service.description}</p>
+
                 <button class="btn-primary" 
                         data-action="request" 
                         data-id="${service.id}"
-                        style="width: 100%; padding: 10px; font-size: 0.7rem; background: none; color: var(--primary-midnight); border: 1px solid var(--primary-midnight);">
-                    SOLICITAR INFORMACIÓN
+                        style="width: 100%; margin-top: 10px; padding: 14px; font-size: 0.75rem; font-weight: 700; background: var(--primary-midnight); color: #fff; border-radius: 8px; flex-shrink: 0;">
+                    SOLICITAR INTERVENCIÓN
                 </button>
-            </div>
-        `).join('');
+            </section>`;
+        }).join('');
     };
 
     // Inicialización del flujo

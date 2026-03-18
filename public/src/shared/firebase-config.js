@@ -41,8 +41,9 @@ export const checkAccess = async (itemType, itemId) => {
         if (userSnap.exists()) {
             const userData = userSnap.data();
             
-            // 1. Prioridad: Admins tienen acceso total (Trazabilidad de Rol)
-            if (userData.rol === 'Admin') return true;
+            // 1. Prioridad: Admins tienen acceso total (Trazabilidad de Rol Resiliente)
+            const userRol = (userData.rol || "").toLowerCase();
+            if (userRol === 'admin' || userRol === 'administrador') return true;
 
             // 2. Lógica de accesos adquiridos
             // Se espera una estructura en Firestore: accesos: { apps: [...], cursos: [...] }

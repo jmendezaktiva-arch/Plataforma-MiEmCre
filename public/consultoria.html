@@ -22,28 +22,30 @@
             margin-top: 30px;
         }
         .card-ia {
-            grid-column: span 2;
+            grid-column: span 1; /* Reducido para igualar el ancho de Staff */
             grid-row: span 2;
-            background: linear-gradient(135deg, var(--primary-midnight), #1a4a8e);
-            color: white;
+            background: var(--card-bg); /* Fondo blanco institucional */
+            color: var(--text-color);
             display: flex;
             flex-direction: column;
-            justify-content: center;
-            align-items: center;
-            text-align: center;
-            border: 1px solid var(--accent-gold);
+            justify-content: flex-start; /* Alineación superior */
+            align-items: flex-start; /* Alineación a la izquierda */
+            text-align: left; /* Texto a la izquierda */
+            border: 1px solid rgba(15, 52, 96, 0.05); /* Borde sutil igual a Staff */
             position: relative;
             overflow: hidden;
         }
+        /* Refinamiento del indicador IA para que sea elegante y no invasivo */
         .card-ia::after {
             content: 'IA';
             position: absolute;
-            top: -20px;
-            right: -10px;
-            font-size: 8rem;
+            bottom: 10px;
+            right: 10px;
+            font-size: 4rem;
             font-weight: 900;
-            opacity: 0.05;
-            color: var(--accent-gold);
+            opacity: 0.03;
+            color: var(--primary-midnight);
+            pointer-events: none;
         }
     </style>
 </head>
@@ -60,28 +62,41 @@
         <main class="consultoria-container">
             <header>
                 <h2 style="color: var(--primary-midnight); font-weight: 700;">Consultoría Estratégica</h2>
-                <p style="color: #666;">Potencia tu negocio con inteligencia artificial y el respaldo de nuestro staff de expertos.</p>
+                <p style="color: #666;">Potencia tu negocio con inteligencia artificial y el respaldo de nuestro staff de expertos. Solicita información sobre nuestros paquetes de consultoría y adquiere el que más se ajuste a tus necesidades y realidad.</p>
             </header>
 
             <div class="bento-consultoria">
                 <section class="card-recurso card-ia">
-                    <span style="color: var(--accent-gold); font-weight: 700; letter-spacing: 2px;">DISPONIBLE 24/7</span>
-                    <h2 style="font-size: 2.5rem; margin: 15px 0;">Consultor IA</h2>
-                    <p style="max-width: 400px; opacity: 0.9;">Resolución inmediata de dudas estratégicas basada en tu metodología de crecimiento.</p>
+                    <h3 style="color: var(--primary-midnight);">Consultor IA</h3>
+                    <p style="font-size: 0.9rem; color: #666;">Resolución inmediata de dudas estratégicas basada en tu metodología de crecimiento.</p>
+                    
+                    <div style="margin-top: 20px; flex-grow: 1; display: flex; flex-direction: column; justify-content: center; background: rgba(15, 52, 96, 0.03); border: 1px solid rgba(15, 52, 96, 0.05); border-radius: 12px; padding: 25px; text-align: center;">
+                        <span style="color: var(--accent-gold); font-weight: 700; font-size: 0.65rem; letter-spacing: 1.5px; text-transform: uppercase;">Asistencia Permanente</span>
+                        <p style="font-size: 0.85rem; color: var(--primary-midnight); font-weight: 600; margin: 10px 0 0 0;">🟢 Sincronizado con tu ADN</p>
+                        <span style="font-size: 0.7rem; color: #999; margin-top: 8px;">Disponible 24/7</span>
+                    </div>
+
                     <button class="btn-primary" 
                             onclick="window.startIAConsultant()" 
-                            style="background: var(--accent-gold); border: none; color: var(--primary-midnight); margin-top: 20px; font-weight: 700;">
+                            style="width: 100%; margin-top: 15px;">
                         INICIAR CONVERSACIÓN
                     </button>
                 </section>
 
-                <section class="card-recurso" style="grid-row: span 2; display: flex; flex-direction: column;">
-                    <h3 style="color: var(--primary-midnight);">Paquetes Staff</h3>
-                    <p style="font-size: 0.9rem; color: #666;">Sesiones personalizadas con consultores senior para retos específicos.</p>
-                    <div id="consulting-products-list" style="margin-top: 20px; flex-grow: 1;">
-                        <p style="font-style: italic; color: #999; font-size: 0.8rem;">Cargando catálogo...</p>
+                <div id="consulting-cards-container" style="display: contents;"></div>
+
+                <section class="card-recurso" style="grid-row: span 2; display: flex; flex-direction: column; justify-content: space-between; background: #fff; border: 1px solid rgba(15, 52, 96, 0.08); position: relative; overflow: hidden;">
+                    <div style="position: absolute; top: 0; left: 0; width: 100%; height: 4px; background: var(--accent-gold);"></div>
+                    <div style="padding-top: 10px;">
+                        <h3 style="color: var(--primary-midnight); font-size: 1.1rem; font-weight: 700;">Proyectos a Medida</h3>
+                        <p style="font-size: 0.85rem; color: #666; margin-top: 15px; line-height: 1.6;">¿Tienes un reto estratégico que no encaja en los paquetes estandarizados? Nuestro staff senior diseña intervenciones personalizadas para la realidad única de tu negocio.</p>
+                        
+                        <div style="margin-top: 25px; padding: 20px; background: rgba(149, 124, 61, 0.03); border: 1.5px dashed var(--accent-gold); border-radius: 12px; text-align: center;">
+                            <span style="font-size: 0.65rem; color: var(--accent-gold); font-weight: 800; text-transform: uppercase; letter-spacing: 1px;">Consultoría Premium</span>
+                            <p style="font-size: 0.8rem; color: var(--primary-midnight); margin-top: 5px; font-weight: 600;">Alcance 100% Personalizado</p>
+                        </div>
                     </div>
-                    <button class="btn-primary" style="width: 100%; margin-top: 15px;">COTIZAR A MEDIDA</button>
+                    <button class="btn-primary" style="width: 100%; margin-top: 20px; background: var(--primary-midnight);">SOLICITAR COTIZACIÓN STAFF</button>
                 </section>
             </div>
         </main>

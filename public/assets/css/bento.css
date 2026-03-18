@@ -44,9 +44,9 @@
 }
 
 .kpi-label {
-    font-size: 0.938rem; /* Elevado a 15px para consistencia con la Navbar Prestige */
+    font-size: var(--font-size-label); /* 15px: Sincronización con Suelo Prestige */
     text-transform: uppercase;
-    letter-spacing: 0.08em; /* Ligera reducción de tracking para mejorar la cohesión de la palabra */
+    letter-spacing: 0.08em;
     color: var(--accent-gold);
     font-weight: 600;
 }
@@ -83,7 +83,7 @@
 }
 
 .card-recurso h3 { 
-    font-size: 1.5rem; /* Aumento ligero para mayor autoridad en el título */
+    font-size: var(--font-size-h3); /* 22px: Sincronización Prestige con Títulos de Módulo */
     color: var(--primary-midnight);
     margin-bottom: 18px;
     font-weight: 700;
@@ -91,23 +91,23 @@
 }
 
 .card-recurso p {
-    font-size: 1rem; /* 16px fijos para asegurar legibilidad en la rejilla */
-    font-weight: 400; /* Peso Regular para que la letra no "desaparezca" */
-    line-height: 1.6;
-    color: #4A5568; /* Gris profundo para contraste suave pero legible */
+    font-size: var(--font-size-body); /* 17px: Sincronización Prestige para legibilidad premium */
+    font-weight: 400;
+    line-height: 1.7; /* Incremento quirúrgico para mejorar el escaneo visual en grid */
+    color: var(--text-color); /* #1A1A1A: Máximo contraste institucional */
     margin-bottom: 0;
 }
 
-/* --- DISEÑO DE BLOQUE KPI (GESTIÓN DE PROCESOS) --- */
+/* --- DISEÑO DE BLOQUE KPI (HOMOLOGADO PRESTIGE) --- */
 .bento-kpi-card {
-    border-left: 4px solid var(--accent-terracotta); /* Identificador de color para Procesos */
+    border-left: 4px solid var(--accent-gold); /* Autoridad visual en Oro Prestige */
 }
 
 .kpi-trend {
-    font-size: 0.938rem; /* Elevado a 15px para lectura rápida de variaciones */
-    font-weight: 700;    /* Incrementado a Bold para que el color de tendencia (verde/rojo) sea más vibrante y visible */
-    margin-top: 12px;   /* Un poco más de aire respecto al valor numérico para evitar saturación */
+    font-size: var(--font-size-label); /* 15px: Sincronización con Suelo Prestige */
+    font-weight: 700;
+    margin-top: 12px;
 }
 
-.trend-up { color: #2e7d32; }
-.trend-down { color: var(--accent-terracotta); }
+.trend-up { color: var(--secondary-color); } /* Sincronización con Verde Institucional */
+.trend-down { color: var(--accent-gold); }    /* Sincronización con Oro Prestige (Ex-Terracotta) */

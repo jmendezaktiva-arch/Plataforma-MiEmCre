@@ -1,4 +1,4 @@
-/* CONEXIÓN CON DREAMS: 
+/* public/src/academia/courses/consolida-360-sesion-b-workbook-css-workbook-local.css CONEXIÓN CON DREAMS: 
    Eliminamos Open Sans para heredar Montserrat del Master CSS.
    Vinculamos colores locales a las variables institucionales.
 */
@@ -65,6 +65,24 @@
   .avoid-break {
     page-break-inside: avoid;
   }
+}
+
+/* --- INFRAESTRUCTURA DE LEGIBILIDAD: MICRO-COPY PRESTIGE --- */
+/* Sincronización con Sesión C: Blindaje contra la fatiga visual en instrucciones */
+
+.instructions-box, .pro-tip, .note-text, .help-content {
+    font-size: 1rem !important; /* 16px estandarizados */
+    line-height: 1.6 !important;
+    font-weight: 400 !important;
+}
+
+/* Títulos internos de las instrucciones */
+.instructions-box strong, .pro-tip strong {
+    font-size: 1.063rem; /* 17px para jerarquía */
+    font-weight: 700;
+    color: var(--primary-midnight);
+    display: block;
+    margin-bottom: 5px;
 }
 
 /* --- COMPONENTES DE ASISTENCIA: TOOLTIPS Y AYUDA --- */

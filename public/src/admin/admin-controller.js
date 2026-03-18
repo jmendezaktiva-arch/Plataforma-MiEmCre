@@ -190,6 +190,13 @@ const renderEditModal = (uid, user) => {
                         <label style="display:block; margin-bottom:8px; font-size:0.9rem;"><input type="checkbox" value="academia-c" ${(user.accesos?.cursos || []).includes('academia-c') ? 'checked' : ''}> Sesión C: Maestría</label>
                     </div>
 
+                    <div style="margin-bottom:20px; padding-top: 10px; border-top: 1px solid #eee;">
+                        <label style="display:block; font-size:0.75rem; font-weight:700; margin-bottom:10px;">APLICACIONES (HERRAMIENTAS)</label>
+                        <label style="display:block; margin-bottom:8px; font-size:0.9rem;"><input type="checkbox" value="app-crm" ${(user.accesos?.apps || []).includes('app-crm') ? 'checked' : ''}> CRM Ventas</label>
+                        <label style="display:block; margin-bottom:8px; font-size:0.9rem;"><input type="checkbox" value="app-erp" ${(user.accesos?.apps || []).includes('app-erp') ? 'checked' : ''}> ERP Finanzas</label>
+                        <label style="display:block; margin-bottom:8px; font-size:0.9rem;"><input type="checkbox" value="app-process" ${(user.accesos?.apps || []).includes('app-process') ? 'checked' : ''}> Process Designer</label>
+                    </div>
+
                     <div style="margin-bottom:25px; padding:10px; background:#f9f5eb; border-radius:6px;">
                         <label style="font-weight:700; font-size:0.8rem; color:var(--accent-gold);"><input type="checkbox" id="edit-ia" ${(user.accesos?.consultor || []).includes('ia-expert') ? 'checked' : ''}> ACTIVAR CONSULTOR IA</label>
                     </div>
@@ -212,14 +219,15 @@ const renderEditModal = (uid, user) => {
         btnSave.disabled = true;
         btnSave.innerText = "GUARDANDO...";
 
-        // Captura de nuevos estados
+        // TRACEABILIDAD: Captura segmentada de nuevos estados para actualización de perfil
         const selectedCursos = Array.from(e.target.querySelectorAll('input[value^="academia-"]:checked')).map(el => el.value);
+        const selectedApps = Array.from(e.target.querySelectorAll('input[value^="app-"]:checked')).map(el => el.value);
         const hasIA = e.target.querySelector('#edit-ia').checked;
         const newRol = document.getElementById('edit-rol').value;
 
         const newAccess = {
             cursos: selectedCursos,
-            apps: user.accesos?.apps || [], // Preservamos apps existentes
+            apps: selectedApps, // Trazabilidad: Sincronización real de herramientas autorizadas
             consultor: hasIA ? ['ia-expert'] : []
         };
 
@@ -422,17 +430,19 @@ document.addEventListener('DOMContentLoaded', async () => {
             const userCredential = await createUserWithEmailAndPassword(secondaryAuth, email, password);
             const uid = userCredential.user.uid;
 
+            // TRACEABILIDAD: Captura segmentada de permisos (Academia, Apps, Consultoría)
             const selectedCursos = Array.from(e.target.querySelectorAll('input[value^="academia-"]:checked')).map(el => el.value);
+            const selectedApps = Array.from(e.target.querySelectorAll('input[value^="app-"]:checked')).map(el => el.value);
             const hasConsultor = e.target.querySelector('input[value="consultor-ia"]:checked');
 
             const userData = {
                 nombre: document.getElementById('new-nombre').value,
                 email: email,
-                empresa: document.getElementById('new-empresa').value, // Trazabilidad: Captura el valor del nuevo input
+                empresa: document.getElementById('new-empresa').value,
                 rol: document.getElementById('new-rol').value,
                 cursos: selectedCursos,
-                consultor: hasConsultor ? ['ia-expert'] : [],
-                apps: []
+                apps: selectedApps, // Trazabilidad: Inyección de herramientas digitales autorizadas
+                consultor: hasConsultor ? ['ia-expert'] : []
             };
 
             // TRACEABILIDAD: Registro en Firestore, Disparo de Correo y Limpieza
@@ -668,10 +678,121 @@ document.addEventListener('DOMContentLoaded', async () => {
     const modalServicio = document.getElementById('modal-servicio');
     const formServicio = document.getElementById('form-config-servicio');
 
+    // --- MOTOR DE UI DINÁMICA: Fases y Actividades (Consultoría Prestige) ---
+    const PhaseEngine = {
+        // Generador de HTML para una Fase
+        renderPhase(index) {
+            return `
+            <div class="phase-block" data-phase-index="${index}" style="background: #fff; border: 1px solid #eee; border-radius: 12px; padding: 15px; position: relative; margin-bottom: 10px;">
+                <div style="display: flex; gap: 10px; align-items: center; margin-bottom: 15px;">
+                    <span style="background: var(--primary-midnight); color: #fff; width: 22px; height: 22px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 0.65rem; font-weight: 700;">${index + 1}</span>
+                    <input type="text" placeholder="Nombre de la Fase (ej: Diagnóstico Inicial)" class="form-control phase-title" style="margin: 0; font-weight: 700; border-color: transparent; background: #f9f9f9; flex: 1;" required>
+                    <button type="button" class="btn-remove-phase" style="background: none; border: none; color: #cc0000; cursor: pointer; font-size: 0.8rem; padding: 5px;" title="Eliminar Fase">✕</button>
+                </div>
+                
+                <div class="activities-container" style="display: flex; flex-direction: column; gap: 8px; padding-left: 32px;">
+                    </div>
+
+                <button type="button" class="btn-add-activity" style="margin: 10px 0 0 32px; background: none; border: 1px dashed #ddd; color: #999; padding: 5px 12px; border-radius: 6px; font-size: 0.65rem; cursor: pointer; font-weight: 600; transition: 0.2s;">
+                    + AGREGAR ACTIVIDAD
+                </button>
+            </div>`;
+        },
+
+        // Generador de HTML para una Actividad
+        renderActivity() {
+            return `
+            <div class="activity-row" style="display: flex; gap: 10px; align-items: center;">
+                <input type="text" placeholder="Nombre de la actividad..." class="form-control activity-title" style="flex: 3; font-size: 0.75rem; margin: 0; padding: 8px;" required>
+                <div style="flex: 1; display: flex; align-items: center; gap: 5px;">
+                    <input type="number" placeholder="0" class="form-control activity-duration" style="margin: 0; font-size: 0.75rem; text-align: center; padding: 8px;" min="0.5" step="0.5" required>
+                    <span style="font-size: 0.6rem; color: #999; font-weight: 700;">HRS</span>
+                </div>
+                <button type="button" class="btn-remove-activity" style="background: none; border: none; color: #ccc; cursor: pointer; font-size: 0.7rem; padding: 5px;">✕</button>
+            </div>`;
+        },
+
+        // Motor de Cálculo de Trazabilidad Temporal
+        calculateTotals() {
+            let grandTotal = 0;
+            document.querySelectorAll('.activity-duration').forEach(input => {
+                grandTotal += parseFloat(input.value) || 0;
+            });
+            
+            const display = document.getElementById('service-total-hours-display');
+            const hiddenInput = document.getElementById('service-total-hours');
+            if (display) display.innerText = `${grandTotal} hrs`;
+            if (hiddenInput) hiddenInput.value = grandTotal;
+        }
+    };
+
+    // Inicialización del Modal de Servicios con Primera Fase
     btnOpenAltaServicio?.addEventListener('click', () => {
         formServicio.reset();
         formServicio.dataset.editingId = ""; 
+        
+        // Limpiar contenedor e inyectar Fase 1 + Actividad 1 por defecto
+        const container = document.getElementById('phases-container');
+        if (container) {
+            container.innerHTML = PhaseEngine.renderPhase(0);
+            container.querySelector('.activities-container').innerHTML = PhaseEngine.renderActivity();
+            PhaseEngine.calculateTotals();
+        }
+        
         modalServicio.style.display = 'block';
+    });
+
+    // --- ESCUCHADORES DINÁMICOS PARA GESTIÓN DE FASES (DELEGACIÓN) ---
+    
+    // 1. Agregar nueva Fase
+    document.getElementById('btn-add-phase')?.addEventListener('click', () => {
+        const container = document.getElementById('phases-container');
+        const nextIndex = container.querySelectorAll('.phase-block').length;
+        
+        container.insertAdjacentHTML('beforeend', PhaseEngine.renderPhase(nextIndex));
+        // Inyectamos la primera actividad de la nueva fase automáticamente
+        container.querySelector(`[data-phase-index="${nextIndex}"] .activities-container`).innerHTML = PhaseEngine.renderActivity();
+        PhaseEngine.calculateTotals();
+    });
+
+    // 2. Control Maestro de Clics (Agregar Actividad / Eliminar elementos)
+    document.getElementById('phases-container')?.addEventListener('click', (e) => {
+        const target = e.target.closest('button');
+        if (!target) return;
+
+        // Lógica: Agregar Actividad
+        if (target.classList.contains('btn-add-activity')) {
+            target.closest('.phase-block').querySelector('.activities-container').insertAdjacentHTML('beforeend', PhaseEngine.renderActivity());
+        }
+
+        // Lógica: Eliminar Actividad (Integridad de Negocio: Mínimo 1)
+        if (target.classList.contains('btn-remove-activity')) {
+            const activities = target.closest('.activities-container').querySelectorAll('.activity-row');
+            if (activities.length > 1) {
+                target.closest('.activity-row').remove();
+                PhaseEngine.calculateTotals();
+            } else {
+                alert("📍 Trazabilidad: Una fase no puede quedar huérfana. Debe tener al menos una actividad.");
+            }
+        }
+
+        // Lógica: Eliminar Fase (Integridad de Negocio: Mínimo 1)
+        if (target.classList.contains('btn-remove-phase')) {
+            const phases = document.querySelectorAll('.phase-block');
+            if (phases.length > 1) {
+                target.closest('.phase-block').remove();
+                PhaseEngine.calculateTotals();
+            } else {
+                alert("📍 Integridad: El servicio debe contar con al menos una fase de ejecución.");
+            }
+        }
+    });
+
+    // 3. Disparador de Recálculo (Cuando cambia cualquier duración)
+    document.getElementById('phases-container')?.addEventListener('input', (e) => {
+        if (e.target.classList.contains('activity-duration')) {
+            PhaseEngine.calculateTotals();
+        }
     });
 
     formServicio?.addEventListener('submit', async (e) => {
@@ -680,6 +801,19 @@ document.addEventListener('DOMContentLoaded', async () => {
         btnSubmit.disabled = true;
         btnSubmit.innerText = "SINCRONIZANDO...";
 
+        // TRACEABILIDAD: Mapeo de estructura compleja (Fases > Actividades)
+        const phasesData = Array.from(document.querySelectorAll('.phase-block')).map(phaseEl => {
+            return {
+                title: phaseEl.querySelector('.phase-title').value,
+                activities: Array.from(phaseEl.querySelectorAll('.activity-row')).map(actEl => {
+                    return {
+                        title: actEl.querySelector('.activity-title').value,
+                        duration: parseFloat(actEl.querySelector('.activity-duration').value) || 0
+                    };
+                })
+            };
+        });
+
         const serviceData = {
             title: document.getElementById('service-title').value,
             description: document.getElementById('service-description').value,
@@ -687,7 +821,11 @@ document.addEventListener('DOMContentLoaded', async () => {
             type: document.getElementById('service-type').value,
             price: parseFloat(document.getElementById('service-price').value) || 0,
             isActive: document.getElementById('service-is-active').checked,
-            isHighlighted: document.getElementById('service-highlight').checked
+            isHighlighted: document.getElementById('service-highlight').checked,
+            
+            // Inyección de nuevos parámetros de Consultoría
+            totalHours: parseFloat(document.getElementById('service-total-hours').value) || 0,
+            phases: phasesData
         };
 
         try {
@@ -743,18 +881,54 @@ document.addEventListener('DOMContentLoaded', async () => {
     };
 
     window.prepareEditService = async (id) => {
-        const docSnap = await getDoc(doc(db, "config_consultoria", id));
-        if (docSnap.exists()) {
-            const s = docSnap.data();
-            formServicio.dataset.editingId = id;
-            document.getElementById('service-title').value = s.title;
-            document.getElementById('service-description').value = s.description;
-            document.getElementById('service-purpose-desc').value = s.purposeDesc;
-            document.getElementById('service-type').value = s.type;
-            document.getElementById('service-price').value = s.price;
-            document.getElementById('service-is-active').checked = s.isActive;
-            document.getElementById('service-highlight').checked = s.isHighlighted;
-            modalServicio.style.display = 'block';
+        try {
+            const docSnap = await getDoc(doc(db, "config_consultoria", id));
+            if (docSnap.exists()) {
+                const s = docSnap.data();
+                formServicio.dataset.editingId = id;
+                
+                // 1. Mapeo de campos estándar
+                document.getElementById('service-title').value = s.title || '';
+                document.getElementById('service-description').value = s.description || '';
+                document.getElementById('service-purpose-desc').value = s.purposeDesc || '';
+                document.getElementById('service-type').value = s.type || 'Proyecto';
+                document.getElementById('service-price').value = s.price || 0;
+                document.getElementById('service-is-active').checked = s.isActive !== false;
+                document.getElementById('service-highlight').checked = s.isHighlighted || false;
+
+                // 2. RECONSTRUCCIÓN DE FASES Y ACTIVIDADES (Mapeo Inverso)
+                const container = document.getElementById('phases-container');
+                container.innerHTML = ''; // Limpieza quirúrgica del contenedor
+
+                if (s.phases && s.phases.length > 0) {
+                    s.phases.forEach((phase, pIdx) => {
+                        // Inyectamos el cascarón de la fase
+                        container.insertAdjacentHTML('beforeend', PhaseEngine.renderPhase(pIdx));
+                        const phaseBlock = container.querySelector(`[data-phase-index="${pIdx}"]`);
+                        phaseBlock.querySelector('.phase-title').value = phase.title;
+
+                        // Inyectamos y poblamos cada actividad de esta fase
+                        const actContainer = phaseBlock.querySelector('.activities-container');
+                        phase.activities.forEach(activity => {
+                            actContainer.insertAdjacentHTML('beforeend', PhaseEngine.renderActivity());
+                            const lastAct = actContainer.lastElementChild;
+                            lastAct.querySelector('.activity-title').value = activity.title;
+                            lastAct.querySelector('.activity-duration').value = activity.duration;
+                        });
+                    });
+                } else {
+                    // Si es un servicio antiguo sin fases, creamos la estructura base
+                    container.innerHTML = PhaseEngine.renderPhase(0);
+                    container.querySelector('.activities-container').innerHTML = PhaseEngine.renderActivity();
+                }
+
+                // 3. Sincronización de totales
+                PhaseEngine.calculateTotals();
+                modalServicio.style.display = 'block';
+            }
+        } catch (error) {
+            console.error("🚨 Error al reconstruir servicio para edición:", error);
+            alert("No se pudo cargar la estructura del servicio. Revisa la consola.");
         }
     };
 
