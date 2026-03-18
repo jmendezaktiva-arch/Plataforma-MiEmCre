@@ -68,25 +68,13 @@ document.addEventListener('DOMContentLoaded', async () => {
         productsContainer.innerHTML = staffServices.map(service => {
             // TRACEABILIDAD: Construcción dinámica del desglose de fases y actividades
             const phasesHtml = (service.phases || []).map((phase, idx) => {
-                // Cálculo de horas por fase para transparencia total
-                const phaseHours = (phase.activities || []).reduce((sum, act) => sum + (act.duration || 0), 0);
-                
                 return `
                 <div style="margin-top: 12px; padding-left: 12px; border-left: 2px solid var(--accent-gold);">
                     <div style="display: flex; justify-content: space-between; align-items: center;">
                         <span style="font-size: 0.7rem; font-weight: 700; color: var(--primary-midnight); text-transform: uppercase; letter-spacing: 0.5px;">
                             ${idx + 1}. ${phase.title}
                         </span>
-                        <span style="font-size: 0.65rem; color: #999; font-weight: 600;">${phaseHours} hrs</span>
                     </div>
-                    <ul style="margin: 6px 0 0 0; padding-left: 0; list-style: none;">
-                        ${(phase.activities || []).map(act => `
-                            <li style="font-size: 0.7rem; color: #777; margin-bottom: 4px; display: flex; justify-content: space-between;">
-                                <span>• ${act.title}</span>
-                                <span style="color: #bbb; font-style: italic;">${act.duration}h</span>
-                            </li>
-                        `).join('')}
-                    </ul>
                 </div>`;
             }).join('');
 
@@ -97,23 +85,34 @@ document.addEventListener('DOMContentLoaded', async () => {
                     <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 15px;">
                         <div style="flex: 1;">
                             <h4 style="margin: 0; color: var(--primary-midnight); font-size: 1.1rem; font-weight: 700;">${service.title}</h4>
-                            <div style="display: flex; gap: 8px; margin-top: 6px; flex-wrap: wrap;">
-                                <span style="background: rgba(149, 124, 61, 0.1); color: var(--accent-gold); padding: 3px 10px; border-radius: 6px; font-size: 0.6rem; font-weight: 800; text-transform: uppercase;">
-                                    ⏱️ ${service.totalHours || 0} Horas
-                                </span>
-                                <span style="background: #f4f4f4; color: #888; padding: 3px 10px; border-radius: 6px; font-size: 0.6rem; font-weight: 800; text-transform: uppercase;">
-                                    📁 ${(service.phases || []).length} Fases
-                                </span>
-                            </div>
+                            <span style="color: var(--accent-gold); font-size: 0.65rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px;">Servicio Estratégico Especializado</span>
                         </div>
-                        <span style="font-weight: 800; color: var(--primary-midnight); font-size: 1.1rem; margin-left: 10px;">
-                            $${(service.price || 0).toLocaleString('es-MX')}
-                        </span>
+                        <div style="text-align: right; margin-left: 15px;">
+                            <span style="display: block; font-size: 0.6rem; color: #999; font-weight: 700; text-transform: uppercase;">Inversión:</span>
+                            <span style="font-weight: 800; color: var(--primary-midnight); font-size: 1.25rem;">
+                                $${(service.price || 0).toLocaleString('es-MX', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+                            </span>
+                        </div>
                     </div>
                     
-                    <p style="font-size: 0.85rem; color: #666; line-height: 1.5; margin-bottom: 15px; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden;">${service.description}</p>
+                    <div style="max-height: 140px; overflow-y: auto; padding-right: 8px; margin-bottom: 20px; border-bottom: 1px solid rgba(15, 52, 96, 0.03);">
+                        <p style="font-size: 0.85rem; color: #666; line-height: 1.6; margin-bottom: 12px; white-space: pre-wrap;">${service.description}</p>
+                        ${service.purposeDesc ? `
+                            <div style="background: rgba(149, 124, 61, 0.05); padding: 12px; border-radius: 8px; border-left: 3px solid var(--accent-gold); margin-bottom: 10px;">
+                                <span style="font-size: 0.6rem; font-weight: 800; color: var(--accent-gold); text-transform: uppercase; letter-spacing: 1px; display: block; margin-bottom: 4px;">Promesa de Valor:</span>
+                                <p style="font-size: 0.8rem; color: var(--primary-midnight); line-height: 1.4; font-style: italic; margin: 0; white-space: pre-wrap;">"${service.purposeDesc}"</p>
+                            </div>
+                        ` : ''}
+                    </div>
                     
-                    <div class="project-roadmap" style="background: rgba(15, 52, 96, 0.02); border-radius: 12px; padding: 15px; border: 1px solid rgba(15, 52, 96, 0.04); flex-grow: 1; overflow-y: auto; margin-bottom: 10px; max-height: 160px;">
+                    <button class="btn-toggle-roadmap" 
+                            data-target="roadmap-${service.id}"
+                            style="width: 100%; background: none; border: 1px solid rgba(15, 52, 96, 0.1); padding: 10px; border-radius: 8px; color: var(--primary-midnight); font-size: 0.65rem; font-weight: 800; text-transform: uppercase; letter-spacing: 1px; cursor: pointer; margin-bottom: 10px; transition: all 0.3s ease; display: flex; justify-content: center; align-items: center; gap: 8px;">
+                        <span>Ver Plan de Trabajo</span>
+                        <span class="icon-arrow" style="transition: transform 0.3s;">▾</span>
+                    </button>
+
+                    <div id="roadmap-${service.id}" class="project-roadmap" style="display: none; background: rgba(15, 52, 96, 0.02); border-radius: 12px; padding: 15px; border: 1px solid rgba(15, 52, 96, 0.04); flex-grow: 1; overflow-y: auto; margin-bottom: 10px; max-height: 160px;">
                         <span style="font-size: 0.6rem; color: #999; font-weight: 800; text-transform: uppercase; letter-spacing: 1px; display: block; margin-bottom: 5px;">Roadmap de Intervención:</span>
                         ${phasesHtml || '<p style="font-size: 0.7rem; color: #bbb; font-style: italic;">Consultar desglose con el asesor.</p>'}
                     </div>
@@ -139,12 +138,62 @@ document.addEventListener('DOMContentLoaded', async () => {
         const btn = e.target.closest('button');
         if (!btn) return;
 
-        const { action, id } = btn.dataset;
+        const { action, id, target } = btn.dataset;
+
+        // Lógica de Despliegue (Show/Hide Roadmap)
+        if (btn.classList.contains('btn-toggle-roadmap')) {
+            const roadmapEl = document.getElementById(target);
+            const isOpening = roadmapEl.style.display === 'none';
+            
+            roadmapEl.style.display = isOpening ? 'block' : 'none';
+            
+            // Mutación visual del botón (Feedback Prestige)
+            btn.querySelector('span').innerText = isOpening ? 'Ocultar Plan de Trabajo' : 'Ver Plan de Trabajo';
+            btn.querySelector('.icon-arrow').style.transform = isOpening ? 'rotate(180deg)' : 'rotate(0deg)';
+            btn.style.borderColor = isOpening ? 'var(--accent-gold)' : 'rgba(15, 52, 96, 0.1)';
+            return;
+        }
 
         if (action === 'request') {
             const service = SERVICES_CONFIG.find(s => s.id === id);
-            alert(`🚀 Intervención Estratégica:\nHas solicitado información sobre: ${service.title}.\nUn consultor senior se pondrá en contacto contigo.`);
-            // Aquí conectarás con tu CRM o sistema de correos
+            const user = auth.currentUser;
+
+            if (!user) {
+                alert("Por favor, inicia sesión para solicitar esta intervención.");
+                return;
+            }
+
+            // MOTOR DE NOTIFICACIÓN PRESTIGE: Sincronización en Nube + Aviso en Tiempo Real
+            const notificarIntervencion = async () => {
+                try {
+                    // 1. Handshake con el servidor para envío de correo y registro (Netlify Function)
+                    const response = await fetch('/.netlify/functions/intervencion-notificacion', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({
+                            destinatario: "contacto@miempresacrece.com.mx",
+                            cliente: {
+                                uid: user.uid,
+                                email: user.email,
+                                nombre: USER_STRATEGIC_CONTEXT.usuario?.nombre || "Cliente en Plataforma"
+                            },
+                            servicio: {
+                                id: service.id,
+                                titulo: service.title
+                            }
+                        })
+                    });
+
+                    if (!response.ok) throw new Error('Fallo en el servicio de notificaciones');
+
+                    alert(`🚀 ¡Solicitud Enviada!\n\nHemos recibido tu interés en "${service.title}". Se ha enviado un aviso automático a nuestro staff y un consultor senior te contactará en breve.`);
+                } catch (err) {
+                    console.error("🚨 Error en el flujo de notificación:", err);
+                    alert("No pudimos completar el aviso automático en este momento, pero tu interés ha quedado registrado. Nos pondremos en contacto.");
+                }
+            };
+
+            notificarIntervencion();
         }
     });
 });

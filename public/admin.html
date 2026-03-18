@@ -109,6 +109,34 @@
                     </div>
                 </div>
             </section>
+        <section class="card" style="margin-top: 30px; width: 100%; border-top: 4px solid var(--accent-gold);">
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 25px;">
+                    <div>
+                        <h3 style="color: var(--primary-midnight); margin: 0;">Bandeja de Intervenciones Estratégicas</h3>
+                        <p style="font-size: 0.75rem; color: #888; margin-top: 5px;">Gestión de leads y solicitudes de consultoría senior capturadas en la nube.</p>
+                    </div>
+                    <span id="requests-count" style="font-size: 0.75rem; color: #666; font-weight: 600; text-transform: uppercase;">0 SOLICITUDES</span>
+                </div>
+
+                <div style="overflow-x: auto;">
+                    <table style="width: 100%; border-collapse: collapse; font-size: 0.85rem; text-align: left;">
+                        <thead>
+                            <tr style="border-bottom: 2px solid #eee; color: #999;">
+                                <th style="padding: 12px;">CLIENTE / EMPRESA</th>
+                                <th style="padding: 12px;">SERVICIO SOLICITADO</th>
+                                <th style="padding: 12px;">FECHA</th>
+                                <th style="padding: 12px;">ESTADO</th>
+                                <th style="padding: 12px; text-align: right;">ACCIONES</th>
+                            </tr>
+                        </thead>
+                        <tbody id="table-requests-body">
+                            <tr>
+                                <td colspan="5" style="padding: 30px; text-align: center; color: #999;">Sincronizando bandeja de leads...</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </section>
         </main>
     </div>
 
@@ -302,10 +330,16 @@
                         <h4 style="font-size: 0.8rem; color: var(--primary-midnight); margin: 0; font-weight: 800; text-transform: uppercase;">Estructura de Consultoría (Fases)</h4>
                         <p style="font-size: 0.65rem; color: #888; margin: 4px 0 0 0;">Define el desglose de horas y actividades por fase.</p>
                     </div>
-                    <div style="text-align: right;">
-                        <span style="font-size: 0.6rem; color: #999; font-weight: 700; display: block; text-transform: uppercase;">Inversión Total de Tiempo:</span>
-                        <strong id="service-total-hours-display" style="font-size: 1.4rem; color: var(--accent-gold);">0 hrs</strong>
-                        <input type="hidden" id="service-total-hours" value="0">
+                    <div style="display: flex; gap: 30px; align-items: flex-end;">
+                        <div style="text-align: right;">
+                            <span style="font-size: 0.6rem; color: #999; font-weight: 700; display: block; text-transform: uppercase;">Inversión de Tiempo:</span>
+                            <strong id="service-total-hours-display" style="font-size: 1.1rem; color: var(--primary-midnight);">0 hrs</strong>
+                            <input type="hidden" id="service-total-hours" value="0">
+                        </div>
+                        <div style="text-align: right; border-left: 2px solid var(--accent-gold); padding-left: 20px;">
+                            <span style="font-size: 0.6rem; color: var(--accent-gold); font-weight: 800; display: block; text-transform: uppercase;">Inversión Económica Total:</span>
+                            <strong id="service-total-investment-display" style="font-size: 1.5rem; color: var(--accent-gold);">$0.00</strong>
+                        </div>
                     </div>
                 </div>
 

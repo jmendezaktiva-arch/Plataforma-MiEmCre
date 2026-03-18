@@ -280,10 +280,10 @@ document.addEventListener('DOMContentLoaded', async () => {
             
             // TRACEABILIDAD: Disparo unificado de motores de datos
             // Ahora incluimos la carga del catálogo existente en Firestore
-            loadAdminStats();
-            loadUsersList();
-            if (typeof loadCoursesList === 'function') {
-                loadCoursesList(); 
+            // TRACEABILIDAD: Orquestación Unificada de Datos (Master Boot)
+            // Ejecuta en un solo pulso la carga de BI, Usuarios, Catálogos y Leads.
+            if (typeof window.initAdminData === 'function') {
+                window.initAdminData();
             }
         } catch (error) {
             console.error("🚨 Error en el Guardia de Seguridad:", error);
@@ -712,17 +712,31 @@ document.addEventListener('DOMContentLoaded', async () => {
             </div>`;
         },
 
-        // Motor de Cálculo de Trazabilidad Temporal
+        // Motor de Cálculo de Trazabilidad Temporal y Económica
         calculateTotals() {
             let grandTotal = 0;
             document.querySelectorAll('.activity-duration').forEach(input => {
                 grandTotal += parseFloat(input.value) || 0;
             });
             
+            // Capturamos el precio por hora definido por el administrador
+            const hourlyRate = parseFloat(document.getElementById('service-price').value) || 0;
+            const totalInvestment = grandTotal * hourlyRate;
+
             const display = document.getElementById('service-total-hours-display');
             const hiddenInput = document.getElementById('service-total-hours');
+            const investmentDisplay = document.getElementById('service-total-investment-display');
+
             if (display) display.innerText = `${grandTotal} hrs`;
             if (hiddenInput) hiddenInput.value = grandTotal;
+            
+            // Inyectamos el cálculo económico en la UI con formato moneda
+            if (investmentDisplay) {
+                investmentDisplay.innerText = `$${totalInvestment.toLocaleString('es-MX', { 
+                    minimumFractionDigits: 2, 
+                    maximumFractionDigits: 2 
+                })}`;
+            }
         }
     };
 
@@ -788,11 +802,17 @@ document.addEventListener('DOMContentLoaded', async () => {
         }
     });
 
-    // 3. Disparador de Recálculo (Cuando cambia cualquier duración)
+    // 3. Disparadores de Recálculo Automático (Trazabilidad Financiera)
+    // Escucha cambios en las duraciones de las actividades (Fases)
     document.getElementById('phases-container')?.addEventListener('input', (e) => {
         if (e.target.classList.contains('activity-duration')) {
             PhaseEngine.calculateTotals();
         }
+    });
+
+    // Escucha cambios en el precio base (Tarifa por Hora)
+    document.getElementById('service-price')?.addEventListener('input', () => {
+        PhaseEngine.calculateTotals();
     });
 
     formServicio?.addEventListener('submit', async (e) => {
@@ -814,17 +834,22 @@ document.addEventListener('DOMContentLoaded', async () => {
             };
         });
 
+        const totalHours = parseFloat(document.getElementById('service-total-hours').value) || 0;
+        const hourlyRate = parseFloat(document.getElementById('service-price').value) || 0;
+
         const serviceData = {
             title: document.getElementById('service-title').value,
             description: document.getElementById('service-description').value,
             purposeDesc: document.getElementById('service-purpose-desc').value,
             type: document.getElementById('service-type').value,
-            price: parseFloat(document.getElementById('service-price').value) || 0,
+            // Trazabilidad Financiera: El precio público es el total calculado
+            price: totalHours * hourlyRate, 
+            hourlyRate: hourlyRate, // Guardamos la tarifa base para que sea editable después
             isActive: document.getElementById('service-is-active').checked,
             isHighlighted: document.getElementById('service-highlight').checked,
             
-            // Inyección de nuevos parámetros de Consultoría
-            totalHours: parseFloat(document.getElementById('service-total-hours').value) || 0,
+            // Inyección de parámetros de Consultoría
+            totalHours: totalHours,
             phases: phasesData
         };
 
@@ -892,7 +917,9 @@ document.addEventListener('DOMContentLoaded', async () => {
                 document.getElementById('service-description').value = s.description || '';
                 document.getElementById('service-purpose-desc').value = s.purposeDesc || '';
                 document.getElementById('service-type').value = s.type || 'Proyecto';
-                document.getElementById('service-price').value = s.price || 0;
+                // Trazabilidad: Cargamos la tarifa horaria base. 
+                // Fallback: Si es un registro antiguo sin hourlyRate, usamos el price actual.
+                document.getElementById('service-price').value = s.hourlyRate || s.price || 0;
                 document.getElementById('service-is-active').checked = s.isActive !== false;
                 document.getElementById('service-highlight').checked = s.isHighlighted || false;
 
@@ -932,11 +959,78 @@ document.addEventListener('DOMContentLoaded', async () => {
         }
     };
 
-    // Actualización del registro maestro de datos
+    /**
+     * MOTOR DE GESTIÓN DE LEADS (INTERVENCIONES)
+     * Objetivo: Sincronizar las solicitudes de consultoría capturadas en la nube.
+     */
+    const loadInterventionsList = async () => {
+        const tableBody = document.getElementById('table-requests-body');
+        const countEl = document.getElementById('requests-count');
+        if (!tableBody) return;
+
+        try {
+            // Trazabilidad: Ordenamos por fecha para priorizar los leads más recientes
+            const q = query(collection(db, "solicitudes_contacto"), orderBy("fechaSolicitud", "desc"));
+            const querySnapshot = await getDocs(q);
+            
+            if (countEl) countEl.innerText = `${querySnapshot.size} SOLICITUDES`;
+
+            if (querySnapshot.empty) {
+                tableBody.innerHTML = `<tr><td colspan="5" style="padding:30px; text-align:center; color:#999;">No hay solicitudes de intervención pendientes.</td></tr>`;
+                return;
+            }
+
+            tableBody.innerHTML = querySnapshot.docs.map(docSnap => {
+                const req = docSnap.data();
+                const fecha = new Date(req.fechaSolicitud).toLocaleDateString('es-MX', {
+                    day: '2-digit', month: '2-digit', year: 'numeric', hour: '2-digit', minute: '2-digit'
+                });
+
+                return `
+                <tr style="border-bottom: 1px solid #f4f4f4; transition: background 0.2s;" onmouseover="this.style.background='#fafafa'" onmouseout="this.style.background='transparent'">
+                    <td style="padding: 15px;">
+                        <div style="font-weight: 600; color: var(--primary-midnight);">${req.clienteNombre || 'Líder Dreams'}</div>
+                        <div style="font-size: 0.75rem; color: #999;">${req.clienteEmail}</div>
+                    </td>
+                    <td style="padding: 15px;">
+                        <div style="font-size: 0.75rem; font-weight: 700; color: var(--accent-gold); text-transform: uppercase;">${req.servicioTitulo}</div>
+                    </td>
+                    <td style="padding: 15px; font-size: 0.75rem; color: #666;">${fecha}</td>
+                    <td style="padding: 15px;">
+                        <span style="background: #fff8e6; color: #856404; padding: 4px 10px; border-radius: 6px; font-size: 0.65rem; font-weight: 800; text-transform: uppercase;">
+                            ${req.status || 'pendiente'}
+                        </span>
+                    </td>
+                    <td style="padding: 15px; text-align: right;">
+                        <button onclick="confirmDeleteIntervention('${docSnap.id}')" style="background: none; border: none; cursor: pointer; color: #dc2626; font-size: 1.1rem;" title="Eliminar Registro">🗑️</button>
+                    </td>
+                </tr>`;
+            }).join('');
+        } catch (error) {
+            console.error("🚨 Error al cargar intervenciones:", error);
+        }
+    };
+
+    /**
+     * confirmDeleteIntervention - Protocolo de Limpieza de Bandeja
+     */
+    window.confirmDeleteIntervention = async (id) => {
+        if (confirm("⚠️ ¿Deseas eliminar este registro de intervención?\nEsta acción es irreversible.")) {
+            try {
+                await deleteDoc(doc(db, "solicitudes_contacto", id));
+                loadInterventionsList(); // Refresco quirúrgico
+            } catch (error) {
+                alert("🚨 Error al eliminar el registro.");
+            }
+        }
+    };
+
+    // Actualización del registro maestro de datos (Centralizado)
     window.initAdminData = () => {
         loadAdminStats();
         loadUsersList();
         loadCoursesList();
-        loadServicesList(); // Inclusión del pilar de consultoría
+        loadServicesList();
+        loadInterventionsList(); // Inyección de la bandeja de leads
     };
 });
