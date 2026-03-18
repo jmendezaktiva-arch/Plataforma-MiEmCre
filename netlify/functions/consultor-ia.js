@@ -1,5 +1,6 @@
 //netlify/functions/consultor-ia.js
-const fetch = require('node-fetch');
+// Nota: Utilizamos el Fetch API nativo de Node.js (disponible en v18+), 
+// por lo que ya no es necesario importar 'node-fetch' como dependencia externa.
 
 exports.handler = async (event, context) => {
     // 1. PROTOCOLO DE SEGURIDAD: Solo aceptamos peticiones POST

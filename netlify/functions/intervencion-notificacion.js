@@ -19,6 +19,12 @@ exports.handler = async (event) => {
     try {
         const { destinatario, cliente, servicio } = JSON.parse(event.body);
 
+        // Validación de Integridad: Asegurar que existan los datos mínimos para la trazabilidad
+        if (!destinatario || !cliente?.email || !servicio?.id) {
+            console.error("🚨 Payload incompleto: Se requiere destinatario, datos de cliente y servicio.");
+            return { statusCode: 400, body: JSON.stringify({ error: "Datos de solicitud insuficientes" }) };
+        }
+
         // 1. REGISTRO EN FIRESTORE (Persistencia para Panel de Admin)
         const solicitudRef = db.collection('solicitudes_contacto').doc();
         await solicitudRef.set({
