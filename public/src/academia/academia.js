@@ -69,16 +69,11 @@ document.addEventListener('DOMContentLoaded', () => {
                 </div>
 
                 <footer class="btn-group" style="display: flex; gap: 10px; align-items: center; margin-top: auto;">
-                    ${!course.isComingSoon ? `
-                        <button class="btn-primary" data-action="purpose" data-id="${course.id}" style="margin-top: 0; flex: 1; font-size: 0.65rem; padding: 8px 5px; background: none; color: var(--primary-midnight); border: 1.5px solid var(--primary-midnight);">
-                            PROPÓSITO
-                        </button>
-                    ` : ''}
                     <button class="btn-primary" 
                         ${course.isComingSoon ? 'disabled style="background: #e2e8f0; color: #94a3b8; cursor: not-allowed;"' : ''} 
                         data-action="${course.hasAccess || course.esGratis ? 'open' : 'buy'}" 
                         data-id="${course.id}" 
-                        style="flex: 1.5; font-size: 0.7rem; padding: 12px 8px;">
+                        style="flex: 1; font-size: 0.7rem; padding: 12px 8px;">
                         ${course.isComingSoon ? 'Próximamente' : (course.hasAccess || course.esGratis ? (course.buttonText || 'INGRESAR') : 'COMPRAR')}
                     </button>
                 </footer>
