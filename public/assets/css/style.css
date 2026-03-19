@@ -238,9 +238,57 @@ strong, b, .calculation-label {
     textarea,
     select,
     .autosave-input {
-        font-size: 16px !important; /* Forzamos el estándar técnico para evitar saltos de cámara */
-        padding: 12px 15px !important; /* Ajuste de respiro para precisión táctil */
+        font-size: 16px !important; 
+        padding: 12px 15px !important; 
         margin-bottom: 15px !important;
+    }
+
+    /* --- AJUSTE 7: MODALES Y CÁPSULAS DE VISIÓN (PRESTIGE MOBILE) --- */
+    .purpose-bubble, .help-bubble, .mindset-bubble {
+        padding: 30px 20px !important; /* Reducción de aire interno */
+        width: 95% !important;
+        max-height: 90vh; /* Evita que el modal sea más alto que la pantalla */
+        overflow-y: auto; /* Permite scroll si el texto es extenso */
+        border-radius: 24px !important;
+    }
+
+    .purpose-bubble h2 {
+        font-size: 1.5rem !important;
+        margin-bottom: 15px !important;
+    }
+
+    .purpose-bubble p {
+        font-size: 1rem !important;
+        line-height: 1.6 !important;
+    }
+
+    /* Mejora de zona táctil para el botón de cierre */
+    .close-bubble {
+        top: 15px !important;
+        right: 15px !important;
+        width: 40px !important;
+        height: 40px !important;
+        background: rgba(15, 52, 96, 0.1) !important;
+    }
+
+    /* --- AJUSTE 8: RESILIENCIA DE WORKBOOKS (IFRAMES MOBILE) --- */
+    #view-presentation, #view-workbook {
+        height: 82vh !important; /* Altura dinámica segura para evitar recortes por UI del navegador */
+        min-height: 500px;
+        -webkit-overflow-scrolling: touch; /* Scroll fluido y natural en iOS/Android */
+        overflow-y: auto;
+    }
+
+    #view-workbook iframe {
+        height: 100% !important;
+        border-radius: 0; /* Aprovechamos cada píxel en pantallas pequeñas */
+    }
+
+    /* Ajuste de contenedores para evitar desbordes en diapositivas */
+    .presentation-wrapper {
+        height: auto !important;
+        min-height: 450px;
+        margin-bottom: 20px;
     }
 }
 

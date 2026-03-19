@@ -369,6 +369,75 @@
         .close-video:hover {
             color: var(--accent-gold);
         }
+        /* --- AJUSTE 6: NARRATIVA DE IDENTIDAD RESPONSIVA (DNA STACK) --- */
+        @media (max-width: 991px) {
+            .dna-container { 
+                margin-left: 0 !important; 
+                padding: 40px 20px; 
+            }
+
+            .golden-circle-wrapper {
+                flex-direction: column;
+                align-items: center;
+                gap: 40px;
+                min-height: auto;
+            }
+
+            .circle-column {
+                width: 320px; /* Escala optimizada para dispositivos móviles */
+                height: 320px;
+                order: 1; /* El Círculo Dorado encabeza la narrativa */
+            }
+
+            /* Re-escala de los anillos Prestige para el nuevo contenedor */
+            .circle-what { width: 320px; height: 320px; }
+            .circle-how { width: 220px; height: 220px; }
+            .circle-why { width: 130px; height: 130px; }
+            .label-why { font-size: 1rem; }
+
+            .panels-column {
+                width: 100%;
+                padding-top: 0;
+                gap: 15px;
+                order: 2; /* Los controles bajan para ser accionados con el pulgar */
+            }
+
+            .info-panel {
+                width: 100%; 
+                margin-top: 0 !important;
+                justify-content: center;
+                height: auto;
+                padding: 15px;
+            }
+
+            /* La narrativa deja de ser absoluta y se integra al flujo vertical */
+            .info-panel p {
+                position: relative;
+                left: 0 !important;
+                top: 0 !important;
+                transform: translateY(10px) !important;
+                width: 100%;
+                margin-top: 10px;
+                opacity: 0;
+                visibility: hidden;
+                height: 0;
+                overflow: hidden;
+                transition: all 0.4s ease;
+                box-shadow: none;
+                border-left: 2px solid var(--accent-gold);
+            }
+
+            .info-panel.is-active p {
+                opacity: 1;
+                visibility: visible;
+                height: auto;
+                transform: translateY(0) !important;
+                padding: 15px 0;
+            }
+
+            /* Ocultamos conectores: Las líneas horizontales no tienen sentido en vertical */
+            .info-panel::before { display: none !important; }
+        }
     </style>
 </head>
 <body>

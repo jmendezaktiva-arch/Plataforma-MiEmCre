@@ -969,8 +969,8 @@ document.addEventListener('DOMContentLoaded', async () => {
         if (!tableBody) return;
 
         try {
-            // Trazabilidad: Ordenamos por fecha para priorizar los leads más recientes
-            const q = query(collection(db, "solicitudes_contacto"), orderBy("fechaSolicitud", "desc"));
+            // Trazabilidad: Sincronizamos con el estándar de fecha del ecosistema (fechaEnvio) para visibilidad total
+            const q = query(collection(db, "solicitudes_contacto"), orderBy("fechaEnvio", "desc"));
             const querySnapshot = await getDocs(q);
             
             if (countEl) countEl.innerText = `${querySnapshot.size} SOLICITUDES`;
@@ -982,7 +982,9 @@ document.addEventListener('DOMContentLoaded', async () => {
 
             tableBody.innerHTML = querySnapshot.docs.map(docSnap => {
                 const req = docSnap.data();
-                const fecha = new Date(req.fechaSolicitud).toLocaleDateString('es-MX', {
+                // TRACEABILIDAD: Soporte híbrido para registros antiguos y nuevos (fechaEnvio || fechaSolicitud)
+                const rawDate = req.fechaEnvio || req.fechaSolicitud || new Date().toISOString();
+                const fecha = new Date(rawDate).toLocaleDateString('es-MX', {
                     day: '2-digit', month: '2-digit', year: 'numeric', hour: '2-digit', minute: '2-digit'
                 });
 
