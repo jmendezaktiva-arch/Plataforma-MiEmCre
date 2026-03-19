@@ -216,6 +216,34 @@ strong, b, .calculation-label {
     color: var(--primary-color);
 }
 
+/* --- AJUSTE 5: RESPONSIVIDAD DE INTERFAZ (HEADER Y ENTRADAS) --- */
+@media (max-width: 991px) {
+    /* Reducción de Header para maximizar el área de trabajo */
+    .navbar {
+        padding: 10px 20px !important;
+    }
+    .logo-header {
+        height: 45px !important; /* Escala proporcional para dispositivos móviles */
+    }
+    .navbar a {
+        font-size: 0.8rem; /* Evita que el menú se desborde horizontalmente */
+    }
+
+    /* Blindaje contra el Zoom Automático en Móviles */
+    input[type="text"], 
+    input[type="email"], 
+    input[type="password"], 
+    input[type="number"], 
+    input[type="date"], 
+    textarea,
+    select,
+    .autosave-input {
+        font-size: 16px !important; /* Forzamos el estándar técnico para evitar saltos de cámara */
+        padding: 12px 15px !important; /* Ajuste de respiro para precisión táctil */
+        margin-bottom: 15px !important;
+    }
+}
+
 /* --- BOTONES Y COMPONENTES (Normalizados) --- */
 /* --- ESTILIZACIÓN QUIRÚRGICA DEL BOTÓN DE ACCIÓN --- */
 /* --- BOTÓN PRIMARIO: PRESTIGE (AZUL & ORO) --- */

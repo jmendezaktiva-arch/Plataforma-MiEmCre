@@ -157,8 +157,10 @@ document.addEventListener('DOMContentLoaded', async () => {
                 btnIA.innerText = "ENVIANDO...";
 
                 try {
+                    // TRACEABILIDAD: Extracción defensiva del perfil para evitar errores de Firebase (campos undefined)
                     const profileSnap = await getDoc(doc(db, "usuarios", user.uid));
-                    const nombreUsuario = profileSnap.exists() ? profileSnap.data().nombre : "Líder Dreams";
+                    const userData = profileSnap.exists() ? profileSnap.data() : {};
+                    const nombreUsuario = userData.nombre || "Líder Dreams";
 
                     // 1. REGISTRO UNIFICADO (Resiliencia + Panel Admin)
                     const solicitudId = `solicitud_ia_${Date.now()}`;
