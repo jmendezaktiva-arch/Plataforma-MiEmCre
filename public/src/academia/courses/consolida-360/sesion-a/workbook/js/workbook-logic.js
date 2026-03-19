@@ -364,7 +364,14 @@ document.addEventListener('DOMContentLoaded', function() {
     const populateReport = () => {
         const rep = document.getElementById('reporte-dinamico-content');
         if(!rep) return;
-        const gV = (id) => localStorage.getItem('cuaderno_'+id) || '---';
+        
+        // Función de obtención con Fallback Prestige
+        const gV = (id) => {
+            const val = localStorage.getItem('cuaderno_'+id);
+            if (val && val !== '---') return val;
+            return id === 'nombre_participante' ? 'Líder Dreams' : 'Mi Empresa Crece';
+        };
+
         rep.innerHTML = `
             <div class="grid grid-cols-2 gap-8">
                 <div class="p-6 bg-gray-50 rounded-2xl"><h6 class="text-[9px] font-black text-gray-400 uppercase">Líder / Dueño</h6><p class="font-bold text-[#0F3460] uppercase">${gV('nombre_participante')}</p></div>

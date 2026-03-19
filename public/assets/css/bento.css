@@ -30,10 +30,28 @@
     border-color: var(--accent-gold);
 }
 
-/* --- CONFIGURACIÓN DE JERARQUÍA (KPIs) --- */
-.bento-main { grid-column: span 2; grid-row: span 2; } /* Cuadrante de Impacto */
-.bento-stat { grid-column: span 1; }                   /* Métricas Rápidas */
-.bento-wide { grid-column: span 2; }                   /* Listas o Flujos */
+/* --- CONFIGURACIÓN DE JERARQUÍA (ADAPTATIVA PRESTIGE) --- */
+.bento-main { grid-column: span 2; grid-row: span 2; } 
+.bento-stat { grid-column: span 1; }                   
+.bento-wide { grid-column: span 2; }                   
+
+/* Breakpoint para Tablets y Laptops pequeñas */
+@media (max-width: 1024px) {
+    .bento-grid { grid-template-columns: repeat(2, 1fr); }
+}
+
+/* Breakpoint para Celulares (Suelo de Legibilidad) */
+@media (max-width: 600px) {
+    .bento-grid { 
+        grid-template-columns: 1fr; 
+        gap: 15px;
+    }
+    .bento-main, .bento-wide { 
+        grid-column: span 1; 
+        grid-row: auto; 
+    }
+    .kpi-value { font-size: 2rem; } /* Ajuste de escala para evitar desbordes */
+}
 
 /* --- ESTÉTICA DE DATOS (KPI) --- */
 .kpi-value {

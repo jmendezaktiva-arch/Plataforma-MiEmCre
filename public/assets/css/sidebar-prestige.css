@@ -140,11 +140,21 @@
 /* TRACER: Esta regla busca el contenedor principal. 
    Asegúrate de que tu contenido esté dentro de un <main> o clase similar.
 */
+/* --- NÚCLEO DE LAYOUT RESPONSIVO (DREAMS CORE) --- */
 main, .main-content, .workbook-container {
-    margin-left: 260px; /* Espacio igual al ancho del sidebar */
-    transition: margin-left 0.4s cubic-bezier(0.19, 1, 0.22, 1), width 0.4s cubic-bezier(0.19, 1, 0.22, 1);
+    margin-left: 260px;
     width: calc(100% - 260px);
     min-height: 100vh;
+    transition: margin-left 0.4s cubic-bezier(0.19, 1, 0.22, 1), width 0.4s cubic-bezier(0.19, 1, 0.22, 1);
+}
+
+/* Intervención Quirúrgica para Pantallas Móviles/Tablets */
+@media (max-width: 991px) {
+    main, .main-content, .workbook-container {
+        margin-left: 0 !important;
+        width: 100% !important;
+        padding: 0 15px; /* Respiro lateral para el contenido */
+    }
 }
 
 /* ESTADO EXPANDIDO: Cuando el body detecta el colapso, 
@@ -155,4 +165,29 @@ body.sidebar-is-collapsed .main-content,
 body.sidebar-is-collapsed .workbook-container {
     margin-left: 8px; 
     width: calc(100% - 8px);
+}
+
+/* --- COMPORTAMIENTO TÁCTIL (OVERLAY PRESTIGE) --- */
+@media (max-width: 991px) {
+    .sidebar-prestige {
+        width: 280px; /* Un poco más ancho para facilitar el toque */
+        background: rgba(15, 52, 96, 0.98); /* Mayor opacidad para legibilidad sobre el contenido */
+        box-shadow: 20px 0 50px rgba(0, 0, 0, 0.3);
+    }
+
+    /* En móviles, ocultamos el sidebar completamente (fuera de pantalla) 
+       pero mantenemos el Peek Logo como disparador táctil */
+    .sidebar-prestige.sidebar-hidden {
+        transform: translateX(-100%); 
+    }
+
+    /* Ajuste del Peek Logo para que sea el "botón" de apertura en móviles */
+    .sidebar-brand-peek {
+        right: -50px; /* Lo sacamos un poco más para que sea fácil de presionar */
+        width: 50px;
+        height: 50px;
+        z-index: 10000;
+        opacity: 1 !important; /* Siempre visible en móvil si el sidebar está oculto */
+        pointer-events: all !important;
+    }
 }

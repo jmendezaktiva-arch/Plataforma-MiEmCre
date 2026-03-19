@@ -124,8 +124,21 @@ const SidebarPrestige = {
         // Estado inicial al renderizar (por defecto colapsado)
         syncSidebarState(true);
 
-        sidebar.addEventListener('mouseenter', () => syncSidebarState(false));
-        sidebar.addEventListener('mouseleave', () => syncSidebarState(true));
+        // DISPARADOR TÁCTIL (Móvil) y CLICK (Escritorio):
+        const peekBtn = sidebar.querySelector('.sidebar-brand-peek');
+        if (peekBtn) {
+            peekBtn.addEventListener('click', (e) => {
+                e.stopPropagation(); // Evita interferencias con otros elementos
+                const isCurrentlyHidden = sidebar.classList.contains('sidebar-hidden');
+                syncSidebarState(!isCurrentlyHidden);
+            });
+        }
+
+        // MANTENEMOS HOVER PARA ESCRITORIO (Solo si no es dispositivo táctil para evitar conflictos)
+        if (window.matchMedia("(hover: hover)").matches) {
+            sidebar.addEventListener('mouseenter', () => syncSidebarState(false));
+            sidebar.addEventListener('mouseleave', () => syncSidebarState(true));
+        }
 
         // Logout Determinístico (Sincronizado con Firebase)
         logoutBtn.addEventListener('click', async (e) => {

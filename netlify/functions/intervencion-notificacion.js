@@ -26,19 +26,29 @@ exports.handler = async (event) => {
             return { statusCode: 400, body: JSON.stringify({ error: "Datos de solicitud insuficientes" }) };
         }
 
-        // 1. REGISTRO EN FIRESTORE (Persistencia para Panel de Admin)
-        const solicitudRef = db.collection('solicitudes_contacto').doc();
-        await solicitudRef.set({
-            clienteId: cliente.uid,
-            clienteEmail: cliente.email,
-            clienteNombre: cliente.nombre,
-            servicioId: servicio.id,
-            servicioTitulo: servicio.titulo,
-            tipo: "INTERVENCION_ESTRATEGICA",
-            status: "pendiente",
-            fechaSolicitud: new Date().toISOString(),
-            canal: "Dreams Cloud (Automated)"
-        });
+        // 1. REGISTRO INTELIGENTE (Prevención de Duplicados y Alineación de Esquema)
+        const { omitirRegistroFirestore } = JSON.parse(event.body);
+        let solicitudId = "email_only";
+
+        if (!omitirRegistroFirestore) {
+            const solicitudRef = db.collection('solicitudes_contacto').doc();
+            solicitudId = solicitudRef.id;
+            
+            // TRACEABILIDAD: Alineamos los campos exactamente con lo que el Admin Panel espera leer
+            await solicitudRef.set({
+                usuarioId: cliente.uid,
+                email: cliente.email,
+                nombre: cliente.nombre,
+                interes: servicio.titulo,
+                servicioId: servicio.id,
+                estado: "pendiente",
+                fechaEnvio: new Date().toISOString(),
+                canal: "Netlify Function (Fallback)"
+            });
+            console.log(`✅ Registro creado en Firestore: ${solicitudId}`);
+        } else {
+            console.log("ℹ️ Registro omitido en Cloud: El cliente ya sincronizó localmente.");
+        }
 
         // 2. CONFIGURACIÓN DE AVISO AUTOMÁTICO (Correo Prestige)
         // Se utilizan variables de entorno de Netlify por seguridad

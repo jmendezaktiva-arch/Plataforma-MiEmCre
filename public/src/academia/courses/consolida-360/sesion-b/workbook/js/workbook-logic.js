@@ -541,24 +541,27 @@ document.addEventListener('DOMContentLoaded', function() {
         const reportContainer = document.getElementById('reporte-dinamico-content');
         if (!reportContainer) return;
 
+        // Función de obtención con Trazabilidad y Fallback Prestige
         const getVal = (id) => {
-            // Priorizamos el estándar Dreams Cloud ('cuaderno_') y usamos el anterior como respaldo
             const val = localStorage.getItem('cuaderno_' + id) || localStorage.getItem('sesionb_' + id);
+            if (val && val !== 'false' && val !== 'undefined' && val !== '' && val !== '---') return val;
             
-            return (val && val !== 'false' && val !== 'undefined' && val !== '') 
-                   ? val 
-                   : '<span class="text-gray-400 italic font-light">Dato no registrado</span>';
+            // Fallbacks de marca si no hay datos
+            if (id === 'nombre_participante') return 'Líder Dreams';
+            if (id === 'nombre_empresa') return 'Mi Empresa Crece';
+            
+            return '<span class="text-gray-400 italic font-light">Dato no registrado</span>';
         };
 
         const html = `
             <div class="grid grid-cols-2 gap-8 mb-10">
                 <div class="p-6 bg-gray-50 rounded-2xl border border-gray-100">
                     <p class="text-xs uppercase font-bold text-gray-400 mb-1 tracking-widest">Líder PyME</p>
-                    <p class="text-xl font-bold brand-blue">${localStorage.getItem('sesionb_nombre_participante') || 'Participante'}</p>
+                    <p class="text-xl font-bold brand-blue">${getVal('nombre_participante')}</p>
                 </div>
                 <div class="p-6 bg-gray-50 rounded-2xl border border-gray-100">
                     <p class="text-xs uppercase font-bold text-gray-400 mb-1 tracking-widest">Empresa</p>
-                    <p class="text-xl font-bold brand-blue">${localStorage.getItem('sesionb_nombre_empresa') || 'Mi Empresa'}</p>
+                    <p class="text-xl font-bold brand-blue">${getVal('nombre_empresa')}</p>
                 </div>
             </div>
 

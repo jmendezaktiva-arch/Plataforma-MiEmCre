@@ -2,7 +2,7 @@
  * DREAMS PLATFORM | Consultoría Prestige Controller
  * Objetivo: Gestionar la oferta de servicios y la activación del Consultor IA.
  */
-import { db, auth, collection, getDocs, query, where, checkAccess, doc, getDoc } from '../shared/firebase-config.js';
+import { db, auth, collection, getDocs, query, where, checkAccess, doc, getDoc, setDoc } from '../shared/firebase-config.js';
 
 let SERVICES_CONFIG = [];
 let USER_STRATEGIC_CONTEXT = {}; // Trazabilidad: Almacén del ADN empresarial
@@ -142,12 +142,10 @@ document.addEventListener('DOMContentLoaded', async () => {
         const hasIA = await checkAccess('consultor', 'ia-expert');
 
         if (hasIA) {
-            // ESTADO: ACTIVO
             btnIA.innerText = "INICIAR CONVERSACIÓN";
             btnIA.style.opacity = "1";
             btnIA.onclick = () => window.startIAConsultant();
         } else {
-            // ESTADO: SOLICITAR (Notificación Directa)
             btnIA.innerText = "SOLICITAR ACCESO";
             btnIA.onclick = async (e) => {
                 e.preventDefault();
@@ -159,26 +157,41 @@ document.addEventListener('DOMContentLoaded', async () => {
                 btnIA.innerText = "ENVIANDO...";
 
                 try {
-                    // TRACEABILIDAD: Recuperamos el nombre del expediente para la notificación
                     const profileSnap = await getDoc(doc(db, "usuarios", user.uid));
                     const nombreUsuario = profileSnap.exists() ? profileSnap.data().nombre : "Líder Dreams";
 
-                    // Disparo directo a la Netlify Function (Sin formularios)
-                    await fetch('/.netlify/functions/intervencion-notificacion', {
+                    // 1. REGISTRO UNIFICADO (Resiliencia + Panel Admin)
+                    const solicitudId = `solicitud_ia_${Date.now()}`;
+                    const leadData = {
+                        usuarioId: user.uid,
+                        email: user.email,
+                        nombre: nombreUsuario,
+                        interes: "Consultor IA (Acceso Premium)",
+                        servicioId: "ia-expert",
+                        estado: "pendiente",
+                        fechaEnvio: new Date().toISOString(),
+                        contexto: "Solicitud Directa IA"
+                    };
+
+                    await setDoc(doc(db, "solicitudes_contacto", solicitudId), leadData);
+
+                    // 2. AVISO POR CORREO (Netlify Function - Solo Mensajería)
+                    fetch('/.netlify/functions/intervencion-notificacion', {
                         method: 'POST',
                         headers: { 'Content-Type': 'application/json' },
                         body: JSON.stringify({
                             destinatario: "contacto@miempresacrece.com.mx",
                             cliente: { uid: user.uid, email: user.email, nombre: nombreUsuario },
-                            servicio: { id: "ia-expert", titulo: "Consultor IA (Acceso Premium)" }
+                            servicio: { id: "ia-expert", titulo: leadData.interes },
+                            omitirRegistroFirestore: true // FLAG: Evita duplicados en la función
                         })
-                    });
+                    }).catch(() => console.warn("📧 Aviso por correo pendiente de despliegue en Netlify."));
 
-                    alert("🚀 ¡Solicitud Enviada!\nJorge ha recibido tu aviso. En breve se activará tu acceso al Consultor IA.");
+                    alert("🚀 ¡Solicitud Recibida!\nTu interés ha quedado registrado en mi panel. En breve activaré tu acceso.");
                     btnIA.innerText = "SOLICITUD PENDIENTE";
                     btnIA.style.background = "#666";
                 } catch (err) {
-                    console.error("🚨 Error al notificar acceso IA:", err);
+                    console.error("🚨 Error en la persistencia de solicitud:", err);
                     btnIA.innerText = originalText;
                     btnIA.disabled = false;
                 }
@@ -220,33 +233,47 @@ document.addEventListener('DOMContentLoaded', async () => {
                 return;
             }
 
-            // MOTOR DE NOTIFICACIÓN PRESTIGE: Sincronización en Nube + Aviso en Tiempo Real
+            // MOTOR DE NOTIFICACIÓN PRESTIGE: Registro Directo + Handshake de Resiliencia
             const notificarIntervencion = async () => {
+                const btnOriginalText = btn.innerText;
                 try {
-                    // 1. Handshake con el servidor para envío de correo y registro (Netlify Function)
-                    const response = await fetch('/.netlify/functions/intervencion-notificacion', {
+                    btn.disabled = true;
+                    btn.innerText = "PROCESANDO...";
+
+                    // 1. PERSISTENCIA NATIVA (Asegura la trazabilidad en Firestore inmediatamente)
+                    const solicitudId = `solicitud_${service.id}_${Date.now()}`;
+                    const leadData = {
+                        usuarioId: user.uid,
+                        email: user.email,
+                        nombre: USER_STRATEGIC_CONTEXT.usuario?.nombre || "Líder Dreams",
+                        interes: service.title,
+                        servicioId: service.id,
+                        estado: "pendiente",
+                        fechaEnvio: new Date().toISOString(), // Sincronizado con el estándar del ecosistema
+                        canal: "Módulo Consultoría (Registro Directo)"
+                    };
+
+                    await setDoc(doc(db, "solicitudes_contacto", solicitudId), leadData);
+
+                    // 2. AVISO POR CORREO (Netlify Function - Ejecución en segundo plano)
+                    fetch('/.netlify/functions/intervencion-notificacion', {
                         method: 'POST',
                         headers: { 'Content-Type': 'application/json' },
                         body: JSON.stringify({
                             destinatario: "contacto@miempresacrece.com.mx",
-                            cliente: {
-                                uid: user.uid,
-                                email: user.email,
-                                nombre: USER_STRATEGIC_CONTEXT.usuario?.nombre || "Cliente en Plataforma"
-                            },
-                            servicio: {
-                                id: service.id,
-                                titulo: service.title
-                            }
+                            cliente: { uid: user.uid, email: user.email, nombre: leadData.nombre },
+                            servicio: { id: service.id, titulo: service.title },
+                            omitirRegistroFirestore: true // FLAG: Evita registros duplicados en la función
                         })
-                    });
+                    }).catch(err => console.warn("📧 Aviso por correo pendiente de configuración:", err));
 
-                    if (!response.ok) throw new Error('Fallo en el servicio de notificaciones');
-
-                    alert(`🚀 ¡Solicitud Enviada!\n\nHemos recibido tu interés en "${service.title}". Se ha enviado un aviso automático a nuestro staff y un consultor senior te contactará en breve.`);
+                    alert(`🚀 ¡Solicitud Recibida!\n\nHemos registrado tu interés en "${service.title}" directamente en tu expediente. Un consultor senior revisará tu perfil en breve.`);
+                    btn.innerText = "SOLICITUD REGISTRADA";
                 } catch (err) {
-                    console.error("🚨 Error en el flujo de notificación:", err);
-                    alert("No pudimos completar el aviso automático en este momento, pero tu interés ha quedado registrado. Nos pondremos en contacto.");
+                    console.error("🚨 Error en la persistencia del lead:", err);
+                    alert("Hubo un problema al registrar tu solicitud. Por favor, intenta de nuevo.");
+                    btn.disabled = false;
+                    btn.innerText = btnOriginalText;
                 }
             };
 

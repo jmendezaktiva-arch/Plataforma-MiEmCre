@@ -187,14 +187,18 @@ const WorkbookCore = {
 
 // --- LISTENERS DE INTEGRACIÓN (CONSERVADOS Y MEJORADOS) ---
 
-// --- ESCUCHADOR MAESTRO DE ENTRADAS (REPARADO PARA DATA-ID) ---
+// --- ESCUCHADOR MAESTRO DE ENTRADAS (MOTOR DE PERSISTENCIA UNIVERSAL) ---
 document.addEventListener('input', (e) => {
-    // Trazabilidad: Priorizamos 'data-id' de los nuevos ejercicios modularizados
-    const fieldId = e.target.dataset.id || e.target.id || e.target.name;
+    const el = e.target;
+    const fieldId = el.dataset.id || el.id || el.name;
     
-    if (e.target.dataset.persist !== "false" && fieldId) {
-        // El Core ahora "ve" las entradas del Ejercicio 7 y las guarda con Debounce
-        WorkbookCore.saveProgress(fieldId, e.target.value);
+    if (el.dataset.persist !== "false" && fieldId) {
+        // DETECCIÓN QUIRÚRGICA DE VALOR: Manejo de booleanos para Checkbox/Radio
+        const valueToSave = (el.type === 'checkbox' || el.type === 'radio') 
+            ? el.checked 
+            : el.value;
+
+        WorkbookCore.saveProgress(fieldId, valueToSave);
     }
 });
 
@@ -215,7 +219,7 @@ window.addEventListener('message', (e) => {
         window.dispatchEvent(new CustomEvent('coreHydrated'));
     }
 
-    // 2. HIDRATACIÓN DE IDENTIDAD (Inyección automática de Perfil)
+    // 2. HIDRATACIÓN DE IDENTIDAD (Persistencia Silenciosa)
     if (e.data.type === 'injectProfile' && e.data.profile) {
         console.log("👤 Dreams Core: Sincronizando identidad del líder...");
         const profileMap = {
@@ -225,15 +229,20 @@ window.addEventListener('message', (e) => {
 
         Object.entries(profileMap).forEach(([id, value]) => {
             if (!value) return;
+            // PERSISTENCIA QUIRÚRGICA: Guardamos en localStorage directamente
+            // Esto asegura que el reporte tenga datos aunque no existan los inputs en el HTML.
+            localStorage.setItem(`cuaderno_${id}`, value);
+            
+            // Actualización visual opcional (si el elemento existe por compatibilidad)
             const el = document.querySelector(`[data-id="${id}"]`);
             if (el) {
                 el.value = value;
-                el.readOnly = true; // Protegemos el dato oficial
-                el.style.backgroundColor = "#F9FAFB"; // Fondo sutil de "solo lectura"
-                el.style.cursor = "not-allowed";
-                el.dispatchEvent(new Event('input', { bubbles: true })); // Guardamos en el progreso local
+                el.readOnly = true;
+                el.style.backgroundColor = "#F9FAFB";
             }
         });
+        // Notificamos a la lógica local que la identidad ha sido cargada
+        window.dispatchEvent(new CustomEvent('coreHydrated'));
     }
 });
 
