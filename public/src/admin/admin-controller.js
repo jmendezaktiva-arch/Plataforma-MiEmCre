@@ -989,19 +989,32 @@ document.addEventListener('DOMContentLoaded', async () => {
                 return `
                 <tr style="border-bottom: 1px solid #f4f4f4; transition: background 0.2s;" onmouseover="this.style.background='#fafafa'" onmouseout="this.style.background='transparent'">
                     <td style="padding: 15px;">
-                        <div style="font-weight: 600; color: var(--primary-midnight);">${req.clienteNombre || 'Líder Dreams'}</div>
-                        <div style="font-size: 0.75rem; color: #999;">${req.clienteEmail}</div>
+                        <div style="font-weight: 600; color: var(--primary-midnight);">${req.nombre || req.clienteNombre || 'Líder Dreams'}</div>
+                        <div style="font-size: 0.75rem; color: #999;">${req.email || req.clienteEmail}</div>
                     </td>
                     <td style="padding: 15px;">
-                        <div style="font-size: 0.75rem; font-weight: 700; color: var(--accent-gold); text-transform: uppercase;">${req.servicioTitulo}</div>
+                        <div style="font-size: 0.75rem; font-weight: 700; color: var(--accent-gold); text-transform: uppercase;">${req.interes || req.servicioTitulo}</div>
                     </td>
                     <td style="padding: 15px; font-size: 0.75rem; color: #666;">${fecha}</td>
                     <td style="padding: 15px;">
-                        <span style="background: #fff8e6; color: #856404; padding: 4px 10px; border-radius: 6px; font-size: 0.65rem; font-weight: 800; text-transform: uppercase;">
-                            ${req.status || 'pendiente'}
-                        </span>
+                        ${(req.estado === 'aprobado' || req.status === 'aprobado') ? `
+                            <span style="background: #e6fffa; color: #065f46; padding: 4px 10px; border-radius: 6px; font-size: 0.65rem; font-weight: 800; text-transform: uppercase; border: 1px solid #34d399;">
+                                ✅ ACTIVADO
+                            </span>
+                        ` : `
+                            <span style="background: #fff8e6; color: #856404; padding: 4px 10px; border-radius: 6px; font-size: 0.65rem; font-weight: 800; text-transform: uppercase;">
+                                ⏳ PENDIENTE
+                            </span>
+                        `}
                     </td>
-                    <td style="padding: 15px; text-align: right;">
+                    <td style="padding: 15px; text-align: right; display: flex; gap: 10px; justify-content: flex-end;">
+                        ${(req.usuarioId && req.usuarioId !== 'visitante') ? `
+                            <button onclick="approveQuickIA('${req.usuarioId}', '${docSnap.id}')" 
+                                    style="background: #e6fffa; border: none; cursor: pointer; color: #059669; font-size: 1rem; padding: 5px; border-radius: 4px; display: flex; align-items: center;" 
+                                    title="Activar Consultor IA">
+                                ✅ <span style="font-size: 0.6rem; margin-left: 4px; font-weight: 800;">IA</span>
+                            </button>
+                        ` : ''}
                         <button onclick="confirmDeleteIntervention('${docSnap.id}')" style="background: none; border: none; cursor: pointer; color: #dc2626; font-size: 1.1rem;" title="Eliminar Registro">🗑️</button>
                     </td>
                 </tr>`;
@@ -1022,6 +1035,50 @@ document.addEventListener('DOMContentLoaded', async () => {
             } catch (error) {
                 alert("🚨 Error al eliminar el registro.");
             }
+        }
+    };
+
+    /**
+     * approveQuickIA - Protocolo de Activación Express
+     * Vincula la solicitud de la nube con el permiso real del usuario.
+     */
+    window.approveQuickIA = async (uid, leadId) => {
+        if (!confirm("🎯 ¿Confirmas la activación inmediata del Consultor IA para este cliente?")) return;
+
+        try {
+            // 1. TRACE: Obtenemos el expediente actual para preservar otros permisos (Cursos/Apps)
+            const userRef = doc(db, "usuarios", uid);
+            const userSnap = await getDoc(userRef);
+
+            if (!userSnap.exists()) throw new Error("Expediente de usuario no encontrado.");
+
+            const userData = userSnap.data();
+            const currentConsultorAccess = userData.accesos?.consultor || [];
+
+            // 2. MUTACIÓN: Inyectamos el permiso si no lo tiene
+            if (!currentConsultorAccess.includes('ia-expert')) {
+                currentConsultorAccess.push('ia-expert');
+            }
+
+            // 3. PERSISTENCIA DUAL: Actualizamos Usuario y marcamos Lead como aprobado
+            await updateDoc(userRef, {
+                "accesos.consultor": currentConsultorAccess,
+                "ultimaModificacion": serverTimestamp()
+            });
+
+            await updateDoc(doc(db, "solicitudes_contacto", leadId), {
+                "estado": "aprobado",
+                "fechaAprobacion": serverTimestamp()
+            });
+
+            alert("✅ ¡Sincronización Exitosa!\nEl Consultor IA ha sido activado y el registro actualizado.");
+            
+            // 4. RE-HIDRATACIÓN: Refrescamos tablas y métricas
+            window.initAdminData();
+
+        } catch (error) {
+            console.error("🚨 Error en el motor de aprobación:", error);
+            alert("No se pudo completar la activación. Verifica la consola.");
         }
     };
 

@@ -182,14 +182,20 @@ document.addEventListener('DOMContentLoaded', () => {
     const contactForm = document.getElementById('contact-form');
     const contactStatus = document.getElementById('contact-status');
 
-    // Función de control de la cápsula
+    // Función de control de la cápsula (Resiliente)
     const toggleContact = (state) => {
+        // TRACEABILIDAD: Verificamos existencia antes de mutar el DOM para evitar errores en SPA
+        if (!contactOverlay) {
+            console.warn("⚠️ Protocolo Interrumpido: El elemento #contact-overlay no existe en esta página. Inyecta el HTML del modal para activar la interfaz de contacto.");
+            return;
+        }
+
         if (state) {
             contactOverlay.classList.add('active');
-            document.body.style.overflow = 'hidden'; // Evita el scroll del fondo al estar abierto
+            document.body.style.overflow = 'hidden'; 
         } else {
             contactOverlay.classList.remove('active');
-            document.body.style.overflow = ''; // Restaura el scroll
+            document.body.style.overflow = ''; 
         }
     };
 

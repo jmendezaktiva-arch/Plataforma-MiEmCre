@@ -132,6 +132,63 @@ document.addEventListener('DOMContentLoaded', async () => {
     fetchServices();
 
     /**
+     * MOTOR DE ACCESO Y NOTIFICACIÓN: Consultor IA
+     * Sincroniza el botón y permite solicitar acceso con un solo clic (Protocolo Prestige).
+     */
+    const syncIAAccess = async () => {
+        const btnIA = document.getElementById('btn-ia-consultant');
+        if (!btnIA) return;
+
+        const hasIA = await checkAccess('consultor', 'ia-expert');
+
+        if (hasIA) {
+            // ESTADO: ACTIVO
+            btnIA.innerText = "INICIAR CONVERSACIÓN";
+            btnIA.style.opacity = "1";
+            btnIA.onclick = () => window.startIAConsultant();
+        } else {
+            // ESTADO: SOLICITAR (Notificación Directa)
+            btnIA.innerText = "SOLICITAR ACCESO";
+            btnIA.onclick = async (e) => {
+                e.preventDefault();
+                const user = auth.currentUser;
+                if (!user) return;
+
+                const originalText = btnIA.innerText;
+                btnIA.disabled = true;
+                btnIA.innerText = "ENVIANDO...";
+
+                try {
+                    // TRACEABILIDAD: Recuperamos el nombre del expediente para la notificación
+                    const profileSnap = await getDoc(doc(db, "usuarios", user.uid));
+                    const nombreUsuario = profileSnap.exists() ? profileSnap.data().nombre : "Líder Dreams";
+
+                    // Disparo directo a la Netlify Function (Sin formularios)
+                    await fetch('/.netlify/functions/intervencion-notificacion', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({
+                            destinatario: "contacto@miempresacrece.com.mx",
+                            cliente: { uid: user.uid, email: user.email, nombre: nombreUsuario },
+                            servicio: { id: "ia-expert", titulo: "Consultor IA (Acceso Premium)" }
+                        })
+                    });
+
+                    alert("🚀 ¡Solicitud Enviada!\nJorge ha recibido tu aviso. En breve se activará tu acceso al Consultor IA.");
+                    btnIA.innerText = "SOLICITUD PENDIENTE";
+                    btnIA.style.background = "#666";
+                } catch (err) {
+                    console.error("🚨 Error al notificar acceso IA:", err);
+                    btnIA.innerText = originalText;
+                    btnIA.disabled = false;
+                }
+            };
+        }
+    };
+
+    syncIAAccess();
+
+    /**
      * GESTIÓN DE INTERACCIONES
      */
     document.addEventListener('click', (e) => {
