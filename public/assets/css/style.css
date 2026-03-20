@@ -454,7 +454,24 @@ strong, b, .calculation-label {
         margin: 20px;
     }
     .login-brand-side {
-        display: none; /* En móviles ocultamos la marca para priorizar el acceso */
+        display: flex; /* Restauramos la identidad visual en dispositivos móviles */
+        padding: 40px 24px;
+        background: rgba(15, 52, 96, 0.92); /* Transparencia Prestige sobre Azul Medianoche */
+        backdrop-filter: blur(10px); /* Efecto Liquid Glass para cohesión visual */
+        border-bottom: 1px solid rgba(149, 124, 61, 0.2); /* Línea capilar en Oro para separar del form */
+    }
+
+    .login-brand-side .brand-content p {
+        display: none; /* Ocultamos la descripción larga para priorizar el área de interacción */
+    }
+
+    .login-brand-side .brand-content h1 {
+        font-size: 1.25rem !important; /* Reducción de jerarquía para balancear el logotipo */
+        margin-top: 10px;
+    }
+
+    .login-hero-logo {
+        max-width: 120px; /* Escala optimizada para ergonomía en smartphones */
     }
 }
 
