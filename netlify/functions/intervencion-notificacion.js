@@ -90,7 +90,7 @@ exports.handler = async (event) => {
                 <div style="font-family: 'Montserrat', sans-serif; color: #0F3460; padding: 40px; border-top: 6px solid #957C3D; background: #fdfdfd; max-width: 600px; margin: auto;">
                     <h2 style="font-weight: 900; letter-spacing: 1px; text-transform: uppercase;">Tu Ruta de Crecimiento</h2>
                     <p style="font-size: 1.1rem; line-height: 1.6;">Hola <strong>${cliente.nombre}</strong>,</p>
-                    <p style="font-size: 1rem; line-height: 1.6;">Es un gusto saludarte. Hemos preparado el acceso para tu siguiente paso estratégico en la <strong>Dreams Platform</strong>:</p>
+                    <p style="font-size: 1rem; line-height: 1.6;">Es un gusto saludarte. Hemos preparado el acceso para tu siguiente paso estratégico en la <strong>Mi Empresa Crece Platform</strong>:</p>
                     
                     <div style="background: #0F3460; color: #ffffff; padding: 25px; border-radius: 12px; text-align: center; margin: 30px 0;">
                         <h3 style="margin: 0; color: #957C3D; font-size: 1.2rem;">${servicio.titulo}</h3>
@@ -103,7 +103,7 @@ exports.handler = async (event) => {
 
                     <p style="font-size: 0.85rem; color: #666; font-style: italic; text-align: center;">Si tienes alguna duda técnica, recuerda que puedes contactarnos respondiendo a este correo.</p>
                     <hr style="border: 0.5px solid rgba(15, 52, 96, 0.1); margin: 30px 0;">
-                    <p style="font-size: 0.75rem; color: #999; text-align: center;">Enviado por Mi Empresa Crece | Dreams Intelligence System</p>
+                    <p style="font-size: 0.75rem; color: #999; text-align: center;">Enviado por Mi Empresa Crece | ME Crece System</p>
                 </div>
             `;
         } else {
