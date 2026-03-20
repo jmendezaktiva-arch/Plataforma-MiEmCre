@@ -17,9 +17,22 @@
         .bento-consultoria {
             display: grid;
             grid-template-columns: repeat(3, 1fr);
-            grid-auto-rows: 250px;
+            grid-auto-rows: auto; /* Liberación del Suelo de Legibilidad */
             gap: 20px;
             margin-top: 30px;
+        }
+
+        /* SINCRONIZACIÓN PRESTIGE: Columna Única Vertical (Móvil) */
+        @media (max-width: 991px) {
+            .bento-consultoria {
+                grid-template-columns: 1fr; /* Paridad con el módulo de Academia */
+                gap: 25px;
+            }
+            .card-ia, .card-recurso {
+                grid-column: span 1 !important;
+                grid-row: auto !important; /* Reset de jerarquía para flujo vertical */
+                min-height: 480px; /* Asegura el suelo de legibilidad sin amontonar texto */
+            }
         }
         .card-ia {
             grid-column: span 1; /* Reducido para igualar el ancho de Staff */
