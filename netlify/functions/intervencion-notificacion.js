@@ -17,6 +17,18 @@ exports.handler = async (event) => {
         return { statusCode: 405, body: 'Método no permitido' };
     }
 
+    // MONITOREO DE TRAZABILIDAD: Verificación de Variables de Entorno
+    const variablesCriticas = ['MAIL_HOST', 'MAIL_USER', 'MAIL_PASS', 'FIREBASE_SERVICE_ACCOUNT'];
+    const faltantes = variablesCriticas.filter(v => !process.env[v]);
+
+    if (faltantes.length > 0) {
+        console.error(`🚨 ERROR DE CONFIGURACIÓN: Faltan las variables: ${faltantes.join(', ')}`);
+        return { 
+            statusCode: 500, 
+            body: JSON.stringify({ error: `Configuración incompleta en Netlify: ${faltantes.join(', ')}` }) 
+        };
+    }
+
     try {
         const { destinatario, cliente, servicio } = JSON.parse(event.body);
 
@@ -106,9 +118,11 @@ exports.handler = async (event) => {
             `;
         }
 
+        // TRACEABILIDAD DE MARCA: Definición del Remitente Oficial
         const mailOptions = {
             from: `"Mi Empresa Crece" <${process.env.MAIL_USER}>`,
             to: destinatario,
+            replyTo: 'contacto@miempresacrece.com.mx', // Asegura que si responden, llegue al lugar correcto
             subject: emailSubject,
             html: emailHtml
         };
