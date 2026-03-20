@@ -377,7 +377,7 @@ document.addEventListener('DOMContentLoaded', function() {
         const gV = (id) => {
             const val = localStorage.getItem('cuaderno_'+id);
             if (val && val !== '---') return val;
-            return id === 'nombre_participante' ? 'Líder Dreams' : 'Mi Empresa Crece';
+            return id === 'nombre_participante' ? 'Líder ME Crece' : 'Mi Empresa Crece';
         };
 
         rep.innerHTML = `

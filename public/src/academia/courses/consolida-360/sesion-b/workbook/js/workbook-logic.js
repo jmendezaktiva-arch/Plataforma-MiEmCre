@@ -595,7 +595,7 @@ document.addEventListener('DOMContentLoaded', function() {
             if (val && val !== 'false' && val !== 'undefined' && val !== '' && val !== '---') return val;
             
             // Fallbacks de marca si no hay datos
-            if (id === 'nombre_participante') return 'Líder Dreams';
+            if (id === 'nombre_participante') return 'Líder ME Crece';
             if (id === 'nombre_empresa') return 'Mi Empresa Crece';
             
             return '<span class="text-gray-400 italic font-light">Dato no registrado</span>';

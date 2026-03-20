@@ -154,7 +154,7 @@ document.addEventListener('DOMContentLoaded', async () => {
                     // TRACEABILIDAD: Extracción defensiva del perfil para evitar errores de Firebase (campos undefined)
                     const profileSnap = await getDoc(doc(db, "usuarios", user.uid));
                     const userData = profileSnap.exists() ? profileSnap.data() : {};
-                    const nombreUsuario = userData.nombre || "Líder Dreams";
+                    const nombreUsuario = userData.nombre || "Líder ME Crece";
 
                     // 1. REGISTRO UNIFICADO (Resiliencia + Panel Admin)
                     const solicitudId = `solicitud_ia_${Date.now()}`;
@@ -288,7 +288,7 @@ document.addEventListener('DOMContentLoaded', async () => {
                     const leadData = {
                         usuarioId: user.uid,
                         email: user.email,
-                        nombre: USER_STRATEGIC_CONTEXT.usuario?.nombre || "Líder Dreams",
+                        nombre: USER_STRATEGIC_CONTEXT.usuario?.nombre || "Líder ME Crece",
                         interes: service.title,
                         servicioId: service.id,
                         estado: "pendiente",
@@ -364,7 +364,7 @@ window.startIAConsultant = async () => {
         // 3. CONSOLIDACIÓN DE CONTEXTO: Fusionamos ADN Cultural + ADN Empresarial
         USER_STRATEGIC_CONTEXT = {
             usuario: {
-                nombre: profileData.nombre || "Líder Dreams",
+                nombre: profileData.nombre || "Líder ME Crece",
                 empresa: profileData.empresa || "Empresa en Crecimiento",
                 diagnosticos: workbookData
             },

@@ -1222,7 +1222,7 @@ document.addEventListener('DOMContentLoaded', async () => {
                 return `
                 <tr style="border-bottom: 1px solid #f4f4f4; transition: background 0.2s;" onmouseover="this.style.background='#fafafa'" onmouseout="this.style.background='transparent'">
                     <td style="padding: 15px;">
-                        <div style="font-weight: 600; color: var(--primary-midnight);">${req.nombre || req.clienteNombre || 'Líder Dreams'}</div>
+                        <div style="font-weight: 600; color: var(--primary-midnight);">${req.nombre || req.clienteNombre || 'Líder ME Crece'}</div>
                         <div style="font-size: 0.75rem; color: #999;">${req.email || req.clienteEmail}</div>
                     </td>
                     <td style="padding: 15px;">
