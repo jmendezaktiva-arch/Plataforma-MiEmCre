@@ -124,7 +124,12 @@ exports.handler = async (event) => {
         console.error('🚨 Error Crítico en Función de Notificación:', error);
         return {
             statusCode: 500,
-            body: JSON.stringify({ error: 'Fallo en la comunicación del servidor' })
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ 
+                error: 'Fallo en la respuesta del servidor de correos',
+                detalles: error.message,
+                trazabilidad: "Netlify-Hook-Error"
+            })
         };
     }
 };
