@@ -1281,17 +1281,22 @@ document.addEventListener('DOMContentLoaded', async () => {
         if (!confirm(`🚀 ¿Enviar enlace de compra para "${servicio}" a ${nombre}?`)) return;
 
         try {
-            // PROTOCOLO COMERCIAL: Conexión con el Servidor de Notificaciones
+            // PROTOCOLO COMERCIAL: Conexión con el Servidor de Notificaciones (Dreams Prestige Engine)
+            const payload = {
+                destinatario: email,
+                cliente: { email: email, nombre: nombre },
+                servicio: { titulo: servicio, id: 'link_carrito' },
+                tipo: 'CARRITO_COMPRA',
+                omitirRegistroFirestore: true
+            };
+
             const response = await fetch('/.netlify/functions/intervencion-notificacion', {
                 method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({
-                    destinatario: email,
-                    cliente: { email, nombre },
-                    servicio: { titulo: servicio, id: 'link_carrito' },
-                    tipo: 'CARRITO_COMPRA',
-                    omitirRegistroFirestore: true // Trazabilidad: El registro ya existe en la bandeja
-                })
+                headers: { 
+                    'Accept': 'application/json',
+                    'Content-Type': 'application/json' 
+                },
+                body: JSON.stringify(payload)
             });
 
             if (response.ok) {

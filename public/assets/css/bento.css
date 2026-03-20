@@ -42,15 +42,21 @@
 
 /* Breakpoint para Celulares (Suelo de Legibilidad) */
 @media (max-width: 600px) {
-    .bento-grid { 
-        grid-template-columns: 1fr; 
-        gap: 15px;
+    /* Homologación: Forzamos columna única para el Bento y la Grid de Consultoría */
+    .bento-grid, .grid-recursos { 
+        grid-template-columns: 1fr !important; 
+        gap: 20px;
     }
     .bento-main, .bento-wide { 
         grid-column: span 1; 
         grid-row: auto; 
     }
-    .kpi-value { font-size: 2rem; } /* Ajuste de escala para evitar desbordes */
+    .kpi-value { font-size: 2rem; } 
+    
+    /* Optimización de respiro interno para tarjetas en pantallas pequeñas */
+    .card-recurso {
+        padding: 25px;
+    }
 }
 
 /* --- ESTÉTICA DE DATOS (KPI) --- */

@@ -95,27 +95,21 @@ document.addEventListener('DOMContentLoaded', async () => {
                         </div>
                     </div>
                     
-                    <div style="max-height: 140px; overflow-y: auto; padding-right: 8px; margin-bottom: 20px; border-bottom: 1px solid rgba(15, 52, 96, 0.03);">
-                        <p style="font-size: 0.85rem; color: #666; line-height: 1.6; margin-bottom: 12px; white-space: pre-wrap;">${service.description}</p>
-                        ${service.purposeDesc ? `
-                            <div style="background: rgba(149, 124, 61, 0.05); padding: 12px; border-radius: 8px; border-left: 3px solid var(--accent-gold); margin-bottom: 10px;">
-                                <span style="font-size: 0.6rem; font-weight: 800; color: var(--accent-gold); text-transform: uppercase; letter-spacing: 1px; display: block; margin-bottom: 4px;">Promesa de Valor:</span>
-                                <p style="font-size: 0.8rem; color: var(--primary-midnight); line-height: 1.4; font-style: italic; margin: 0; white-space: pre-wrap;">"${service.purposeDesc}"</p>
-                            </div>
-                        ` : ''}
+                    <div style="flex-grow: 1; margin-bottom: 20px;">
+                        <p style="font-size: 0.85rem; color: #666; line-height: 1.6; display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical; overflow: hidden; text-overflow: ellipsis;">
+                            ${service.description}
+                        </p>
+                        <span style="font-size: 0.7rem; color: var(--accent-gold); font-weight: 600; text-transform: uppercase; letter-spacing: 0.5px; display: block; margin-top: 8px;">
+                            + Ver detalles y promesa de valor
+                        </span>
                     </div>
                     
-                    <button class="btn-toggle-roadmap" 
-                            data-target="roadmap-${service.id}"
-                            style="width: 100%; background: none; border: 1px solid rgba(15, 52, 96, 0.1); padding: 10px; border-radius: 8px; color: var(--primary-midnight); font-size: 0.65rem; font-weight: 800; text-transform: uppercase; letter-spacing: 1px; cursor: pointer; margin-bottom: 10px; transition: all 0.3s ease; display: flex; justify-content: center; align-items: center; gap: 8px;">
-                        <span>Ver Plan de Trabajo</span>
-                        <span class="icon-arrow" style="transition: transform 0.3s;">▾</span>
+                    <button class="btn-open-service-modal" 
+                            data-id="${service.id}"
+                            style="width: 100%; background: rgba(15, 52, 96, 0.03); border: 1px solid var(--accent-gold); padding: 12px; border-radius: 8px; color: var(--primary-midnight); font-size: 0.7rem; font-weight: 800; text-transform: uppercase; letter-spacing: 1px; cursor: pointer; margin-bottom: 15px; transition: all 0.3s ease; display: flex; justify-content: center; align-items: center; gap: 8px;">
+                        <span>Explorar Roadmap Estratégico</span>
+                        <span style="font-size: 1.1rem; line-height: 1;">⊕</span>
                     </button>
-
-                    <div id="roadmap-${service.id}" class="project-roadmap" style="display: none; background: rgba(15, 52, 96, 0.02); border-radius: 12px; padding: 15px; border: 1px solid rgba(15, 52, 96, 0.04); flex-grow: 1; overflow-y: auto; margin-bottom: 10px; max-height: 160px;">
-                        <span style="font-size: 0.6rem; color: #999; font-weight: 800; text-transform: uppercase; letter-spacing: 1px; display: block; margin-bottom: 5px;">Roadmap de Intervención:</span>
-                        ${phasesHtml || '<p style="font-size: 0.7rem; color: #bbb; font-style: italic;">Consultar desglose con el asesor.</p>'}
-                    </div>
                 </div>
 
                 <button class="btn-primary" 
@@ -212,17 +206,64 @@ document.addEventListener('DOMContentLoaded', async () => {
 
         const { action, id, target } = btn.dataset;
 
-        // Lógica de Despliegue (Show/Hide Roadmap)
-        if (btn.classList.contains('btn-toggle-roadmap')) {
-            const roadmapEl = document.getElementById(target);
-            const isOpening = roadmapEl.style.display === 'none';
+        // Lógica de la Cápsula Prestige (Modal de Detalle)
+        if (btn.classList.contains('btn-open-service-modal')) {
+            const service = SERVICES_CONFIG.find(s => s.id === id);
+            if (!service) return;
+
+            const modalOverlay = document.getElementById('service-modal-overlay');
+            const modalBody = document.getElementById('service-modal-body');
+            const btnRequest = document.getElementById('btn-modal-request');
+
+            // 1. Construcción de Fases con Estética Prestige
+            const phasesHtml = (service.phases || []).map((phase, idx) => `
+                <div style="margin-bottom: 15px; padding-left: 15px; border-left: 3px solid var(--accent-gold);">
+                    <span style="font-size: 0.7rem; font-weight: 700; color: var(--primary-midnight); text-transform: uppercase; letter-spacing: 0.5px;">
+                        ${idx + 1}. ${phase.title}
+                    </span>
+                </div>
+            `).join('');
+
+            // 2. Inyección Dinámica de Contenido Inmersivo (Arquitectura Hook & Depth)
+            modalBody.innerHTML = `
+                <h3 style="color: var(--primary-midnight); font-weight: 900; margin-bottom: 5px;">${service.title}</h3>
+                <span style="color: var(--accent-gold); font-size: 0.7rem; font-weight: 700; text-transform: uppercase; letter-spacing: 2px;">Servicio Estratégico Especializado</span>
+                
+                ${service.purposeDesc ? `
+                    <div style="margin: 30px 0; padding: 30px; background: linear-gradient(135deg, rgba(149, 124, 61, 0.08), rgba(15, 52, 96, 0.02)); border-left: 5px solid var(--accent-gold); border-radius: 0 20px 20px 0; position: relative; overflow: hidden;">
+                        <span style="position: absolute; top: -10px; right: 10px; font-size: 6rem; color: var(--accent-gold); opacity: 0.1; font-family: serif; pointer-events: none;">&ldquo;</span>
+                        <span style="font-size: 0.65rem; font-weight: 800; color: var(--accent-gold); text-transform: uppercase; letter-spacing: 1.5px; display: block; margin-bottom: 12px;">Nuestra Promesa Prestige:</span>
+                        <p style="font-size: 1.15rem; color: var(--primary-midnight); line-height: 1.5; font-style: italic; font-weight: 500; margin: 0; position: relative; z-index: 1;">
+                            "${service.purposeDesc}"
+                        </p>
+                    </div>
+                ` : ''}
+
+                <div style="margin-bottom: 30px; line-height: 1.8; color: var(--text-color); font-size: 0.95rem; white-space: pre-wrap;">${service.description}</div>
+
+                <div style="background: rgba(15, 52, 96, 0.03); padding: 25px; border-radius: 16px; border: 1px solid rgba(15, 52, 96, 0.05);">
+                    <h4 style="font-size: 0.65rem; color: var(--accent-gold); font-weight: 800; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 20px; display: flex; align-items: center; gap: 10px;">
+                        <span style="width: 20px; height: 1px; background: var(--accent-gold);"></span>
+                        Roadmap de Intervención
+                    </h4>
+                    ${phasesHtml || '<p style="font-size: 0.7rem; color: #999; font-style: italic;">Consulte el desglose con su asesor senior.</p>'}
+                </div>
+            `;
+
+            // 3. Sincronización del Botón de Solicitud (Acción Blindada)
+            btnRequest.dataset.id = service.id;
+            btnRequest.dataset.action = 'request'; 
             
-            roadmapEl.style.display = isOpening ? 'block' : 'none';
-            
-            // Mutación visual del botón (Feedback Prestige)
-            btn.querySelector('span').innerText = isOpening ? 'Ocultar Plan de Trabajo' : 'Ver Plan de Trabajo';
-            btn.querySelector('.icon-arrow').style.transform = isOpening ? 'rotate(180deg)' : 'rotate(0deg)';
-            btn.style.borderColor = isOpening ? 'var(--accent-gold)' : 'rgba(15, 52, 96, 0.1)';
+            // 4. Activación de la Interfaz
+            modalOverlay.classList.add('active');
+            document.body.style.overflow = 'hidden'; // Bloqueo de scroll de fondo
+            return;
+        }
+
+        // Lógica de Cierre de la Cápsula (Escape Visual)
+        if (btn.id === 'btn-close-service-modal' || (e.target.id === 'service-modal-overlay' && !e.target.closest('.purpose-bubble'))) {
+            document.getElementById('service-modal-overlay').classList.remove('active');
+            document.body.style.overflow = '';
             return;
         }
 
