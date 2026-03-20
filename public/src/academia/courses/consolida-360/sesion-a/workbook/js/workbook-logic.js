@@ -44,29 +44,8 @@ document.addEventListener('DOMContentLoaded', function() {
 
         injectSectionTemplates();
         setupEvents();
-        repairBrandAssets();
-    };
-
-    /**
-     * Motor de Reparación de Activos de Marca (Sesión A)
-     * Sincroniza las rutas estáticas y marcadores de datos con el motor de rutas de Dreams.
-     */
-    const repairBrandAssets = () => {
-        const logoUrl = DREAMS_CONFIG.resolvePath('logo.png');
-        
-        // 1. Reparar imágenes con marcador de datos (Aside y Reporte)
-        document.querySelectorAll('img[data-asset="logo.png"]').forEach(img => {
-            img.src = logoUrl;
-        });
-
-        // 2. Reparar imágenes con rutas estáticas remanentes (Header decorativo)
-        document.querySelectorAll('img[src*="logo.png"]').forEach(img => {
-            if(!img.src.startsWith('https')) img.src = logoUrl;
-        });
-
-        // 3. Reparar Favicon
-        const favicon = document.querySelector('link[rel*="icon"]');
-        if (favicon) favicon.href = logoUrl;
+        // TRACEABILIDAD (Hito 4.3): Eliminamos llamado y definición local redundante.
+        // La reparación de activos se ejecuta de forma centralizada al final del DOMContentLoaded.
     };
 
     // --- 3. TEMPLATES METODOLÓGICOS (INTEGRIDAD TOTAL DE MUNDOS) ---

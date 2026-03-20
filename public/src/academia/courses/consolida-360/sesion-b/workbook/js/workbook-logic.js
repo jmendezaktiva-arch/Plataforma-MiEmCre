@@ -616,9 +616,15 @@ document.addEventListener('DOMContentLoaded', function() {
             <div class="space-y-8">
                 <div class="p-8 border-l-4 border-brand-orange bg-orange-50/50 rounded-r-2xl">
                     <h4 class="text-sm font-bold brand-orange uppercase mb-4 tracking-widest">👤 Cliente Ideal: ${getVal('avatar_nombre')}</h4>
-                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6 text-sm">
-                        <p><strong>Dolores:</strong> ${getVal('avatar_dolores')}</p>
-                        <p><strong>Metas:</strong> ${getVal('avatar_metas')}</p>
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-8 text-sm">
+                        <div class="bg-white/40 p-4 rounded-xl shadow-sm border border-orange-100/50">
+                            <p class="font-black text-[10px] uppercase text-orange-700 mb-2 tracking-widest">Detección de Dolores</p>
+                            <p class="italic leading-relaxed text-gray-700">${getVal('avatar_dolores')}</p>
+                        </div>
+                        <div class="bg-white/40 p-4 rounded-xl shadow-sm border border-orange-100/50">
+                            <p class="font-black text-[10px] uppercase text-orange-700 mb-2 tracking-widest">Aspiraciones y Metas</p>
+                            <p class="italic leading-relaxed text-gray-700">${getVal('avatar_metas')}</p>
+                        </div>
                     </div>
                 </div>
 
@@ -685,7 +691,6 @@ document.addEventListener('DOMContentLoaded', function() {
                         <p class="text-[10px] font-bold text-gray-400 uppercase">Conversión</p>
                         <p class="text-lg font-bold brand-blue">${getVal('metrica_tasa_cierre')}</p>
                     </div>
-                </div>
             </div>
         `;
         reportContainer.innerHTML = html;
