@@ -66,11 +66,16 @@ exports.handler = async (event) => {
         // Se utilizan variables de entorno de Netlify por seguridad
         const transporter = nodemailer.createTransport({
             host: process.env.MAIL_HOST,
-            port: process.env.MAIL_PORT,
-            secure: true,
+            port: Number(process.env.MAIL_PORT), 
+            secure: Number(process.env.MAIL_PORT) === 465, 
             auth: {
                 user: process.env.MAIL_USER,
                 pass: process.env.MAIL_PASS
+            },
+            tls: {
+                // Protocolo de Seguridad: Permite la conexión aunque el certificado 
+                // del servidor no coincida exactamente con el host (común en cPanel/Webmail)
+                rejectUnauthorized: false 
             }
         });
 
