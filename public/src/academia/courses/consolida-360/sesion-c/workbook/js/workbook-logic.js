@@ -2658,11 +2658,27 @@ document.addEventListener('DOMContentLoaded', function() {
             const badge = display?.nextElementSibling; // El cuadro de texto debajo del porcentaje
 
             if (monto > 0) {
-                // 1. CÁLCULO FIEL: ROI Anualizado = ((Rendimiento / Monto) / (Plazo / 12)) * 100
-                const roiAnualizado = ((rendimiento / monto) / (plazo / 12)) * 100;
+                // TRACEABILIDAD (Hito 2): Recuperamos el Factor de Eficiencia basado en Hábitos (Ej. 6 Cualitativo)
+                const f = parseInt(document.querySelector('[data-id="ej6_frecuencia"]')?.value) || 0;
+                const s = parseInt(document.querySelector('[data-id="ej6_solucion"]')?.value) || 0;
+                const i = parseInt(document.querySelector('[data-id="ej6_impacto"]')?.value) || 0;
+                
+                // Definición de Factor (Puntaje 0-6): Un puntaje de 6 duplica el potencial (Factor 2.0)
+                const habitFactor = 1 + ((f + s + i) / 6); 
+
+                // APLICACIÓN DE FÓRMULA DE AUDITORÍA: (Inv x Factor) - Inv
+                const roiProyectadoReal = (monto * habitFactor) - monto;
+                
+                // Cálculo de ROI Anualizado ajustado por realidad operativa
+                const roiAnualizado = ((roiProyectadoReal / monto) / (plazo / 12)) * 100;
                 
                 if (display) {
                     display.innerText = roiAnualizado.toFixed(1) + '%';
+                    
+                    // PERSISTENCIA DE INTEGRIDAD: Guardamos el ROI Proyectado en moneda para el reporte
+                    if (window.WorkbookCore) {
+                        WorkbookCore.saveProgress('ej6_roi_proyectado_monto', roiProyectadoReal.toFixed(2));
+                    }
                     
                     // 2. RANGOS METODOLÓGICOS EXACTOS
                     let status = "", color = "", bg = "";
@@ -2721,11 +2737,15 @@ document.addEventListener('DOMContentLoaded', function() {
                 // TRACEABILIDAD: Limpiamos solo las clases de estado, preservando la estructura base del badge
                 categoryDisplay.classList.remove('bg-gray-200', 'text-gray-500', 'bg-blue-100', 'text-brand-blue', 'bg-orange-100', 'text-brand-orange');
                 
-                if (totalPoints >= 5) {
+                // FILTRO DE INTEGRIDAD (Hito 2.2): El hábito manda sobre el impacto.
+                // Si la frecuencia es baja (0) o la solución es pobre (0), se degrada a Gasto Ordinario.
+                const lowHabit = f === 0 || s === 0;
+
+                if (totalPoints >= 5 && !lowHabit) {
                     categoryDisplay.innerText = "ESTRATEGIA MAESTRA";
                     categoryDisplay.classList.add('bg-orange-100', 'text-brand-orange');
                     if (iconDisplay) iconDisplay.innerHTML = '🏆';
-                } else if (totalPoints >= 3) {
+                } else if (totalPoints >= 3 && f > 0) {
                     categoryDisplay.innerText = "INVERSIÓN TÁCTICA";
                     categoryDisplay.classList.add('bg-blue-100', 'text-brand-blue');
                     if (iconDisplay) iconDisplay.innerHTML = '⚙️';

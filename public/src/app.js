@@ -60,6 +60,14 @@ onAuthStateChanged(auth, async (user) => {
             }
             
             if (window.location.pathname.includes('dashboard.html')) {
+                // HIDRATACIÓN DE IDENTIDAD: Localizamos el ancla y personalizamos el saludo
+                const displayElement = document.getElementById('user-display-name');
+                if (displayElement) {
+                    // TRACEABILIDAD: Priorizamos el nombre de perfil de Firestore
+                    const name = userData?.nombre || user.displayName || 'Socio';
+                    displayElement.innerText = `Bienvenido de nuevo, ${name}`;
+                    displayElement.style.opacity = "1";
+                }
                 syncDashboardAccess();
             }
         } catch (error) {

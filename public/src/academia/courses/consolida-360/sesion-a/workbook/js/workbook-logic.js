@@ -142,22 +142,30 @@ document.addEventListener('DOMContentLoaded', function() {
                     </div>
                 </div>`).join('')}</div>`;
 
-        // EJ. 5: DELEGACIÓN (7 Prácticas x 3 Tareas)
+        // EJ. 5: DELEGACIÓN (7 Prácticas x 3 Tareas) - REHABILITACIÓN DE FILAS (Hito 3.1)
         const dQ = ["¿Vínculo con Misión?", "¿Repaso de Objetivo?", "¿Recurrente/Excepción?", "¿Fecha y Hora exacta?", "¿Respaldo por Escrito?", "¿Confirmación de Recursos?", "¿Pregunta de Ayuda?"];
         document.getElementById('delegacion').innerHTML = `
             <h2 class="${titleClass}">Delegación Efectiva</h2>
             <div class="overflow-x-auto rounded-3xl border border-gray-100 shadow-sm">
                 <table class="w-full text-left border-collapse">
                     <thead class="bg-gray-50 text-[10px] font-black uppercase text-gray-400">
-                        <tr><th class="p-5 border-b">Buenas Prácticas de Delegación</th>${[1,2,3].map(t=>`<th class="text-center border-b">Tarea ${t}</th>`).join('')}</tr>
+                        <tr>
+                            <th class="p-5 border-b">Buenas Prácticas de Delegación</th>
+                            ${[1,2,3].map(t=>`<th class="text-center border-b">Tarea ${t}</th>`).join('')}
+                            <th class="text-center border-b bg-blue-50/50">Cumplimiento %</th>
+                        </tr>
                     </thead>
                     <tbody>${dQ.map((q, i) => `
-                        <tr class="border-b"><td class="p-5 text-xs font-bold text-gray-600">${q}</td>
-                        ${[1,2,3].map(t => `<td class="p-5 text-center"><select class="autosave-input p-2 rounded-lg text-[10px] bg-gray-50 font-bold border-none" data-id="del_t${t}_q${i}"><option value="--">--</option><option value="0">NO</option><option value="1">SÍ</option></select></td>`).join('')}
+                        <tr class="border-b">
+                            <td class="p-5 text-xs font-bold text-gray-600">${q}</td>
+                            ${[1,2,3].map(t => `<td class="p-5 text-center"><select class="autosave-input p-2 rounded-lg text-[10px] bg-gray-50 font-bold border-none" data-id="del_t${t}_q${i}"><option value="--">--</option><option value="0">NO</option><option value="1">SÍ</option></select></td>`).join('')}
+                            <td id="score_row_q${i}" class="text-center font-black text-[#0F3460] bg-blue-50/30 text-xs">0%</td>
                         </tr>`).join('')}</tbody>
                     <tfoot class="bg-[#0F3460] text-white">
-                        <tr><td class="p-5 font-black text-xs uppercase tracking-widest">Total Prácticas Aplicadas</td>
-                        ${[1,2,3].map(t => `<td id="score_del_t${t}" class="text-center font-black text-sm">0/7</td>`).join('')}
+                        <tr>
+                            <td class="p-5 font-black text-xs uppercase tracking-widest">Total Prácticas Aplicadas</td>
+                            ${[1,2,3].map(t => `<td id="score_del_t${t}" class="text-center font-black text-sm">0/7</td>`).join('')}
+                            <td class="bg-[#0F3460]/80"></td>
                         </tr>
                     </tfoot>
                 </table>
@@ -269,7 +277,8 @@ document.addEventListener('DOMContentLoaded', function() {
         updateText('prio_name_p1', t1); updateText('prio_name_p2', t2);
         updateText('mision_name_p1', t1); updateText('mision_name_p2', t2);
 
-        // Recalcular Tabla Delegación (Sección 5)
+        // Recalcular Tabla Delegación (Sección 5) - INTEGRIDAD DE FILAS Y COLUMNAS (Hito 3.2)
+        // 1. Cálculo por Columnas (Tareas 1, 2, 3) - Cuantitativo
         [1,2,3].forEach(t => {
             let sum = 0;
             for(let q=0; q<7; q++) {
@@ -278,6 +287,26 @@ document.addEventListener('DOMContentLoaded', function() {
             }
             updateText(`score_del_t${t}`, `${sum}/7`);
         });
+
+        // 2. Cálculo por Filas (Prácticas 0-6) - Análisis Cualitativo
+        for(let q=0; q<7; q++) {
+            let rowSum = 0;
+            for(let t=1; t<=3; t++) {
+                const val = localStorage.getItem(`cuaderno_del_t${t}_q${q}`);
+                if(val === '1') rowSum++;
+            }
+            const rowPercent = Math.round((rowSum / 3) * 100);
+            const rowEl = document.getElementById(`score_row_q${q}`);
+            
+            if(rowEl) {
+                rowEl.textContent = `${rowPercent}%`;
+                // SEMAFORIZACIÓN: Rojo (0%), Oro (33-66%), Verde (100%)
+                rowEl.className = "text-center font-black text-xs py-2 transition-colors duration-500";
+                if(rowPercent === 0) rowEl.classList.add('text-red-500');
+                else if(rowPercent < 100) rowEl.classList.add('text-[#957C3D]'); 
+                else rowEl.classList.add('text-green-600');
+            }
+        }
 
         renderTimeline();
         populateReport();

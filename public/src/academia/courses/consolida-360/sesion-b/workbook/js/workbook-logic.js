@@ -9,10 +9,11 @@ document.addEventListener('DOMContentLoaded', function() {
         { id: 'diagnostico_digital', title: '1. Diagnóstico Digital', icon: `<svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" /></svg>` },
         { id: 'cliente_ideal', title: '2. Mi Cliente Ideal', icon: `<svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" /></svg>` },
         { id: 'canales_mensaje', title: '3. Canales y Mensaje', icon: `<svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5.882V19.24a1.76 1.76 0 01-3.417.592l-2.147-6.15M18 13a3 3 0 100-6M5.436 13.683A4.001 4.001 0 017 6h1.832c4.1 0 7.625-1.234 9.168-3v14c-1.543-1.766-5.067-3-9.168-3H7a3.988 3.988 0 01-1.564-.317z" /></svg>` },
-        { id: 'lead_magnet', title: '4. Oferta Irresistible', icon: `<svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v13m0-13V6a2 2 0 112 2h-2zm0 0V5.5A2.5 2.5 0 109.5 8H12zm-7 4h14M5 12a2 2 0 110-4h14a2 2 0 110 4M5 12v7a2 2 0 002 2h10a2 2 0 002-2v-7" /></svg>` },
-        { id: 'flujo_captura', title: '5. Flujo de Captura', icon: `<svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" /></svg>` },
-        { id: 'metricas_ventas', title: '6. Métricas y Control', icon: `<svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 7h6m0 10v-3m-3 3h.01M9 17h.01M9 14h.01M12 14h.01M15 11h.01M12 11h.01M9 11h.01M7 21h10a2 2 0 002-2V5a2 2 0 00-2-2H7a2 2 0 00-2 2v14a2 2 0 002 2z" /></svg>` },
-        { id: 'plan_b', title: '7. Plan de Acción B', icon: `<svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 5l7 7-7 7M5 5l7 7-7 7" /></svg>` }
+        { id: 'matriz_priorizacion', title: '4. Matriz de Priorización', icon: `<svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 5a1 1 0 011-1h14a1 1 0 011 1v2a1 1 0 01-1 1H5a1 1 0 01-1-1V5zM4 13a1 1 0 011-1h6a1 1 0 011 1v6a1 1 0 01-1 1H5a1 1 0 01-1-1v-6zM16 13a1 1 0 011-1h2a1 1 0 011 1v6a1 1 0 01-1 1h-2a1 1 0 01-1-1v-6z" /></svg>` },
+        { id: 'lead_magnet', title: '5. Oferta Irresistible', icon: `<svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v13m0-13V6a2 2 0 112 2h-2zm0 0V5.5A2.5 2.5 0 109.5 8H12zm-7 4h14M5 12a2 2 0 110-4h14a2 2 0 110 4M5 12v7a2 2 0 002 2h10a2 2 0 002-2v-7" /></svg>` },
+        { id: 'flujo_captura', title: '6. Flujo de Captura', icon: `<svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" /></svg>` },
+        { id: 'metricas_ventas', title: '7. Métricas y Control', icon: `<svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 7h6m0 10v-3m-3 3h.01M9 17h.01M9 14h.01M12 14h.01M15 11h.01M12 11h.01M9 11h.01M7 21h10a2 2 0 002-2V5a2 2 0 00-2-2H7a2 2 0 00-2 2v14a2 2 0 002 2z" /></svg>` },
+        { id: 'plan_b', title: '8. Plan de Acción B', icon: `<svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 5l7 7-7 7M5 5l7 7-7 7" /></svg>` }
     ];
 
     // 1. MOTOR DE RENDERIZADO DINÁMICO (Sincronización con Modelo de Oro)
@@ -63,16 +64,6 @@ document.addEventListener('DOMContentLoaded', function() {
                 <tbody id="digital-diag-body"></tbody>
             </table>
         </div>
-        <div class="mt-6 text-right">
-            <button id="calculate-digital-score" class="bg-brand-orange text-white font-bold py-2 px-6 rounded-lg hover:bg-orange-600 transition-colors shadow-md">
-                Calcular Nivel de Madurez
-            </button>
-        </div>
-        <div id="digital-score-result" class="mt-6 p-6 bg-blue-50 border-l-4 border-brand-blue rounded-r-lg hidden">
-            <h4 class="font-bold text-lg brand-blue">Resultado del Ecosistema</h4>
-            <p id="digital-score-text" class="text-gray-700 italic mt-2"></p>
-        </div>
-
         <div class="mt-6 text-right">
             <button id="calculate-digital-score" class="bg-brand-orange text-white font-bold py-2 px-6 rounded-lg hover:bg-orange-600 transition-colors shadow-md">
                 Calcular Nivel de Madurez
@@ -190,6 +181,56 @@ document.addEventListener('DOMContentLoaded', function() {
             </div>
         </div>`;
 
+    // 4.1 INYECCIÓN QUIRÚRGICA: EJERCICIO 4 (MATRIZ DE PRIORIZACIÓN ESTRATÉGICA)
+    document.getElementById('matriz_priorizacion').innerHTML = `
+        <h2 class="text-3xl font-bold brand-orange mb-4 flex items-center gap-3">${sectionsData[3].icon} ${sectionsData[3].title.substring(3)}</h2>
+        <div class="${instructionsBoxClass}">
+            <p><strong>Objetivo:</strong> Filtrar tus iniciativas digitales para enfocarte en lo que genera tracción rápida con el menor esfuerzo posible.</p>
+            <p class="mt-2"><strong>Instrucción:</strong> Distribuye tus ideas de marketing en los 4 cuadrantes según su impacto y facilidad.</p>
+        </div>
+
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <div class="p-6 bg-green-50 border-l-4 border-green-500 rounded-r-2xl shadow-sm">
+                <h4 class="font-bold text-green-700 flex items-center gap-2 mb-3">
+                    <span class="text-xl">💎</span> JOYAS DE LA CORONA
+                </h4>
+                <p class="text-[10px] text-green-600 mb-3 uppercase font-black tracking-widest">Alto Impacto / Alta Facilidad</p>
+                <textarea class="autosave-input w-full p-3 border border-green-200 rounded-xl h-32 text-sm bg-white/50 focus:bg-white transition-all outline-none" 
+                    data-section="matriz_priorizacion" data-id="matriz_q1" 
+                    placeholder="Ej: Activar campaña de retargeting a clientes que ya me conocen..."></textarea>
+            </div>
+
+            <div class="p-6 bg-blue-50 border-l-4 border-brand-blue rounded-r-2xl shadow-sm">
+                <h4 class="font-bold brand-blue flex items-center gap-2 mb-3">
+                    <span class="text-xl">🚀</span> PROYECTOS ESTRATÉGICOS
+                </h4>
+                <p class="text-[10px] text-blue-500 mb-3 uppercase font-black tracking-widest">Alto Impacto / Baja Facilidad</p>
+                <textarea class="autosave-input w-full p-3 border border-blue-200 rounded-xl h-32 text-sm bg-white/50 focus:bg-white transition-all outline-none" 
+                    data-section="matriz_priorizacion" data-id="matriz_q2" 
+                    placeholder="Ej: Grabar un curso online desde cero o implementar un CRM complejo..."></textarea>
+            </div>
+
+            <div class="p-6 bg-orange-50 border-l-4 border-brand-orange rounded-r-2xl shadow-sm">
+                <h4 class="font-bold brand-orange flex items-center gap-2 mb-3">
+                    <span class="text-xl">⚡</span> TAREAS DE RELLENO
+                </h4>
+                <p class="text-[10px] text-orange-500 mb-3 uppercase font-black tracking-widest">Bajo Impacto / Alta Facilidad</p>
+                <textarea class="autosave-input w-full p-3 border border-orange-200 rounded-xl h-32 text-sm bg-white/50 focus:bg-white transition-all outline-none" 
+                    data-section="matriz_priorizacion" data-id="matriz_q3" 
+                    placeholder="Ej: Cambiar el diseño de las tarjetas de presentación o actualizar el banner..."></textarea>
+            </div>
+
+            <div class="p-6 bg-gray-100 border-l-4 border-gray-400 rounded-r-2xl shadow-sm opacity-80">
+                <h4 class="font-bold text-gray-600 flex items-center gap-2 mb-3">
+                    <span class="text-xl">⚠️</span> SUMIDEROS DE TIEMPO
+                </h4>
+                <p class="text-[10px] text-gray-500 mb-3 uppercase font-black tracking-widest">Bajo Impacto / Baja Facilidad</p>
+                <textarea class="autosave-input w-full p-3 border border-gray-300 rounded-xl h-32 text-sm bg-white/50 focus:bg-white transition-all outline-none" 
+                    data-section="matriz_priorizacion" data-id="matriz_q4" 
+                    placeholder="Ej: Estudiar una red social nueva donde no está mi cliente ideal..."></textarea>
+            </div>
+        </div>`;
+
     // 4. EJERCICIO 3 (CANALES Y MENSAJE) - LIMPIEZA DE SINTAXIS
     document.getElementById('canales_mensaje').innerHTML = `
         <h2 class="text-3xl font-bold brand-orange mb-4 flex items-center gap-3">${sectionsData[2].icon} ${sectionsData[2].title.substring(3)}</h2>
@@ -240,9 +281,9 @@ document.addEventListener('DOMContentLoaded', function() {
             </div>
         </div>`;
 
-    // 5. EJERCICIO 4 (OFERTA IRRESISTIBLE / LEAD MAGNET)
+    // 5. EJERCICIO 5 (OFERTA IRRESISTIBLE / LEAD MAGNET)
     document.getElementById('lead_magnet').innerHTML = `
-        <h2 class="text-3xl font-bold brand-orange mb-4 flex items-center gap-3">${sectionsData[3].icon} ${sectionsData[3].title.substring(3)}</h2>
+        <h2 class="text-3xl font-bold brand-orange mb-4 flex items-center gap-3">${sectionsData[4].icon} ${sectionsData[4].title.substring(3)}</h2>
         <div class="${instructionsBoxClass}">
             <p><strong>Objetivo:</strong> Crear un recurso de alto valor que intercambiarás por los datos de contacto de tu prospecto (Nombre y WhatsApp).</p>
             <p class="mt-2"><strong>Instrucción:</strong> Define el nombre y el formato del regalo que atraerá a tu Cliente Ideal.</p>
@@ -279,9 +320,9 @@ document.addEventListener('DOMContentLoaded', function() {
             </div>
         </div>`;
 
-    // 6. EJERCICIO 5 (FLUJO DE CAPTURA / EMBUDO)
+    // 6. EJERCICIO 6 (FLUJO DE CAPTURA / EMBUDO)
     document.getElementById('flujo_captura').innerHTML = `
-        <h2 class="text-3xl font-bold brand-orange mb-4 flex items-center gap-3">${sectionsData[4].icon} ${sectionsData[4].title.substring(3)}</h2>
+        <h2 class="text-3xl font-bold brand-orange mb-4 flex items-center gap-3">${sectionsData[5].icon} ${sectionsData[5].title.substring(3)}</h2>
         <div class="${instructionsBoxClass}">
             <p><strong>Objetivo:</strong> Trazar el recorrido técnico que hará el cliente desde que ve tu anuncio hasta que llega a tu WhatsApp o CRM.</p>
             <p class="mt-2"><strong>Instrucción:</strong> Define los pasos de tu proceso de captura actual o deseado para convertir extraños en prospectos calificados.</p>
@@ -323,9 +364,9 @@ document.addEventListener('DOMContentLoaded', function() {
             </div>
         </div>`;
 
-    // 7. EJERCICIO 6 (MÉTRICAS Y CONTROL / KPIs)
+    // 7. EJERCICIO 7 (MÉTRICAS Y CONTROL / KPIs)
     document.getElementById('metricas_ventas').innerHTML = `
-        <h2 class="text-3xl font-bold brand-orange mb-4 flex items-center gap-3">${sectionsData[5].icon} ${sectionsData[5].title.substring(3)}</h2>
+        <h2 class="text-3xl font-bold brand-orange mb-4 flex items-center gap-3">${sectionsData[6].icon} ${sectionsData[6].title.substring(3)}</h2>
         <div class="${instructionsBoxClass}">
             <p><strong>Objetivo:</strong> Definir los indicadores numéricos que determinarán si tu inversión digital es rentable o si necesita ajustes urgentes.</p>
             <p class="mt-2"><strong>Instrucción:</strong> Establece tus metas mensuales para cada indicador clave.</p>
@@ -389,9 +430,9 @@ document.addEventListener('DOMContentLoaded', function() {
             </p>
         </div>`;
 
-    // 8. EJERCICIO 7 (PLAN DE ACCIÓN B / TU RUTA DIGITAL)
+    // 8. EJERCICIO 8 (PLAN DE ACCIÓN B / TU RUTA DIGITAL)
     document.getElementById('plan_b').innerHTML = `
-        <h2 class="text-3xl font-bold brand-orange mb-4 flex items-center gap-3">${sectionsData[6].icon} ${sectionsData[6].title.substring(3)}</h2>
+        <h2 class="text-3xl font-bold brand-orange mb-4 flex items-center gap-3">${sectionsData[7].icon} ${sectionsData[7].title.substring(3)}</h2>
         <div class="${instructionsBoxClass}">
             <p><strong>Objetivo:</strong> Convertir la estrategia en pasos tácticos con fecha de caducidad para lanzar o potenciar tu ecosistema digital.</p>
             <p class="mt-2"><strong>Instrucción:</strong> Define las 2 acciones prioritarias para los próximos 15 días.</p>
@@ -468,12 +509,19 @@ document.addEventListener('DOMContentLoaded', function() {
         document.querySelectorAll('.autosave-input').forEach(input => {
             // Buscamos con el prefijo 'cuaderno_' (Estándar Dreams Cloud) 
             // y mantenemos 'sesionb_' como respaldo de migración
-            const savedValue = localStorage.getItem('cuaderno_' + input.dataset.id) || 
-                               localStorage.getItem('sesionb_' + input.dataset.id);
+            let savedValue = localStorage.getItem('cuaderno_' + input.dataset.id);
+            const legacyValue = localStorage.getItem('sesionb_' + input.dataset.id);
+
+            // Mapeo de compatibilidad: Escala 0-3 (App 1) -> 1-5 (App 2)
+            if (!savedValue && legacyValue !== null) {
+                const map = { "0": "1", "1": "2", "2": "4", "3": "5" };
+                savedValue = map[legacyValue] || legacyValue;
+                console.log(`♻️ Mapeando valor legacy: ${legacyValue} -> ${savedValue} para ID: ${input.dataset.id}`);
+            }
                                
             if (savedValue !== null) {
                 if (input.type === 'radio') {
-                    if (input.value === savedValue) input.checked = true;
+                    if (input.value === String(savedValue)) input.checked = true;
                 } else if (input.type === 'checkbox') {
                     input.checked = (savedValue === 'true');
                 } else {
@@ -571,6 +619,28 @@ document.addEventListener('DOMContentLoaded', function() {
                     <div class="grid grid-cols-1 md:grid-cols-2 gap-6 text-sm">
                         <p><strong>Dolores:</strong> ${getVal('avatar_dolores')}</p>
                         <p><strong>Metas:</strong> ${getVal('avatar_metas')}</p>
+                    </div>
+                </div>
+
+                <div class="p-8 border border-gray-100 rounded-3xl shadow-sm bg-white">
+                    <h4 class="text-sm font-bold brand-blue uppercase mb-6 tracking-widest">🎯 Prioridades Estratégicas (Matriz)</h4>
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <div class="p-4 bg-green-50 rounded-xl border border-green-100">
+                            <p class="text-[9px] font-black text-green-600 uppercase mb-1 tracking-tighter">💎 Joyas de la Corona (Impacto + / Facilidad +)</p>
+                            <p class="text-[11px] text-gray-700 leading-snug">${getVal('matriz_q1')}</p>
+                        </div>
+                        <div class="p-4 bg-blue-50 rounded-xl border border-blue-100">
+                            <p class="text-[9px] font-black text-blue-600 uppercase mb-1 tracking-tighter">🚀 Proyectos Estratégicos (Impacto + / Facilidad -)</p>
+                            <p class="text-[11px] text-gray-700 leading-snug">${getVal('matriz_q2')}</p>
+                        </div>
+                        <div class="p-4 bg-orange-50 rounded-xl border border-orange-100">
+                            <p class="text-[9px] font-black text-orange-600 uppercase mb-1 tracking-tighter">⚡ Tareas de Relleno (Impacto - / Facilidad +)</p>
+                            <p class="text-[11px] text-gray-700 leading-snug">${getVal('matriz_q3')}</p>
+                        </div>
+                        <div class="p-4 bg-gray-50 rounded-xl border border-gray-200 opacity-60">
+                            <p class="text-[9px] font-black text-gray-600 uppercase mb-1 tracking-tighter">⚠️ Sumideros de Tiempo (Impacto - / Facilidad -)</p>
+                            <p class="text-[11px] text-gray-700 leading-snug">${getVal('matriz_q4')}</p>
+                        </div>
                     </div>
                 </div>
 

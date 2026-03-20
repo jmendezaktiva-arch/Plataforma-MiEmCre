@@ -34,10 +34,34 @@
     background: rgba(15, 52, 96, 1);
 }
 
+/* --- IDENTIDAD DE SESIÓN (PRESTIGE) --- */
+.sidebar-user-identity {
+    padding: 30px 20px 10px 35px; /* Alineación con el margen izquierdo de los links */
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+}
+
+.user-greeting {
+    font-size: 11px;
+    text-transform: uppercase;
+    letter-spacing: 2px;
+    color: rgba(245, 245, 240, 0.5); /* Marfil de Lino con transparencia sutil */
+    font-weight: 500;
+}
+
+.user-name {
+    font-size: 19px;
+    font-weight: 700;
+    color: var(--accent-gold); /* Oro Bronceado para resaltar la identidad */
+    font-family: 'Montserrat', sans-serif;
+    letter-spacing: -0.02em;
+}
+
 /* Área de Navegación */
 .sidebar-nav {
     flex-grow: 1;
-    padding: 40px 20px;
+    padding: 20px 20px 40px 20px; /* Ajuste de padding superior para equilibrar el bloque de identidad */
 }
 
 .sidebar-link {

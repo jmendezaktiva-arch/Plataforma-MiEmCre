@@ -10,31 +10,30 @@ const SidebarPrestige = {
         try {
             this.injectStyles();
             
-            // TRACEABILIDAD: El Sentinel de Auth decide qué versión del Sidebar inyectar
+            // TRACEABILIDAD: El Sentinel de Auth extrae identidad y rol para la sesión personalizada
             auth.onAuthStateChanged(async (user) => {
-                let role = 'cliente'; 
-                
+                let role = 'cliente';
+                let name = 'Socio'; // Respaldo de marca (Prestige)
+
                 if (user) {
                     try {
                         const userDoc = await getDoc(doc(db, "usuarios", user.uid));
                         if (userDoc.exists()) {
-                            // NORMALIZACIÓN QUIRÚRGICA: Evita fallos por mayúsculas o variaciones de nombre
-                            const rawRole = (userDoc.data().rol || 'cliente').toLowerCase();
+                            const userData = userDoc.data();
                             
-                            // Mapeo de Superpoderes (God Mode)
-                            if (rawRole === 'admin' || rawRole === 'administrador') {
-                                role = 'admin';
-                            } else {
-                                role = 'cliente';
-                            }
+                            // Captura quirúrgica del nombre desde Firestore o el Perfil de Auth
+                            name = userData.nombre || user.displayName || 'Socio';
+                            
+                            const rawRole = (userData.rol || 'cliente').toLowerCase();
+                            role = (rawRole === 'admin' || rawRole === 'administrador') ? 'admin' : 'cliente';
                         }
                     } catch (error) {
                         console.error("🚨 DREAMS LOG: Error recuperando identidad:", error);
                     }
                 }
                 
-                console.log(`🎭 Modo de navegación: ${role.toUpperCase()}`);
-                this.render(role); 
+                console.log(`🎭 Sesión activa: ${name} [${role.toUpperCase()}]`);
+                this.render(role, name); 
                 this.setupAfterRender();
             });
 
@@ -58,7 +57,7 @@ const SidebarPrestige = {
         }
     },
 
-    render(role) {
+    render(role, userName) {
         // TRACEABILIDAD: Eliminamos sidebars previos si existen para evitar duplicidad en cambios de rol
         const oldSidebar = document.getElementById('dreams-sidebar');
         if (oldSidebar) oldSidebar.remove();
@@ -67,6 +66,11 @@ const SidebarPrestige = {
             <nav id="dreams-sidebar" class="sidebar-prestige sidebar-hidden">
                 <div class="sidebar-brand-peek" title="Mi Empresa Crece">
                     <img data-asset="logo.png" alt="Marca">
+                </div>
+
+                <div class="sidebar-user-identity">
+                    <span class="user-greeting">Bienvenido,</span>
+                    <span class="user-name">${userName}</span>
                 </div>
 
                 <div class="sidebar-nav">

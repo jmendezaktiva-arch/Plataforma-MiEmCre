@@ -42,15 +42,52 @@ const MetricsEngine = {
                 }
             });
 
+            // 3. Monitor de Expiración SaaS (Escaneo de Trazabilidad Temporal)
+            // Identifica cuántos servicios requieren atención inmediata en todo el sistema.
+            let vencidos = 0;
+            let proximos = 0;
+
+            users.forEach(u => {
+                const servicios = u.expediente?.servicios || {};
+                Object.values(servicios).forEach(svc => {
+                    const evalRes = ExpirationEngine.evaluate(svc.fechaVencimiento);
+                    if (evalRes.status === 'vencido') vencidos++;
+                    if (evalRes.status === 'critico') proximos++;
+                });
+            });
+
             return {
                 promedioPuntoEquilibrio: clientesConDato > 0 ? sumaEquilibrio / clientesConDato : 0,
                 appMasPopular: popularApp.toUpperCase(),
-                totalClientes: users.length
+                totalClientes: users.length,
+                vencidos,
+                proximos
             };
         } catch (error) {
             console.error("🚨 Error en Motor de Métricas:", error);
             return { promedioPuntoEquilibrio: 0, appMasPopular: 'ERROR', totalClientes: 0 };
         }
+    }
+};
+
+// TRACEABILIDAD: Motor de Vigencia SaaS (Expiration Engine)
+// Centraliza el cálculo de tiempos para garantizar que las alertas sean consistentes en todo el ecosistema.
+const ExpirationEngine = {
+    evaluate(fechaVencimientoISO) {
+        if (!fechaVencimientoISO) return { dias: 999, status: 'inactivo', color: 'rgba(15, 52, 96, 0.2)' };
+        
+        const hoy = new Date();
+        const venc = new Date(fechaVencimientoISO);
+        const diferencia = venc - hoy;
+        const diasRestantes = Math.ceil(diferencia / (1000 * 60 * 60 * 24));
+
+        if (diasRestantes < 0) {
+            return { dias: diasRestantes, status: 'vencido', color: '#dc2626' }; // Rojo: Bloqueo sugerido
+        }
+        if (diasRestantes <= 30) {
+            return { dias: diasRestantes, status: 'critico', color: '#f59e0b' }; // Naranja: Alerta de renovación
+        }
+        return { dias: diasRestantes, status: 'vigente', color: '#16a34a' }; // Verde: Operación normal
     }
 };
 
@@ -79,13 +116,14 @@ const UserManager = {
     async createUserProfile(uid, data) {
         try {
             const userRef = doc(db, "usuarios", uid);
+            // TRACEABILIDAD: Inicialización del Expediente Maestro (CRM Core)
             const profileData = {
                 email: data.email,
                 rol: data.rol.toLowerCase(),
                 nombre: data.nombre || '',
                 empresa: data.empresa || 'Dreams Platform',
                 status: 'activo',
-                requiereCambioPassword: true, // Trazabilidad: Forza al usuario a definir su clave en el primer acceso
+                requiereCambioPassword: true, 
                 fechaCreacion: serverTimestamp(),
                 accesos: {
                     cursos: data.cursos || [],
@@ -93,6 +131,20 @@ const UserManager = {
                     consultor: data.consultor || []
                 },
                 expediente: {
+                    // Control de Vigencia Dinámico (SaaS Model)
+                    servicios: {}, 
+                    // Historial de Movimientos (Handshake Log)
+                    trazabilidad: [{
+                        fecha: new Date().toISOString(),
+                        evento: "SISTEMA_ALTA",
+                        descripcion: "Perfil creado y accesos iniciales asignados."
+                    }],
+                    // Inteligencia Financiera
+                    finanzas: {
+                        historialPagos: [],
+                        saldoPendiente: 0,
+                        totalInvertido: 0
+                    },
                     diagnosticos: [],
                     ultimoAcceso: null,
                     progresoGeneral: 0
@@ -109,17 +161,72 @@ const UserManager = {
     /**
      * updateAccess - Persistencia de cambios en permisos y roles
      */
-    async updateAccess(uid, newAccess, newRol) {
+    /**
+     * updateAccess - Procesador de Expediente Maestro v2.0 (Super Poderes)
+     * Gestiona accesos, vigencias, registros financieros y escalabilidad.
+     */
+    async updateAccess(uid, newAccess, newRol, extraData = {}) {
         try {
             const userRef = doc(db, "usuarios", uid);
+            
+            // 1. SINCRONIZACIÓN: Recuperamos estado actual
+            const userSnap = await getDoc(userRef);
+            const currentData = userSnap.data() || {};
+            const currentExpediente = currentData.expediente || {};
+            const currentFinanzas = currentExpediente.finanzas || { totalInvertido: 0, historialPagos: [] };
+
+            const hoy = new Date();
+            const vencimientoSaaS = new Date();
+            vencimientoSaaS.setFullYear(hoy.getFullYear() + 1);
+
+            // 2. CÁLCULO DE VIGENCIA
+            const nuevosServicios = { ...(currentExpediente.servicios || {}) };
+            const serviciosActivados = [...(newAccess.apps || []), ...(newAccess.consultor || [])];
+            
+            serviciosActivados.forEach(id => {
+                if (!nuevosServicios[id]) {
+                    nuevosServicios[id] = {
+                        fechaActivacion: hoy.toISOString(),
+                        fechaVencimiento: vencimientoSaaS.toISOString(),
+                        status: 'activo'
+                    };
+                }
+            });
+
+            // 3. PROCESAMIENTO FINANCIERO Y ESCALABILIDAD
+            let totalInvertido = currentFinanzas.totalInvertido || 0;
+            const logTrazabilidad = [...(currentExpediente.trazabilidad || [])];
+
+            // Si hay un pago nuevo, lo sumamos y generamos hito en el Dossier
+            if (extraData.nuevoPago > 0) {
+                totalInvertido += extraData.nuevoPago;
+                logTrazabilidad.push({
+                    fecha: hoy.toISOString(),
+                    evento: "PAGO_REGISTRADO",
+                    descripcion: `Ingreso manual de $${extraData.nuevoPago.toLocaleString()} asignado al expediente.`
+                });
+            }
+
+            logTrazabilidad.push({
+                fecha: hoy.toISOString(),
+                evento: "ACTUALIZACION_SISTEMA",
+                descripcion: `Modificación manual. Rol: ${newRol.toUpperCase()}. Cuota usuarios: ${extraData.cuotaUsuarios}.`
+            });
+
+            // 4. PERSISTENCIA ATÓMICA DEL EXPEDIENTE MAESTRO
             await updateDoc(userRef, {
                 "accesos": newAccess,
                 "rol": newRol,
-                "ultimaModificacion": serverTimestamp()
+                "ultimaModificacion": serverTimestamp(),
+                "expediente.servicios": nuevosServicios,
+                "expediente.usuariosAdicionales": parseInt(extraData.cuotaUsuarios) || 0,
+                "expediente.finanzas.totalInvertido": totalInvertido,
+                "expediente.trazabilidad": logTrazabilidad
             });
-            console.log(`✅ Documento ${uid} actualizado en Firestore.`);
+            
+            console.log(`✅ Super Poderes aplicados al expediente de ${uid}.`);
         } catch (error) {
-            console.error("🚨 Error en updateAccess:", error);
+            console.error("🚨 Error en Procesador Maestro:", error);
             throw error;
         }
     },
@@ -197,8 +304,22 @@ const renderEditModal = (uid, user) => {
                         <label style="display:block; margin-bottom:8px; font-size:0.9rem;"><input type="checkbox" value="app-process" ${(user.accesos?.apps || []).includes('app-process') ? 'checked' : ''}> Process Designer</label>
                     </div>
 
-                    <div style="margin-bottom:25px; padding:10px; background:#f9f5eb; border-radius:6px;">
+                    <div style="margin-bottom:20px; padding:10px; background:#f9f5eb; border-radius:6px;">
                         <label style="font-weight:700; font-size:0.8rem; color:var(--accent-gold);"><input type="checkbox" id="edit-ia" ${(user.accesos?.consultor || []).includes('ia-expert') ? 'checked' : ''}> ACTIVAR CONSULTOR IA</label>
+                    </div>
+
+                    <div style="margin-bottom:25px; padding-top: 15px; border-top: 1px solid #eee;">
+                        <label style="display:block; font-size:0.75rem; font-weight:700; margin-bottom:12px; color:var(--primary-midnight);">FINANZAS Y ESCALABILIDAD</label>
+                        <div style="display:flex; gap:12px;">
+                            <div style="flex:1;">
+                                <label style="display:block; font-size:0.65rem; color:#999; margin-bottom:5px;">REGISTRAR NUEVO PAGO ($)</label>
+                                <input type="number" id="edit-pago" placeholder="0.00" step="0.01" style="width:100%; padding:10px; border:1px solid #ddd; border-radius:6px; font-size:0.85rem;">
+                            </div>
+                            <div style="flex:1;">
+                                <label style="display:block; font-size:0.65rem; color:#999; margin-bottom:5px;">CUOTA USUARIOS EXTRA</label>
+                                <input type="number" id="edit-cuota" value="${user.expediente?.usuariosAdicionales || 0}" min="0" style="width:100%; padding:10px; border:1px solid #ddd; border-radius:6px; font-size:0.85rem;">
+                            </div>
+                        </div>
                     </div>
 
                     <div style="display:flex; gap:10px; justify-content:flex-end;">
@@ -231,10 +352,15 @@ const renderEditModal = (uid, user) => {
             consultor: hasIA ? ['ia-expert'] : []
         };
 
+        const extraData = {
+            nuevoPago: parseFloat(document.getElementById('edit-pago').value) || 0,
+            cuotaUsuarios: parseInt(document.getElementById('edit-cuota').value) || 0
+        };
+
         try {
-            await UserManager.updateAccess(uid, newAccess, newRol);
+            await UserManager.updateAccess(uid, newAccess, newRol, extraData);
             
-            alert("✅ Accesos actualizados con éxito.");
+            alert("✅ Expediente Maestro actualizado con éxito.");
             document.getElementById('modal-edit-container').remove();
             
             // Refresco de tabla y métricas para reflejar cambios
@@ -299,11 +425,12 @@ document.addEventListener('DOMContentLoaded', async () => {
     
     let allUsersCache = []; // Trazabilidad: Almacena los datos para búsqueda instantánea
     
-    // --- MOTOR DE MÉTRICAS (BI) ---
+    // --- MOTOR DE MÉTRICAS (BI) + MONITOR DE ALERTAS ---
     const loadAdminStats = async () => {
         try {
             const stats = await MetricsEngine.getGlobalAnalytics();
             
+            // 1. Renderizado de Métricas Estándar
             const elBreakEven = document.getElementById('stat-break-even');
             const elPopular = document.getElementById('stat-popular-app');
             const elParticipation = document.getElementById('stat-participation');
@@ -316,8 +443,32 @@ document.addEventListener('DOMContentLoaded', async () => {
                 elParticipation.innerText = `${percent}%`;
                 if (barParticipation) barParticipation.style.width = `${percent}%`;
             }
+
+            // 2. TRACEABILIDAD VISUAL: Inyección de Alertas SaaS Prestige
+            // Si existen servicios vencidos o por vencer, inyectamos una cinta de aviso proactivo.
+            const alertContainer = document.getElementById('saas-alerts-container');
+            if (alertContainer) {
+                if (stats.vencidos > 0 || stats.proximos > 0) {
+                    alertContainer.style.display = 'block';
+                    alertContainer.innerHTML = `
+                        <div style="background: ${stats.vencidos > 0 ? '#fee2e2' : '#fef3c7'}; color: ${stats.vencidos > 0 ? '#991b1b' : '#92400e'}; padding: 15px 25px; border-radius: 16px; margin-bottom: 30px; display: flex; align-items: center; gap: 20px; border: 1px solid ${stats.vencidos > 0 ? '#fecaca' : '#fde68a'}; animation: fadeIn 0.6s ease-out; box-shadow: 0 4px 15px rgba(0,0,0,0.05);">
+                            <span style="font-size: 1.5rem;">${stats.vencidos > 0 ? '🛑' : '⏳'}</span>
+                            <div style="flex: 1;">
+                                <h5 style="margin: 0; font-size: 0.9rem; font-weight: 900; text-transform: uppercase; letter-spacing: 1px;">Estado de Vigencia SaaS</h5>
+                                <p style="margin: 3px 0 0 0; font-size: 0.8rem; font-weight: 400; opacity: 0.9;">
+                                    Se detectaron <strong style="text-decoration:underline;">${stats.vencidos} servicios vencidos</strong> y <strong>${stats.proximos} alertas críticas</strong> de renovación.
+                                </p>
+                            </div>
+                            <button onclick="document.getElementById('search-input').focus();" style="background: rgba(255,255,255,0.5); border: none; padding: 8px 15px; border-radius: 8px; font-size: 0.7rem; font-weight: 800; cursor: pointer; color: inherit; transition: 0.3s;">GESTIONAR AHORA</button>
+                        </div>
+                    `;
+                } else {
+                    alertContainer.style.display = 'none';
+                    alertContainer.innerHTML = '';
+                }
+            }
         } catch (error) {
-            console.error("🚨 Error al cargar analíticas:", error);
+            console.error("🚨 Error al cargar analíticas y alertas:", error);
         }
     };
 
@@ -350,8 +501,17 @@ document.addEventListener('DOMContentLoaded', async () => {
 
             tableBody.innerHTML = filteredUsers.map(user => {
                 const totalCursos = user.accesos?.cursos?.length || 0;
-                const totalApps = user.accesos?.apps?.length || 0;
-                const tieneIA = user.accesos?.consultor?.length > 0 ? '✓ IA' : '';
+                const servicios = user.expediente?.servicios || {};
+                
+                // TRACEABILIDAD: Evaluación de Vigencia vía ExpirationEngine
+                // Delegamos la inteligencia de colores al motor central para mantener consistencia.
+                const getStatusColor = (id) => {
+                    const svc = servicios[id];
+                    const analysis = ExpirationEngine.evaluate(svc?.fechaVencimiento);
+                    return analysis.color;
+                };
+
+                const tieneIA = (user.accesos?.consultor || []).includes('ia-expert');
 
                 return `
                 <tr style="border-bottom: 1px solid #f4f4f4; transition: background 0.2s;" onmouseover="this.style.background='#fafafa'" onmouseout="this.style.background='transparent'">
@@ -364,13 +524,21 @@ document.addEventListener('DOMContentLoaded', async () => {
                         <span style="background: #eee; padding: 4px 8px; border-radius: 4px; font-size: 0.7rem; text-transform: uppercase;">${user.rol}</span>
                     </td>
                     <td style="padding: 15px;">
-                        <div style="font-size: 0.75rem;">
-                            <strong>${totalCursos}</strong> Cursos | <strong>${totalApps}</strong> Apps <span style="color: var(--accent-gold); font-weight: 700;">${tieneIA}</span>
+                        <div style="font-size: 0.75rem; display: flex; align-items: center; gap: 12px;">
+                            <span title="Cursos en Academia">📚 <strong>${totalCursos}</strong></span>
+                            |
+                            <div style="display: flex; gap: 6px;">
+                                ${(user.accesos?.apps || []).map(app => 
+                                    `<span style="color: ${getStatusColor(app)}; cursor: help; font-size: 1.1rem;" title="App: ${app}">📱</span>`
+                                ).join('')}
+                                ${tieneIA ? `<span style="color: ${getStatusColor('ia-expert')}; cursor: help; font-size: 1.1rem;" title="Consultor IA Expert">✨</span>` : ''}
+                            </div>
                         </div>
                     </td>
                     <td style="padding: 15px; text-align: right;">
-                        <button class="btn-action" onclick="prepareEditUser('${user.id}')" style="background: none; border: none; cursor: pointer; margin-right: 10px;" title="Editar Accesos">⚙️</button>
-                        <button class="btn-action" onclick="confirmDeleteUser('${user.id}', '${user.nombre}')" style="background: none; border: none; cursor: pointer; color: #dc2626;" title="Eliminar Usuario">🗑️</button>
+                        <button class="btn-action" onclick="window.viewUserLogs('${user.id}', '${user.nombre}')" style="background: none; border: none; cursor: pointer; margin-right: 12px; font-size: 1.2rem;" title="Ver Expediente de Trazabilidad">📑</button>
+                        <button class="btn-action" onclick="prepareEditUser('${user.id}')" style="background: none; border: none; cursor: pointer; margin-right: 12px;" title="Gestionar Accesos">⚙️</button>
+                        <button class="btn-action" onclick="confirmDeleteUser('${user.id}', '${user.nombre}')" style="background: none; border: none; cursor: pointer; color: #dc2626;" title="Eliminar Cliente">🗑️</button>
                     </td>
                 </tr>
                 `;
@@ -407,7 +575,70 @@ document.addEventListener('DOMContentLoaded', async () => {
         }
     };
 
-    // Nota: El disparo de loadAdminStats() y loadUsersList() ahora es gestionado 
+    /**
+     * viewUserLogs - Motor de Visualización del Expediente Maestro
+     * Recupera y renderiza la línea de tiempo de trazabilidad del cliente.
+     */
+    window.viewUserLogs = async (uid, nombre) => {
+        try {
+            const userSnap = await getDoc(doc(db, "usuarios", uid));
+            if (!userSnap.exists()) return alert("🚨 Error: No se encontró el expediente del usuario.");
+
+            const data = userSnap.data();
+            const trazabilidad = data.expediente?.trazabilidad || [];
+            
+            renderTimelineModal(nombre, trazabilidad);
+        } catch (error) {
+            console.error("🚨 Error al cargar trazabilidad:", error);
+            alert("No se pudo abrir el dossier. Revisa la consola.");
+        }
+    };
+
+    /**
+     * renderTimelineModal - Interfaz "Dossier Dreams" (UI Prestige)
+     * Construye un Timeline cronológico inverso (lo más reciente arriba).
+     */
+    const renderTimelineModal = (nombre, logs) => {
+        document.getElementById('modal-logs-container')?.remove();
+
+        const sortedLogs = [...logs].reverse(); // Prioridad a los hitos recientes
+
+        const logsHtml = sortedLogs.map(log => `
+            <div style="border-left: 3px solid var(--accent-gold); padding-left: 20px; margin-bottom: 25px; position: relative; animation: fadeIn 0.4s ease-out;">
+                <div style="width: 12px; height: 12px; background: var(--accent-gold); border-radius: 50%; position: absolute; left: -8px; top: 4px; box-shadow: 0 0 10px rgba(149, 124, 61, 0.4);"></div>
+                <div style="font-size: 0.7rem; color: #999; font-weight: 700; letter-spacing: 0.5px;">${new Date(log.fecha).toLocaleString('es-MX')}</div>
+                <div style="font-size: 0.85rem; font-weight: 800; color: var(--primary-midnight); text-transform: uppercase; margin: 4px 0;">${log.evento.replace(/_/g, ' ')}</div>
+                <div style="font-size: 0.9rem; color: #444; line-height: 1.5; font-weight: 400;">${log.descripcion}</div>
+            </div>
+        `).join('') || '<div style="text-align:center; padding:40px; color:#999; font-style:italic;">No existen registros históricos para este cliente.</div>';
+
+        const modalHtml = `
+            <div id="modal-logs-container" style="display:flex; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(15, 52, 96, 0.9); z-index:10001; align-items:center; justify-content:center; backdrop-filter: blur(10px);">
+                <div style="background:#fff; width:550px; max-height: 85vh; border-radius:24px; box-shadow: 0 40px 100px rgba(0,0,0,0.5); display:flex; flex-direction:column; overflow:hidden; border: 1px solid rgba(255,255,255,0.2);">
+                    <header style="background: var(--primary-midnight); padding: 30px; color: #fff; border-bottom: 5px solid var(--accent-gold);">
+                        <h3 style="margin:0; font-size: 1.2rem; font-weight: 900; letter-spacing: 1.5px;">DOSSIER DE TRAZABILIDAD</h3>
+                        <p style="margin: 8px 0 0 0; font-size: 0.8rem; color: var(--accent-gold); font-weight: 700; text-transform: uppercase;">Líder: ${nombre}</p>
+                    </header>
+                    
+                    <div style="flex: 1; overflow-y: auto; padding: 40px; background: #fdfdfd;">
+                        ${logsHtml}
+                    </div>
+
+                    <footer style="padding: 25px; border-top: 1px solid #eee; text-align: right; background: #fff;">
+                        <button onclick="document.getElementById('modal-logs-container').remove()" 
+                                style="background: var(--primary-midnight); color: white; border: 1px solid var(--accent-gold); padding: 14px 30px; border-radius: 12px; font-weight: 700; cursor: pointer; font-size: 0.8rem; letter-spacing: 1px; transition: 0.3s;"
+                                onmouseover="this.style.background='#164275'" onmouseout="this.style.background='var(--primary-midnight)'">
+                            CERRAR EXPEDIENTE
+                        </button>
+                    </footer>
+                </div>
+            </div>
+        `;
+
+        document.body.insertAdjacentHTML('beforeend', modalHtml);
+    };
+
+    // Nota: El disparo de loadAdminStats() y loadUsersList() ahora es gestionado
     // exclusivamente por el Guardia de Seguridad (Admin Guard) arriba.
 
     // 1. CONTROL DE APERTURA (MODAL)
@@ -1010,13 +1241,11 @@ document.addEventListener('DOMContentLoaded', async () => {
                         `}
                     </td>
                     <td style="padding: 15px; text-align: right; display: flex; gap: 10px; justify-content: flex-end;">
-                        ${(req.usuarioId && req.usuarioId !== 'visitante') ? `
-                            <button onclick="approveQuickIA('${req.usuarioId}', '${docSnap.id}')" 
-                                    style="background: #e6fffa; border: none; cursor: pointer; color: #059669; font-size: 1rem; padding: 5px; border-radius: 4px; display: flex; align-items: center;" 
-                                    title="Activar Consultor IA">
-                                ✅ <span style="font-size: 0.6rem; margin-left: 4px; font-weight: 800;">IA</span>
-                            </button>
-                        ` : ''}
+                        <button onclick="sendPurchaseCart('${req.email}', '${req.nombre}', '${req.interes || req.servicioId}')" 
+                                style="background: #f0f4f8; border: none; cursor: pointer; color: var(--primary-midnight); font-size: 1rem; padding: 5px; border-radius: 4px; display: flex; align-items: center; border: 1px solid rgba(15, 52, 96, 0.1);" 
+                                title="Enviar Carrito de Compra">
+                            ✉️ <span style="font-size: 0.6rem; margin-left: 6px; font-weight: 800;">ENVIAR CARRITO</span>
+                        </button>
                         <button onclick="confirmDeleteIntervention('${docSnap.id}')" style="background: none; border: none; cursor: pointer; color: #dc2626; font-size: 1.1rem;" title="Eliminar Registro">🗑️</button>
                     </td>
                 </tr>`;
@@ -1044,43 +1273,35 @@ document.addEventListener('DOMContentLoaded', async () => {
      * approveQuickIA - Protocolo de Activación Express
      * Vincula la solicitud de la nube con el permiso real del usuario.
      */
-    window.approveQuickIA = async (uid, leadId) => {
-        if (!confirm("🎯 ¿Confirmas la activación inmediata del Consultor IA para este cliente?")) return;
+    /**
+     * sendPurchaseCart - Protocolo Comercial Prestige
+     * Dispara el flujo de correo con el enlace al carrito de compras.
+     */
+    window.sendPurchaseCart = async (email, nombre, servicio) => {
+        if (!confirm(`🚀 ¿Enviar enlace de compra para "${servicio}" a ${nombre}?`)) return;
 
         try {
-            // 1. TRACE: Obtenemos el expediente actual para preservar otros permisos (Cursos/Apps)
-            const userRef = doc(db, "usuarios", uid);
-            const userSnap = await getDoc(userRef);
+            // PROTOCOLO COMERCIAL: Conexión con el Servidor de Notificaciones
+            const response = await fetch('/.netlify/functions/intervencion-notificacion', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    destinatario: email,
+                    cliente: { email, nombre },
+                    servicio: { titulo: servicio, id: 'link_carrito' },
+                    tipo: 'CARRITO_COMPRA',
+                    omitirRegistroFirestore: true // Trazabilidad: El registro ya existe en la bandeja
+                })
+            });
 
-            if (!userSnap.exists()) throw new Error("Expediente de usuario no encontrado.");
-
-            const userData = userSnap.data();
-            const currentConsultorAccess = userData.accesos?.consultor || [];
-
-            // 2. MUTACIÓN: Inyectamos el permiso si no lo tiene
-            if (!currentConsultorAccess.includes('ia-expert')) {
-                currentConsultorAccess.push('ia-expert');
+            if (response.ok) {
+                alert(`✅ Enlace de compra enviado con éxito a ${email}.`);
+            } else {
+                throw new Error("Fallo en la respuesta del servidor de correos");
             }
-
-            // 3. PERSISTENCIA DUAL: Actualizamos Usuario y marcamos Lead como aprobado
-            await updateDoc(userRef, {
-                "accesos.consultor": currentConsultorAccess,
-                "ultimaModificacion": serverTimestamp()
-            });
-
-            await updateDoc(doc(db, "solicitudes_contacto", leadId), {
-                "estado": "aprobado",
-                "fechaAprobacion": serverTimestamp()
-            });
-
-            alert("✅ ¡Sincronización Exitosa!\nEl Consultor IA ha sido activado y el registro actualizado.");
-            
-            // 4. RE-HIDRATACIÓN: Refrescamos tablas y métricas
-            window.initAdminData();
-
         } catch (error) {
-            console.error("🚨 Error en el motor de aprobación:", error);
-            alert("No se pudo completar la activación. Verifica la consola.");
+            console.error("🚨 Error en protocolo de envío:", error);
+            alert("Hubo un error al intentar enviar el correo. Revisa la conexión o las variables de entorno.");
         }
     };
 

@@ -44,14 +44,25 @@ const WorkbookCore = {
         // Capa 1: Persistencia local inmediata
         localStorage.setItem(`cuaderno_${fieldId}`, value);
 
-        // Capa 2: Programación de sincronización a la nube (Cero colisiones)
+        // Capa 2: Programación de sincronización a la nube con FILTRO DE INTEGRIDAD
         this.config.timers[fieldId] = setTimeout(() => {
-            console.log(`☁️ Dreams Sync [Pendiente]: ${fieldId}`);
+            // VALIDACIÓN CRÍTICA (Hito 1): 
+            // No sincronizamos si el valor es nulo, indefinido o un cero que rompa la lógica financiera (Race Condition).
+            const isInvalidZero = (typeof value === 'number' || !isNaN(value)) && Number(value) <= 0 && fieldId.includes('total');
+            const isEmpty = value === null || value === undefined;
+
+            if (isEmpty || isInvalidZero) {
+                console.warn(`🛡️ Dreams Guard: Sincronización abortada para [${fieldId}]. Motivo: Valor ínfimo o nulo detectado.`);
+                delete this.config.timers[fieldId];
+                return; 
+            }
+
+            console.log(`☁️ Dreams Sync [Validado]: ${fieldId}`);
             this.syncQueue.push({
                 id: fieldId, 
                 value: this.utils.sanitize(value)
             });
-            delete this.config.timers[fieldId]; // Limpieza de memoria
+            delete this.config.timers[fieldId]; 
         }, this.config.debounceTime);
     },
 
