@@ -248,19 +248,35 @@ document.addEventListener('DOMContentLoaded', () => {
         };
 
         try {
-            // Generamos un ID único basado en el tiempo para la solicitud
             const solicitudId = `solicitud_${Date.now()}`;
             const docRef = doc(db, "solicitudes_contacto", solicitudId);
 
-            // Guardado directo en Firestore (Fase 2: Persistencia Nativa)
+            // 1. PERSISTENCIA: Registro en Firestore para control administrativo
             await setDoc(docRef, {
                 ...formData,
                 fechaEnvio: new Date().toISOString(),
-                estado: "pendiente", // Permite al Consultor gestionar la trazabilidad
+                estado: "pendiente",
                 usuarioId: auth.currentUser?.uid || "visitante"
             });
 
-            contactStatus.innerText = "✅ Solicitud recibida. Nos contactaremos pronto.";
+            // 2. DISCRIMINADOR DE INTENCIÓN (Superpoder de Respuesta Inmediata)
+            // Filtramos si es compra (Consultoría) o asistencia (Dudas/Soporte/Otro)
+            const intentType = formData.interes === 'Consultoría' ? 'CARRITO_COMPRA' : 'CONFIRMACION_SOPORTE';
+
+            // 3. DISPARO AUTOMÁTICO: Conexión con el motor de notificaciones Prestige
+            await fetch('/.netlify/functions/intervencion-notificacion', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    destinatario: formData.email, // El cliente recibe la respuesta directa
+                    cliente: { nombre: formData.nombre, email: formData.email },
+                    servicio: { titulo: formData.interes, id: 'atencion_automatica' },
+                    tipo: intentType,
+                    omitirRegistroFirestore: true // Evitamos duplicar registros, ya lo hicimos en el paso 1
+                })
+            });
+
+            contactStatus.innerText = "✅ Mensaje enviado. Revisa tu correo, te hemos respondido de inmediato.";
             contactStatus.style.color = "#2e7d32";
             contactForm.reset();
             

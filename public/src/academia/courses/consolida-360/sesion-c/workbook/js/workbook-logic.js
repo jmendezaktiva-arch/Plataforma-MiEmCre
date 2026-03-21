@@ -1709,6 +1709,30 @@ document.addEventListener('DOMContentLoaded', function() {
         WorkbookCore.metadata.sessionID = 'sesion_c';
     }
     
+    // --- 12. MOTOR DE EXPORTACIÓN (DELEGACIÓN AL CORE) ---
+    document.getElementById('export-pdf')?.addEventListener('click', () => {
+        const reportContent = document.getElementById('reporte-dinamico-content');
+        
+        // 1. Forzamos la actualización de datos en el Tablero de Comando
+        if (window.ImplementationManager) {
+            window.ImplementationManager.refreshSummary();
+        }
+
+        // 2. Transferencia quirúrgica de datos al contenedor de impresión
+        // Recuperamos el template del Ejercicio 11 (Resumen Ejecutivo) para el PDF
+        const summaryView = sectionTemplates['ej11'];
+        if (reportContent && summaryView) {
+            reportContent.innerHTML = summaryView;
+            // Hidratamos los IDs recién inyectados en el contenedor de reporte
+            window.ImplementationManager.refreshSummary();
+        }
+
+        // 3. Disparo del motor de PDF centralizado
+        const emp = (localStorage.getItem('cuaderno_sesionc_nombre_empresa') || 'MiEmpresa').replace(/\s+/g, '_');
+        WorkbookCore.exportToPDF('reporte', `Plan_Consolidacion_${emp}`);
+    });
+
+    // --- INICIALIZACIÓN FINAL ---
     initWorkbook();
     setTimeout(() => showSection('ej1'), 100);
 });

@@ -352,13 +352,27 @@ document.addEventListener('DOMContentLoaded', () => {
                 showPurpose(id);
             }
             else if (action === 'buy') {
-                // ESTRATEGIA DE CONVERSIÓN: Disparamos el carrito con el ID del curso
-                console.log(`🛒 Iniciando intención de compra para: ${id}`);
-                
-                // Buscamos el curso para pasarle el título y precio al carrito si es necesario
                 const course = COURSES_CONFIG.find(c => c.id === id);
-                
-                // Disparo de evento global para que la burbuja del carrito reaccione
+                const user = auth.currentUser;
+
+                // 1. DISPARO DE NOTIFICACIÓN INMEDIATA (Prestige Sales Engine)
+                // Si el usuario está logueado, detonamos el Carrito de Compra a su correo en tiempo real.
+                if (user) {
+                    fetch('/.netlify/functions/intervencion-notificacion', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({
+                            destinatario: user.email,
+                            cliente: { nombre: user.displayName || 'Líder', email: user.email },
+                            servicio: { titulo: course?.title || 'Programa Estratégico', id: id },
+                            tipo: 'CARRITO_COMPRA',
+                            omitirRegistroFirestore: false // Creamos el registro en la bandeja de intervenciones
+                        })
+                    }).then(() => console.log(`🚀 Carrito enviado a ${user.email}`))
+                      .catch(err => console.error("🚨 Fallo en despacho automático:", err));
+                }
+
+                // 2. INTERFAZ: Activación de la pasarela visual
                 window.dispatchEvent(new CustomEvent('OPEN_SHOPPING_CART', { 
                     detail: { 
                         courseId: id,

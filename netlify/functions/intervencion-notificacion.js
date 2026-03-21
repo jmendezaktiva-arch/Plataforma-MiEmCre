@@ -84,14 +84,13 @@ exports.handler = async (event) => {
         let emailSubject, emailHtml;
 
         if (tipo === 'CARRITO_COMPRA') {
-            // Plantilla para el CLIENTE: Invitación al Carrito
+            // Plantilla para el CLIENTE: Invitación al Carrito (Ventas)
             emailSubject = `✨ Todo listo para iniciar: ${servicio.titulo}`;
             emailHtml = `
                 <div style="font-family: 'Montserrat', sans-serif; color: #0F3460; padding: 40px; border-top: 6px solid #957C3D; background: #fdfdfd; max-width: 600px; margin: auto;">
                     <h2 style="font-weight: 900; letter-spacing: 1px; text-transform: uppercase;">Tu Ruta de Crecimiento</h2>
                     <p style="font-size: 1.1rem; line-height: 1.6;">Hola <strong>${cliente.nombre}</strong>,</p>
                     <p style="font-size: 1rem; line-height: 1.6;">Es un gusto saludarte. Hemos preparado el acceso para tu siguiente paso estratégico en la <strong>Mi Empresa Crece Platform</strong>:</p>
-                    
                     <div style="background: #0F3460; color: #ffffff; padding: 25px; border-radius: 12px; text-align: center; margin: 30px 0;">
                         <h3 style="margin: 0; color: #957C3D; font-size: 1.2rem;">${servicio.titulo}</h3>
                         <p style="font-size: 0.9rem; opacity: 0.8; margin-top: 10px;">Haz clic en el botón de abajo para completar tu registro y activar el servicio.</p>
@@ -100,14 +99,29 @@ exports.handler = async (event) => {
                            INGRESAR AL CARRITO
                         </a>
                     </div>
-
                     <p style="font-size: 0.85rem; color: #666; font-style: italic; text-align: center;">Si tienes alguna duda técnica, recuerda que puedes contactarnos respondiendo a este correo.</p>
                     <hr style="border: 0.5px solid rgba(15, 52, 96, 0.1); margin: 30px 0;">
                     <p style="font-size: 0.75rem; color: #999; text-align: center;">Enviado por Mi Empresa Crece | ME Crece System</p>
                 </div>
             `;
+        } else if (tipo === 'CONFIRMACION_SOPORTE') {
+            // Plantilla para el CLIENTE: Acuse de Recibo (Atención)
+            emailSubject = `📩 Hemos recibido tu mensaje: ${servicio.titulo}`;
+            emailHtml = `
+                <div style="font-family: 'Montserrat', sans-serif; color: #0F3460; padding: 40px; border-top: 6px solid #957C3D; background: #fdfdfd; max-width: 600px; margin: auto;">
+                    <h2 style="font-weight: 900; letter-spacing: 1px; text-transform: uppercase;">Solicitud Recibida</h2>
+                    <p style="font-size: 1.1rem; line-height: 1.6;">Hola <strong>${cliente.nombre}</strong>,</p>
+                    <p style="font-size: 1rem; line-height: 1.6;">Confirmamos que hemos recibido tu mensaje referente a: <strong>${servicio.titulo}</strong>.</p>
+                    <div style="background: #f4f4f4; color: #0F3460; padding: 20px; border-radius: 12px; border-left: 4px solid #957C3D; margin: 30px 0;">
+                        <p style="font-size: 0.95rem; margin: 0;">Un consultor de nuestro equipo revisará los detalles y te contactará en breve para dar seguimiento a tu solicitud.</p>
+                    </div>
+                    <p style="font-size: 0.85rem; color: #666; text-align: center;">Agradecemos tu paciencia y confianza en nuestro ecosistema.</p>
+                    <hr style="border: 0.5px solid rgba(15, 52, 96, 0.1); margin: 30px 0;">
+                    <p style="font-size: 0.75rem; color: #999; text-align: center;">Mi Empresa Crece | Soporte Estratégico</p>
+                </div>
+            `;
         } else {
-            // Plantilla para el ADMIN: Alerta de Intervención (Default)
+            // Plantilla para el ADMIN: Alerta Interna (Dashboard Notificación)
             emailSubject = `🚀 Nueva Solicitud de Intervención: ${servicio.titulo}`;
             emailHtml = `
                 <div style="font-family: 'Montserrat', sans-serif; color: #0F3460; padding: 30px; border-top: 6px solid #957C3D; background: #fdfdfd;">
@@ -117,6 +131,7 @@ exports.handler = async (event) => {
                         <p><strong>Líder:</strong> ${cliente.nombre}</p>
                         <p><strong>Email:</strong> ${cliente.email}</p>
                         <p><strong>Servicio:</strong> ${servicio.titulo}</p>
+                        <p><strong>Intención:</strong> ${tipo || 'No definida'}</p>
                     </div>
                     <p style="font-size: 0.75rem; color: #999;">Datos disponibles en el Panel Maestro.</p>
                 </div>

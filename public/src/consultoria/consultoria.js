@@ -154,7 +154,9 @@ document.addEventListener('DOMContentLoaded', async () => {
                     // TRACEABILIDAD: Extracción defensiva del perfil para evitar errores de Firebase (campos undefined)
                     const profileSnap = await getDoc(doc(db, "usuarios", user.uid));
                     const userData = profileSnap.exists() ? profileSnap.data() : {};
-                    const nombreUsuario = userData.nombre || "Líder ME Crece";
+                    // Trazabilidad: Priorizamos nombre real, si no existe usamos el correo, 
+                    // evitando sobreescribir con el nombre de la marca.
+                    const nombreUsuario = userData.nombre || user.email.split('@')[0];
 
                     // 1. REGISTRO UNIFICADO (Resiliencia + Panel Admin)
                     const solicitudId = `solicitud_ia_${Date.now()}`;
@@ -171,17 +173,18 @@ document.addEventListener('DOMContentLoaded', async () => {
 
                     await setDoc(doc(db, "solicitudes_contacto", solicitudId), leadData);
 
-                    // 2. AVISO POR CORREO (Netlify Function - Solo Mensajería)
+                    // 2. DISPARO DE CARRITO (Protocolo de Conversión Real)
                     fetch('/.netlify/functions/intervencion-notificacion', {
                         method: 'POST',
                         headers: { 'Content-Type': 'application/json' },
                         body: JSON.stringify({
-                            destinatario: "contacto@miempresacrece.com.mx",
+                            destinatario: user.email, // Respuesta inmediata al cliente
                             cliente: { uid: user.uid, email: user.email, nombre: nombreUsuario },
                             servicio: { id: "ia-expert", titulo: leadData.interes },
-                            omitirRegistroFirestore: true // FLAG: Evita duplicados en la función
+                            tipo: 'CARRITO_COMPRA', // Detona el flujo comercial
+                            omitirRegistroFirestore: true 
                         })
-                    }).catch(() => console.warn("📧 Aviso por correo pendiente de despliegue en Netlify."));
+                    }).catch(err => console.error("🚨 Error en despacho IA:", err));
 
                     alert("🚀 ¡Solicitud Recibida!\nTu interés ha quedado registrado en mi panel. En breve activaré tu acceso.");
                     btnIA.innerText = "SOLICITUD PENDIENTE";
@@ -208,8 +211,13 @@ document.addEventListener('DOMContentLoaded', async () => {
 
         // Lógica de la Cápsula Prestige (Modal de Detalle)
         if (btn.classList.contains('btn-open-service-modal')) {
-            const service = SERVICES_CONFIG.find(s => s.id === id);
-            if (!service) return;
+            // TRACEABILIDAD: Normalización de ID (Coacción a String) para evitar fallos por discrepancia de tipos
+            const service = SERVICES_CONFIG.find(s => String(s.id).trim() === String(id).trim());
+            
+            if (!service) {
+                console.error(`🚨 Dreams Trace Error: No se encontró el servicio con ID [${id}] en el catálogo activo.`);
+                return;
+            }
 
             const modalOverlay = document.getElementById('service-modal-overlay');
             const modalBody = document.getElementById('service-modal-body');
@@ -268,8 +276,20 @@ document.addEventListener('DOMContentLoaded', async () => {
         }
 
         if (action === 'request') {
-            const service = SERVICES_CONFIG.find(s => s.id === id);
+            // TRACEABILIDAD: Búsqueda normalizada con soporte para servicios estáticos (Hardcoded)
+            let service = SERVICES_CONFIG.find(s => String(s.id).trim() === String(id).trim());
+
+            // Protocolo de Resiliencia: Si el servicio no está en DB (como Proyectos a Medida), creamos un objeto virtual
+            if (!service && id === 'proyectos-a-medida') {
+                service = { id: 'proyectos-a-medida', title: 'Proyectos a Medida (Cotización Staff)' };
+            }
+
             const user = auth.currentUser;
+
+            if (!service) {
+                console.error(`🚨 Dreams Request Error: No se halló el ID [${id}]. La solicitud no puede procesarse.`);
+                return;
+            }
 
             if (!user) {
                 alert("Por favor, inicia sesión para solicitar esta intervención.");
@@ -288,7 +308,8 @@ document.addEventListener('DOMContentLoaded', async () => {
                     const leadData = {
                         usuarioId: user.uid,
                         email: user.email,
-                        nombre: USER_STRATEGIC_CONTEXT.usuario?.nombre || "Líder ME Crece",
+                        // Trazabilidad: Usamos el contexto estratégico del usuario o el prefijo de su email
+                        nombre: USER_STRATEGIC_CONTEXT.usuario?.nombre || user.email.split('@')[0],
                         interes: service.title,
                         servicioId: service.id,
                         estado: "pendiente",
@@ -298,17 +319,18 @@ document.addEventListener('DOMContentLoaded', async () => {
 
                     await setDoc(doc(db, "solicitudes_contacto", solicitudId), leadData);
 
-                    // 2. AVISO POR CORREO (Netlify Function - Ejecución en segundo plano)
+                    // 2. DISPARO AUTOMÁTICO (Superpoder de Respuesta en Tiempo Real)
                     fetch('/.netlify/functions/intervencion-notificacion', {
                         method: 'POST',
                         headers: { 'Content-Type': 'application/json' },
                         body: JSON.stringify({
-                            destinatario: "contacto@miempresacrece.com.mx",
+                            destinatario: user.email, // El cliente recibe la respuesta de inmediato
                             cliente: { uid: user.uid, email: user.email, nombre: leadData.nombre },
                             servicio: { id: service.id, titulo: service.title },
-                            omitirRegistroFirestore: true // FLAG: Evita registros duplicados en la función
+                            tipo: 'CARRITO_COMPRA', // Identificamos la solicitud como intención de compra
+                            omitirRegistroFirestore: true // Mantenemos integridad (ya registrado arriba)
                         })
-                    }).catch(err => console.warn("📧 Aviso por correo pendiente de configuración:", err));
+                    }).catch(err => console.warn("🚨 Fallo en despacho automático:", err));
 
                     alert(`🚀 ¡Solicitud Recibida!\n\nHemos registrado tu interés en "${service.title}" directamente en tu expediente. Un consultor senior revisará tu perfil en breve.`);
                     btn.innerText = "SOLICITUD REGISTRADA";

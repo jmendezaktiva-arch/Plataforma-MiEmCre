@@ -192,7 +192,50 @@ const WorkbookCore = {
     },
 
     async exportToPDF(elementId, filename) {
-        // ... (Código original de html2canvas y jsPDF conservado íntegramente)
+        const element = document.getElementById(elementId);
+        const loading = document.getElementById('loading') || document.getElementById('loading-overlay');
+        
+        if (!element) {
+            console.error(`🚨 Dreams Core: El elemento de reporte [${elementId}] no fue encontrado.`);
+            return;
+        }
+
+        // Mostrar indicador de carga visual
+        if (loading) loading.classList.remove('hidden');
+
+        try {
+            // TRACEABILIDAD: Forzamos visibilidad temporal para que el motor de captura pueda "ver" el contenido
+            const originalStyle = element.style.display;
+            element.style.display = 'block';
+
+            const canvas = await html2canvas(element, {
+                scale: 2, // Alta resolución para garantizar legibilidad de tablas financieras
+                useCORS: true,
+                backgroundColor: "#FFFFFF",
+                logging: false
+            });
+
+            const imgData = canvas.toDataURL('image/png');
+            const { jsPDF } = window.jspdf;
+            const pdf = new jsPDF('p', 'mm', 'a4');
+            
+            const pdfWidth = pdf.internal.pageSize.getWidth();
+            const pdfHeight = (canvas.height * pdfWidth) / canvas.width;
+
+            pdf.addImage(imgData, 'PNG', 0, 0, pdfWidth, pdfHeight);
+            pdf.save(`${filename}.pdf`);
+
+            // Restauramos el estado visual original (oculto si así estaba)
+            element.style.display = originalStyle;
+            console.log(`✅ Dreams PDF: Reporte [${filename}] generado con éxito.`);
+        } catch (error) {
+            console.error("🚨 Dreams Core: Fallo en el motor de exportación:", error);
+        } finally {
+            if (loading) {
+                // Pequeño delay para una transición suave antes de ocultar el cargando
+                setTimeout(() => loading.classList.add('hidden'), 500);
+            }
+        }
     }
 };
 

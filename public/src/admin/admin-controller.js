@@ -1213,7 +1213,12 @@ document.addEventListener('DOMContentLoaded', async () => {
 
             tableBody.innerHTML = querySnapshot.docs.map(docSnap => {
                 const req = docSnap.data();
-                // TRACEABILIDAD: Soporte híbrido para registros antiguos y nuevos (fechaEnvio || fechaSolicitud)
+                
+                // TRACEABILIDAD: Unificación de Identidad (Garantiza que el nombre viaje al correo)
+                const nombreSeguro = req.nombre || req.clienteNombre || "Líder Dreams";
+                const emailSeguro = req.email || req.clienteEmail;
+                const servicioSeguro = req.interes || req.servicioTitulo || "Servicio Dreams";
+
                 const rawDate = req.fechaEnvio || req.fechaSolicitud || new Date().toISOString();
                 const fecha = new Date(rawDate).toLocaleDateString('es-MX', {
                     day: '2-digit', month: '2-digit', year: 'numeric', hour: '2-digit', minute: '2-digit'
@@ -1222,11 +1227,11 @@ document.addEventListener('DOMContentLoaded', async () => {
                 return `
                 <tr style="border-bottom: 1px solid #f4f4f4; transition: background 0.2s;" onmouseover="this.style.background='#fafafa'" onmouseout="this.style.background='transparent'">
                     <td style="padding: 15px;">
-                        <div style="font-weight: 600; color: var(--primary-midnight);">${req.nombre || req.clienteNombre || 'Líder ME Crece'}</div>
-                        <div style="font-size: 0.75rem; color: #999;">${req.email || req.clienteEmail}</div>
+                        <div style="font-weight: 600; color: var(--primary-midnight);">${nombreSeguro}</div>
+                        <div style="font-size: 0.75rem; color: #999;">${emailSeguro}</div>
                     </td>
                     <td style="padding: 15px;">
-                        <div style="font-size: 0.75rem; font-weight: 700; color: var(--accent-gold); text-transform: uppercase;">${req.interes || req.servicioTitulo}</div>
+                        <div style="font-size: 0.75rem; font-weight: 700; color: var(--accent-gold); text-transform: uppercase;">${servicioSeguro}</div>
                     </td>
                     <td style="padding: 15px; font-size: 0.75rem; color: #666;">${fecha}</td>
                     <td style="padding: 15px;">
@@ -1241,7 +1246,7 @@ document.addEventListener('DOMContentLoaded', async () => {
                         `}
                     </td>
                     <td style="padding: 15px; text-align: right; display: flex; gap: 10px; justify-content: flex-end;">
-                        <button onclick="sendPurchaseCart('${req.email}', '${req.nombre}', '${req.interes || req.servicioId}')" 
+                        <button onclick="sendPurchaseCart('${emailSeguro}', '${nombreSeguro}', '${servicioSeguro}')" 
                                 style="background: #f0f4f8; border: none; cursor: pointer; color: var(--primary-midnight); font-size: 1rem; padding: 5px; border-radius: 4px; display: flex; align-items: center; border: 1px solid rgba(15, 52, 96, 0.1);" 
                                 title="Enviar Carrito de Compra">
                             ✉️ <span style="font-size: 0.6rem; margin-left: 6px; font-weight: 800;">ENVIAR CARRITO</span>
