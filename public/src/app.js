@@ -11,23 +11,30 @@ const syncDashboardAccess = async () => {
     const btnApps = document.getElementById('btn-apps-access');
     
     if (btnApps) {
-        // Consultamos al motor de resiliencia
-        const hasAccess = await checkAccess('apps', 'bloque-general');
+        // TRACEABILIDAD: Validación Multi-App (Sincronizada con Sidebar)
+        const hasCrm = await checkAccess('apps', 'app-crm');
+        const hasErp = await checkAccess('apps', 'app-erp');
+        const hasProcess = await checkAccess('apps', 'app-process');
         
-        if (hasAccess) {
+        const hasAnyApp = hasCrm || hasErp || hasProcess;
+
+        if (hasAnyApp) {
             // ESTADO: DESBLOQUEADO (Prestige Gold)
             btnApps.innerText = "MIS APLICACIONES";
             btnApps.style.opacity = "1";
             btnApps.onclick = () => window.location.href = 'apps.html';
         } else {
             // ESTADO: BLOQUEADO (Estrategia de Conversión)
-            btnApps.innerText = "Para mayor información agenda tu cita";
+            btnApps.innerText = "ADQUIRIR ECOSISTEMA DE APPS";
             btnApps.style.background = "var(--primary-midnight)";
             btnApps.style.border = "1px solid var(--accent-gold)";
             btnApps.onclick = (e) => {
                 e.preventDefault();
-                // Usamos el sistema de mensajes que ya tienes para abrir el contacto
-                window.postMessage({ type: 'OPEN_CONTACT_MODAL' }, '*');
+                // Disparamos protocolo comercial con contexto de Dashboard Central
+                window.postMessage({ 
+                    type: 'OPEN_CONTACT_MODAL',
+                    data: { subject: 'Adquisición de Apps', context: 'dashboard_central_trigger' }
+                }, '*');
             };
         }
     }
@@ -259,20 +266,36 @@ document.addEventListener('DOMContentLoaded', () => {
                 usuarioId: auth.currentUser?.uid || "visitante"
             });
 
-            // 2. DISCRIMINADOR DE INTENCIÓN (Superpoder de Respuesta Inmediata)
-            // Filtramos si es compra (Consultoría) o asistencia (Dudas/Soporte/Otro)
-            const intentType = formData.interes === 'Consultoría' ? 'CARRITO_COMPRA' : 'CONFIRMACION_SOPORTE';
+            // 2. DISCRIMINADOR DE INTENCIÓN (Superpoder de Respuesta Inmediata v2.0)
+            let intentType = 'CONFIRMACION_SOPORTE'; // Estado por defecto
+            
+            if (formData.interes === 'Consultoría') {
+                intentType = 'CARRITO_COMPRA';
+            } else if (formData.mensaje.includes('Ecosistema de Apps')) {
+                // Detectamos la frase clave inyectada en el modal por el disparador de Apps
+                intentType = 'INTERES_APPS';
+            }
 
-            // 3. DISPARO AUTOMÁTICO: Conexión con el motor de notificaciones Prestige
+            // 3. HANDSHAKE SEGURO (Sentinel Verification): Certificamos identidad antes del disparo
+            const validatedUser = auth.currentUser;
+            
             await fetch('/.netlify/functions/intervencion-notificacion', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({
-                    destinatario: formData.email, // El cliente recibe la respuesta directa
-                    cliente: { nombre: formData.nombre, email: formData.email },
-                    servicio: { titulo: formData.interes, id: 'atencion_automatica' },
+                    destinatario: formData.email, 
+                    cliente: { 
+                        nombre: formData.nombre, 
+                        email: formData.email,
+                        // TRACEABILIDAD: Vinculamos el UID real para que el Admin Panel reconozca al socio
+                        uid: validatedUser ? validatedUser.uid : 'visitante_externo' 
+                    },
+                    servicio: { 
+                        titulo: intentType === 'INTERES_APPS' ? 'Ecosistema de Apps' : formData.interes, 
+                        id: 'atencion_automatica' 
+                    },
                     tipo: intentType,
-                    omitirRegistroFirestore: true // Evitamos duplicar registros, ya lo hicimos en el paso 1
+                    omitirRegistroFirestore: true 
                 })
             });
 
@@ -298,8 +321,20 @@ document.addEventListener('DOMContentLoaded', () => {
     window.addEventListener('message', async (event) => {
         const { type, data, metadata } = event.data;
 
-        // A. Abrir modal de contacto (Humanización)
+        // A. Abrir modal de contacto (Hidratación de Contexto Comercial)
         if (type === 'OPEN_CONTACT_MODAL') {
+            const interestSelect = document.getElementById('contact-interest');
+            const messageArea = document.getElementById('contact-message');
+
+            // Si el origen es un botón de Apps, preparamos el formulario
+            if (data?.subject === 'Adquisición de Apps') {
+                if (interestSelect) interestSelect.value = 'Otro'; // Fallback para la opción Apps
+                if (messageArea) {
+                    messageArea.value = `Hola equipo de ME Crece, me interesa escalar mi operativa con el Ecosistema de Apps. Me gustaría agendar la videollamada de Zoom para conocer el impacto en mi negocio.`;
+                }
+                console.log("🎯 ME Crece LOG: Formulario hidratado para cierre comercial de Apps.");
+            }
+            
             toggleContact(true);
         }
 

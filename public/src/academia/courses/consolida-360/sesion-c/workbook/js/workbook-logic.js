@@ -6,6 +6,12 @@
 
 document.addEventListener('DOMContentLoaded', function() {
     
+    // TRACEABILIDAD QUIRÚRGICA: Forzamos la identidad de Sesión C para evitar el fallback a 'sesion-a'
+    if (window.WorkbookCore) {
+        WorkbookCore.metadata.sessionID = 'sesion-c';
+        console.log("🎯 Dreams Core: Identidad forzada a [sesion-c] para exportación.");
+    }
+
     // --- 1. MAPA DE SECCIONES (ESTRUCTURA DOCUMENTAL ORIGINAL) ---
     // Restauramos los 11 pasos exactos de la metodología Sesión C Externa.
     const sectionsData = [
@@ -1641,7 +1647,9 @@ document.addEventListener('DOMContentLoaded', function() {
     // --- 4. GESTOR DE VISIBILIDAD (MOTOR DE INYECCIÓN) ---
     // --- GESTOR DE VISIBILIDAD CON REHIDRATACIÓN (SOLUCIONA PÉRDIDA DE DATOS) [cite: 364] ---
     window.showSection = (sectionId) => {
-        const content = document.getElementById('workbook-content');
+        // TRACEABILIDAD QUIRÚRGICA: Apuntamos al contenedor de ejercicios, NO al 'main'.
+        // Esto evita que el .innerHTML borre el div #reporte y el Header al cambiar de pestaña.
+        const content = document.getElementById('workbook-sections-container');
         if (!content) return;
 
         // 1. Actualizar Navegación

@@ -44,14 +44,40 @@ export const SupportService = {
                     tipo: 'soporte_ia'
                 });
 
-                // 3. Generar respuesta con Gemini (Requisito d)
+                // 3. GENERAR RESPUESTA CON IA (Guardián de Contención)
                 const aiResponse = await TicketAI.generateSmartResponse(formData.mensaje, userData);
 
-                // 4. Actualizar ticket con la respuesta de la IA
+                // 4. DISCRIMINADOR DE INTENCIÓN Y DISPARO DE CORREO (Netlify Handshake)
+                let intentType = 'CONFIRMACION_SOPORTE';
+                if (formData.interes === 'Consultoría') intentType = 'CARRITO_COMPRA';
+                if (formData.mensaje.includes('Ecosistema de Apps')) intentType = 'INTERES_APPS';
+
+                await fetch('/.netlify/functions/intervencion-notificacion', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        destinatario: formData.email,
+                        cliente: { 
+                            nombre: formData.nombre, 
+                            email: formData.email, 
+                            empresa: userData.empresa || '',
+                            uid: user.uid 
+                        },
+                        servicio: { 
+                            titulo: intentType === 'INTERES_APPS' ? 'Ecosistema de Apps' : formData.interes, 
+                            id: 'atencion_automatica' 
+                        },
+                        tipo: intentType,
+                        omitirRegistroFirestore: true // Ya lo guardamos en el paso 2 de esta función
+                    })
+                });
+
+                // 5. ACTUALIZAR TRAZABILIDAD EN FIRESTORE
                 await updateDoc(ticketRef, {
                     respuesta_ia: aiResponse,
                     respondido_en: serverTimestamp(),
-                    status: 'atendido_ia'
+                    status: 'atendido_ia',
+                    intent_detected: intentType
                 });
 
                 // 5. Mostrar respuesta al usuario

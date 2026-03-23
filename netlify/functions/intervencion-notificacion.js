@@ -79,63 +79,65 @@ exports.handler = async (event) => {
             }
         });
 
-        // 2. MOTOR DE PLANTILLAS DINÁMICAS (Prestige Email Engine)
+        // 2. MOTOR DE RESPUESTA HÍBRIDA (ME Crece Intelligence Engine)
         const { tipo } = JSON.parse(event.body);
         let emailSubject, emailHtml;
 
+        // Estilos Base Prestige para consistencia de marca
+        const headerStyle = "font-family: 'Montserrat', sans-serif; color: #0F3460; padding: 40px; border-top: 6px solid #957C3D; background: #fdfdfd; max-width: 600px; margin: auto;";
+        const footerStyle = "font-size: 0.75rem; color: #999; text-align: center; margin-top: 30px; font-family: 'Montserrat', sans-serif;";
+        const buttonStyle = "display: inline-block; margin-top: 20px; padding: 15px 30px; background: #0F3460; color: #fff; text-decoration: none; border-radius: 8px; font-weight: 700; letter-spacing: 1px;";
+
         if (tipo === 'CARRITO_COMPRA') {
-            // Plantilla para el CLIENTE: Invitación al Carrito (Ventas)
-            emailSubject = `✨ Todo listo para iniciar: ${servicio.titulo}`;
+            emailSubject = `✨ Todo listo para iniciar el crecimiento de ${cliente.empresa || 'tu negocio'}`;
             emailHtml = `
-                <div style="font-family: 'Montserrat', sans-serif; color: #0F3460; padding: 40px; border-top: 6px solid #957C3D; background: #fdfdfd; max-width: 600px; margin: auto;">
-                    <h2 style="font-weight: 900; letter-spacing: 1px; text-transform: uppercase;">Tu Ruta de Crecimiento</h2>
-                    <p style="font-size: 1.1rem; line-height: 1.6;">Hola <strong>${cliente.nombre}</strong>,</p>
-                    <p style="font-size: 1rem; line-height: 1.6;">Es un gusto saludarte. Hemos preparado el acceso para tu siguiente paso estratégico en la <strong>Mi Empresa Crece Platform</strong>:</p>
-                    <div style="background: #0F3460; color: #ffffff; padding: 25px; border-radius: 12px; text-align: center; margin: 30px 0;">
-                        <h3 style="margin: 0; color: #957C3D; font-size: 1.2rem;">${servicio.titulo}</h3>
-                        <p style="font-size: 0.9rem; opacity: 0.8; margin-top: 10px;">Haz clic en el botón de abajo para completar tu registro y activar el servicio.</p>
-                        <a href="https://miempresacrece.com.mx/checkout?service=${servicio.id}" 
-                           style="display: inline-block; margin-top: 20px; padding: 15px 30px; background: #957C3D; color: #fff; text-decoration: none; border-radius: 8px; font-weight: 700; letter-spacing: 1px;">
-                           INGRESAR AL CARRITO
-                        </a>
+                <div style="${headerStyle}">
+                    <h2 style="font-weight: 900; text-transform: uppercase;">Tu Ruta de Crecimiento</h2>
+                    <p>Hola <strong>${cliente.nombre}</strong>, es un gusto saludarte.</p>
+                    <p>Nos entusiasma ver que estás listo para dar el siguiente paso estratégico en la <strong>ME Crece Platform</strong>. Hemos preparado tu acceso para que no pierdas el impulso hacia la profesionalización de tu negocio.</p>
+                    <div style="text-align: center; margin: 30px 0; background: #f9f9f9; padding: 25px; border-radius: 12px;">
+                        <h3 style="color: #957C3D; margin: 0;">${servicio.titulo}</h3>
+                        <a href="https://miempresacrece.com.mx/checkout?service=${servicio.id}" style="${buttonStyle}">ACTIVAR MI ACCESO</a>
                     </div>
-                    <p style="font-size: 0.85rem; color: #666; font-style: italic; text-align: center;">Si tienes alguna duda técnica, recuerda que puedes contactarnos respondiendo a este correo.</p>
-                    <hr style="border: 0.5px solid rgba(15, 52, 96, 0.1); margin: 30px 0;">
-                    <p style="font-size: 0.75rem; color: #999; text-align: center;">Enviado por Mi Empresa Crece | ME Crece System</p>
+                    <p style="font-size: 0.85rem; color: #666; text-align: center; font-style: italic;">"El éxito económico es consecuencia de un liderazgo ético."</p>
+                    <div style="${footerStyle}">ME Crece Platform | Arquitectos de Legados PyME</div>
+                </div>
+            `;
+        } else if (tipo === 'INTERES_APPS') {
+            emailSubject = `🚀 Escalando la operativa de ${cliente.empresa || 'tu empresa'}`;
+            emailHtml = `
+                <div style="${headerStyle}">
+                    <h2 style="font-weight: 900; text-transform: uppercase;">Arquitectura de Procesos</h2>
+                    <p>Hola <strong>${cliente.nombre}</strong>,</p>
+                    <p>Pasar del caos operativo a una arquitectura de procesos es posible con las herramientas de <strong>ME Crece Platform</strong>. Nuestro CRM, ERP y Process Designer están listos para darte el control total que tu liderazgo requiere.</p>
+                    <div style="background: #0F3460; color: #ffffff; padding: 25px; border-radius: 12px; text-align: center; margin: 30px 0;">
+                        <p style="margin: 0 0 15px 0;">Queremos que veas el impacto real por ti mismo. Te invitamos a una videollamada para diseñar tu ecosistema digital a medida.</p>
+                        <a href="https://zoom.us/j/ME-CRECE-VENTAS" style="display: inline-block; padding: 12px 25px; background: #957C3D; color: #fff; text-decoration: none; border-radius: 6px; font-weight: 700;">AGENDAR SESIÓN POR ZOOM</a>
+                    </div>
+                    <div style="${footerStyle}">Enviado por ME Crece Platform</div>
                 </div>
             `;
         } else if (tipo === 'CONFIRMACION_SOPORTE') {
-            // Plantilla para el CLIENTE: Acuse de Recibo (Atención)
-            emailSubject = `📩 Hemos recibido tu mensaje: ${servicio.titulo}`;
+            const esTecnico = servicio.titulo.includes('Técnica') || servicio.titulo.includes('Soporte');
+            emailSubject = esTecnico ? `🛠️ Hemos recibido tu mensaje: Soporte ME Crece` : `💡 Sobre tu consulta estratégica para ${cliente.empresa || 'tu empresa'}`;
+            
+            const mensajeHtml = esTecnico 
+                ? `Confirmamos que tu reporte técnico ya está en nuestras manos. Entendemos que tu tiempo es el recurso más valioso dentro de la <strong>ME Crece Platform</strong>, por lo que nuestro equipo de IT ya está revisando tu acceso para que puedas retomar tus actividades en breve.`
+                : `Qué buena pregunta. Validar estos desafíos estratégicos es el primer paso para la trascendencia de tu PyME dentro del ecosistema <strong>ME Crece</strong>. Para darte una respuesta con el rigor que tu empresa merece, te sugiero profundizar en este tema a través de nuestro <strong>Consultor IA</strong> o agendar una intervención directa con nuestro staff senior.`;
+
             emailHtml = `
-                <div style="font-family: 'Montserrat', sans-serif; color: #0F3460; padding: 40px; border-top: 6px solid #957C3D; background: #fdfdfd; max-width: 600px; margin: auto;">
-                    <h2 style="font-weight: 900; letter-spacing: 1px; text-transform: uppercase;">Solicitud Recibida</h2>
-                    <p style="font-size: 1.1rem; line-height: 1.6;">Hola <strong>${cliente.nombre}</strong>,</p>
-                    <p style="font-size: 1rem; line-height: 1.6;">Confirmamos que hemos recibido tu mensaje referente a: <strong>${servicio.titulo}</strong>.</p>
-                    <div style="background: #f4f4f4; color: #0F3460; padding: 20px; border-radius: 12px; border-left: 4px solid #957C3D; margin: 30px 0;">
-                        <p style="font-size: 0.95rem; margin: 0;">Un consultor de nuestro equipo revisará los detalles y te contactará en breve para dar seguimiento a tu solicitud.</p>
-                    </div>
-                    <p style="font-size: 0.85rem; color: #666; text-align: center;">Agradecemos tu paciencia y confianza en nuestro ecosistema.</p>
-                    <hr style="border: 0.5px solid rgba(15, 52, 96, 0.1); margin: 30px 0;">
-                    <p style="font-size: 0.75rem; color: #999; text-align: center;">Mi Empresa Crece | Soporte Estratégico</p>
+                <div style="${headerStyle}">
+                    <h2 style="font-weight: 900; text-transform: uppercase;">Atención al Socio</h2>
+                    <p>Hola <strong>${cliente.nombre}</strong>,</p>
+                    <p>${mensajeHtml}</p>
+                    <hr style="border: 0.5px solid #eee; margin: 30px 0;">
+                    <div style="${footerStyle}">ME Crece | Soporte Estratégico</div>
                 </div>
             `;
         } else {
-            // Plantilla para el ADMIN: Alerta Interna (Dashboard Notificación)
-            emailSubject = `🚀 Nueva Solicitud de Intervención: ${servicio.titulo}`;
-            emailHtml = `
-                <div style="font-family: 'Montserrat', sans-serif; color: #0F3460; padding: 30px; border-top: 6px solid #957C3D; background: #fdfdfd;">
-                    <h2 style="font-weight: 900; letter-spacing: 1px;">ALERTA DE CONSULTORÍA</h2>
-                    <p style="font-size: 1rem;">Se ha detectado una nueva solicitud estratégica:</p>
-                    <div style="background: #fff; padding: 20px; border-radius: 12px; border: 1px solid #eee; margin: 20px 0;">
-                        <p><strong>Líder:</strong> ${cliente.nombre}</p>
-                        <p><strong>Email:</strong> ${cliente.email}</p>
-                        <p><strong>Servicio:</strong> ${servicio.titulo}</p>
-                        <p><strong>Intención:</strong> ${tipo || 'No definida'}</p>
-                    </div>
-                    <p style="font-size: 0.75rem; color: #999;">Datos disponibles en el Panel Maestro.</p>
-                </div>
-            `;
+            // ALERTA PARA JORGE (Administración)
+            emailSubject = `🚨 Nueva Intervención: ${servicio.titulo} [${cliente.nombre}]`;
+            emailHtml = `<p>Se ha detectado una nueva solicitud de tipo: <strong>${tipo}</strong>.</p><p>Cliente: ${cliente.nombre} (${cliente.email})</p>`;
         }
 
         // TRACEABILIDAD DE MARCA: Definición del Remitente Oficial

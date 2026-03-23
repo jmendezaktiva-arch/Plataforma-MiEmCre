@@ -3,7 +3,7 @@
  * Objetivo: Navegación minimalista con Logout Determinístico.
  */
 import { logout } from '../auth/auth.js';
-import { auth, db, doc, getDoc } from './firebase-config.js'; // Conexión con el núcleo de identidad
+import { auth, db, doc, getDoc, checkAccess } from './firebase-config.js'; // Conexión con el núcleo de identidad y permisos
 
 const SidebarPrestige = {
     async init() {
@@ -92,7 +92,7 @@ const SidebarPrestige = {
                     <a href="academia.html" class="sidebar-link">
                         <span class="label">Academia</span>
                     </a>
-                    <a href="apps.html" class="sidebar-link">
+                    <a href="#" id="btn-sidebar-apps" class="sidebar-link">
                         <span class="label">Apps</span>
                     </a>
                     <a href="consultoria.html" class="sidebar-link">
@@ -135,6 +135,33 @@ const SidebarPrestige = {
                 e.stopPropagation(); // Evita interferencias con otros elementos
                 const isCurrentlyHidden = sidebar.classList.contains('sidebar-hidden');
                 syncSidebarState(!isCurrentlyHidden);
+            });
+        }
+
+        // LÓGICA DE ACCESO INTELIGENTE A APPS (Filtro Comercial)
+        const btnApps = document.getElementById('btn-sidebar-apps');
+        if (btnApps) {
+            btnApps.addEventListener('click', async (e) => {
+                e.preventDefault();
+                const user = auth.currentUser;
+                if (!user) return;
+
+                // TRACEABILIDAD: Validamos acceso a cualquiera de las herramientas del ecosistema
+                const hasCrm = await checkAccess('apps', 'app-crm');
+                const hasErp = await checkAccess('apps', 'app-erp');
+                const hasProcess = await checkAccess('apps', 'app-process');
+
+                if (hasCrm || hasErp || hasProcess) {
+                    console.log("🔓 ME Crece LOG: Acceso concedido a Apps.");
+                    window.location.href = 'apps.html';
+                } else {
+                    // ESTRATEGIA DE CONVERSIÓN: Si no tiene acceso, abrimos el modal con contexto de ventas
+                    console.warn("🔒 ME Crece LOG: Acceso restringido. Disparando protocolo comercial.");
+                    window.postMessage({ 
+                        type: 'OPEN_CONTACT_MODAL', 
+                        data: { subject: 'Adquisición de Apps', context: 'sidebar_trigger' } 
+                    }, '*');
+                }
             });
         }
 

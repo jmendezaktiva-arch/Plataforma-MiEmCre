@@ -323,5 +323,15 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 });
 
-// Handshake Inicial
-window.parent.postMessage({ type: 'WORKBOOK_READY', metadata: WorkbookCore.metadata }, '*');
+// TRACEABILIDAD GLOBAL: Postergamos el Handshake al final del ciclo de carga.
+// Esto permite que el archivo local (workbook-logic.js) defina su identidad (Sesión A, B o C)
+// antes de que la plataforma configure el bus de datos y el motor de PDF.
+document.addEventListener('DOMContentLoaded', () => {
+    setTimeout(() => {
+        console.log(`📡 Dreams Handshake: Sesión [${WorkbookCore.metadata.sessionID}] lista.`);
+        window.parent.postMessage({ 
+            type: 'WORKBOOK_READY', 
+            metadata: WorkbookCore.metadata 
+        }, '*');
+    }, 150); // Margen de seguridad para asegurar sincronía de IDs
+});

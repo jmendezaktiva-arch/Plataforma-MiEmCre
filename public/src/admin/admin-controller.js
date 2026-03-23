@@ -1,4 +1,4 @@
-//public/admin/admin-controller.js
+//public/src/admin/admin-controller.js
 // TRACEABILIDAD: Conexión con el Núcleo del Sistema (src/shared)
 // Nota: Se omite la importación de UserManager ya que su lógica reside al final de este archivo.
 // TRACEABILIDAD: Conexión unificada con el Ecosistema "Dreams Platform" (src/shared)
@@ -119,7 +119,7 @@ const UserManager = {
             // TRACEABILIDAD: Inicialización del Expediente Maestro (CRM Core)
             const profileData = {
                 email: data.email,
-                rol: data.rol.toLowerCase(),
+                rol: data.rol, // Trazabilidad: Se elimina toLowerCase para respetar la capitalización de Security Rules
                 nombre: data.nombre || '',
                 empresa: data.empresa || 'Dreams Platform',
                 status: 'activo',
@@ -284,10 +284,10 @@ const renderEditModal = (uid, user) => {
                 <form id="form-edit-usuario">
                     <label style="display:block; font-size:0.75rem; font-weight:700; margin-bottom:5px;">ROL DEL PERFIL</label>
                     <select id="edit-rol" style="width:100%; padding:10px; margin-bottom:20px; border:1px solid #ddd; border-radius:4px;">
-                        <option value="cliente" ${user.rol === 'cliente' ? 'selected' : ''}>Cliente Estándar</option>
-                        <option value="capacitador" ${user.rol === 'capacitador' ? 'selected' : ''}>Capacitador</option>
-                        <option value="consultor" ${user.rol === 'consultor' ? 'selected' : ''}>Consultor</option>
-                        <option value="admin" ${user.rol === 'admin' ? 'selected' : ''}>Administrador</option>
+                        <option value="Cliente" ${user.rol?.toLowerCase() === 'cliente' ? 'selected' : ''}>Cliente Estándar</option>
+                        <option value="Capacitador" ${user.rol?.toLowerCase() === 'capacitador' ? 'selected' : ''}>Capacitador</option>
+                        <option value="Consultor" ${user.rol?.toLowerCase() === 'consultor' ? 'selected' : ''}>Consultor</option>
+                        <option value="Admin" ${user.rol?.toLowerCase() === 'admin' ? 'selected' : ''}>Administrador</option>
                     </select>
 
                     <div style="margin-bottom:20px;">
