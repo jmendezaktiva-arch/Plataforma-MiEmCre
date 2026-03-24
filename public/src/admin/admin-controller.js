@@ -199,25 +199,32 @@ const UserManager = {
             const vencimientoSaaS = new Date();
             vencimientoSaaS.setFullYear(hoy.getFullYear() + 1);
 
-            // 2. CÁLCULO DE VIGENCIA (Fase 3: Refactorización SaaS)
-            // TRACEABILIDAD: Ahora incluimos los Cursos en el motor de vigencia temporal
+            // 2. MOTOR DE SINCRONIZACIÓN SaaS (Fase 5.4: Alta y Baja Manual)
             const nuevosServicios = { ...(currentExpediente.servicios || {}) };
             const serviciosActivados = [
-                ...(newAccess.cursos || []), // Inyección de IDs de Academia para control de caducidad
+                ...(newAccess.cursos || []), 
                 ...(newAccess.apps || []), 
                 ...(newAccess.consultor || [])
             ];
             
+            // A. LIMPIEZA (BAJA): Eliminamos del expediente lo que Jorge desmarcó en el modal
+            Object.keys(nuevosServicios).forEach(idExistente => {
+                if (!serviciosActivados.includes(idExistente)) {
+                    delete nuevosServicios[idExistente];
+                    console.log(`🗑️ Baja de servicio: ${idExistente}`);
+                }
+            });
+
+            // B. ACTIVACIÓN (ALTA): Agregamos lo nuevo con su vigencia correspondiente
             serviciosActivados.forEach(id => {
                 if (!nuevosServicios[id]) {
                     nuevosServicios[id] = {
                         fechaActivacion: hoy.toISOString(),
                         fechaVencimiento: vencimientoSaaS.toISOString(),
                         status: 'activo',
-                        // TRACEABILIDAD: Sincronización de Modalidad (Fase 3.3)
-                        // Registra si el curso es LIVE u ONLINE según el catálogo al momento de la compra
                         modality: extraData.metadata?.[id]?.modality || 'ONLINE'
                     };
+                    console.log(`✨ Alta de servicio: ${id}`);
                 }
             });
 
