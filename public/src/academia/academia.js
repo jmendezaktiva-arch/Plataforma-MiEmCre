@@ -54,11 +54,20 @@ document.addEventListener('DOMContentLoaded', () => {
                 ? `<div style="font-size: 0.85rem; font-weight: 800; color: var(--accent-gold); margin-bottom: 12px;">INVERSIÓN: $${course.price?.toLocaleString()} MXN</div>` 
                 : '';
 
+            // TRACEABILIDAD: Lógica de Botones según Modalidad (Fase 5.2)
+            const buttonLabel = course.isComingSoon 
+                ? 'Próximamente' 
+                : (!course.hasAccess && !course.esGratis)
+                    ? 'ADQUIRIR AHORA'
+                    : (course.modality === 'LIVE')
+                        ? 'ACCEDER A MENTORÍA'
+                        : 'ACCEDER AL PROGRAMA';
+
             return `
             <article class="card" style="${course.isComingSoon ? 'opacity: 0.6; border: 1px dashed #ccc;' : `border-top: 4px solid ${course.accentColor || 'var(--accent-gold)'};`}; display: flex; flex-direction: column; height: 100%;">
                 <header class="card-header" style="margin-bottom: 15px;">
                     <span class="card-category" style="color: ${course.accentColor || '#999'}; font-size: 0.65rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.05em;">
-                        ${course.category} | ${course.modality || 'ONLINE'}
+                        ${course.category} | <strong style="color:var(--accent-gold)">${course.modality}</strong>
                     </span>
                     <h3 style="margin: 5px 0 0; font-size: 1.15rem; ${course.isComingSoon ? 'color: #999;' : ''}">${course.title}</h3>
                 </header>
@@ -73,8 +82,8 @@ document.addEventListener('DOMContentLoaded', () => {
                         ${course.isComingSoon ? 'disabled style="background: #e2e8f0; color: #94a3b8; cursor: not-allowed;"' : ''} 
                         data-action="${course.hasAccess || course.esGratis ? 'open' : 'buy'}" 
                         data-id="${course.id}" 
-                        style="flex: 1; font-size: 0.7rem; padding: 12px 8px;">
-                        ${course.isComingSoon ? 'Próximamente' : (course.hasAccess || course.esGratis ? (course.buttonText || 'INGRESAR') : 'COMPRAR')}
+                        style="flex: 1; font-size: 0.75rem; padding: 12px 8px; font-weight: 800; letter-spacing: 0.5px;">
+                        ${buttonLabel}
                     </button>
                 </footer>
             </article>`;
@@ -126,19 +135,32 @@ document.addEventListener('DOMContentLoaded', () => {
                 rawCourses.push({ id: doc.id, ...doc.data() });
             });
 
-            // TRACEABILIDAD: Sincronización real con campos de Firebase (esGratis)
-            COURSES_CONFIG = await Promise.all(rawCourses.map(async (course) => {
-                const hasAccess = await checkAccess('cursos', course.id);
+            // FASE 5: Handshake Dinámico de Cliente (Vigencia + ID + Modalidad)
+            const user = auth.currentUser;
+            let userServicios = {};
+            
+            if (user) {
+                const userDoc = await getDoc(doc(db, "usuarios", user.uid));
+                userServicios = userDoc.data()?.expediente?.servicios || {};
+            }
+
+            COURSES_CONFIG = rawCourses.map(course => {
+                const svcRecord = userServicios[course.id];
+                const hoy = new Date();
+                const fechaVenc = svcRecord ? new Date(svcRecord.fechaVencimiento) : null;
                 
-                // Mapeo corregido: 'esGratis' es el campo oficial en el Admin
-                const esGratis = course.esGratis === true; 
+                // VALIDACIÓN SAAS: ¿El servicio está activo y dentro de la fecha de vigencia?
+                const isExpired = fechaVenc ? fechaVenc < hoy : true;
+                const hasValidAccess = svcRecord && svcRecord.status === 'activo' && !isExpired;
                 
                 return { 
                     ...course, 
-                    hasAccess, 
-                    esGratis 
+                    // Un curso es accesible si el cliente lo compró (y está vigente) o si es gratuito
+                    hasAccess: hasValidAccess || course.esGratis === true,
+                    // TRACEABILIDAD: Priorizamos la modalidad asignada en el expediente sobre la del catálogo
+                    modality: svcRecord?.modality || course.modality || 'ONLINE'
                 };
-            }));
+            });
 
             console.log(`✅ Dreams Cloud: ${COURSES_CONFIG.length} cursos validados y sincronizados.`);
             renderLobby();
@@ -507,11 +529,25 @@ document.addEventListener('DOMContentLoaded', () => {
         // Fase 4: Limpieza de seguridad para evitar colisiones entre módulos
         if (autosaveTimer) clearTimeout(autosaveTimer);
 
-        // Buscamos la coincidencia exacta del ID sin forzar minúsculas
+        // Buscamos la coincidencia exacta del ID
         const courseConfig = COURSES_CONFIG.find(c => c.id === courseId);
         
-        if (!courseConfig || !courseConfig.jsonPath) {
-            console.error("Configuración de curso no encontrada para:", courseId);
+        if (!courseConfig) {
+            console.error("🚨 Dreams Security: Intento de acceso a curso inexistente.");
+            return;
+        }
+
+        // --- SENTINEL DE SEGURIDAD (FASE 5.3) ---
+        // Validación de "Último Segundo": Bloquea el acceso si la vigencia expiró 
+        // o si se intenta vulnerar un curso de pago sin permiso activo.
+        if (!courseConfig.hasAccess && !courseConfig.esGratis) {
+            alert("🔒 ACCESO RESTRINGIDO:\nTu licencia para este programa ha expirado o no se encuentra activa.\n\nPor favor, contacta a tu consultor para renovar tu suscripción.");
+            console.warn(`🚫 Sentinel: Acceso denegado para el curso [${courseId}]`);
+            return;
+        }
+
+        if (!courseConfig.jsonPath) {
+            console.error("🚨 Dreams Security: Ruta de contenido no definida.");
             return;
         }
 

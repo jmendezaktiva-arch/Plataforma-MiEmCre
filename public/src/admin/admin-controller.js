@@ -30,20 +30,25 @@ const MetricsEngine = {
             });
             const popularApp = Object.keys(appsCount).reduce((a, b) => appsCount[a] > appsCount[b] ? a : b, "Ninguna");
 
-            // 2. Cálculo de Punto de Equilibrio Promedio (Trazabilidad con Expediente)
-            // Nota: Se asume que el dato vive en u.expediente.finanzas.puntoEquilibrio
+            // 2. Inteligencia Financiera: Punto de Equilibrio Promedio (Fase 4: BI Core)
             let sumaEquilibrio = 0;
             let clientesConDato = 0;
+            let clientesActivos = 0;
+
             users.forEach(u => {
-                const pe = u.expediente?.finanzas?.puntoEquilibrio || 0;
+                // Forzamos conversión a número para evitar concatenaciones de texto
+                const pe = parseFloat(u.expediente?.finanzas?.puntoEquilibrio) || 0;
                 if (pe > 0) {
                     sumaEquilibrio += pe;
                     clientesConDato++;
                 }
+                // Trazabilidad de Adopción: Clientes con al menos 1 servicio o app activada
+                if (Object.keys(u.expediente?.servicios || {}).length > 0) {
+                    clientesActivos++;
+                }
             });
 
             // 3. Monitor de Expiración SaaS (Escaneo de Trazabilidad Temporal)
-            // Identifica cuántos servicios requieren atención inmediata en todo el sistema.
             let vencidos = 0;
             let proximos = 0;
 
@@ -60,6 +65,7 @@ const MetricsEngine = {
                 promedioPuntoEquilibrio: clientesConDato > 0 ? sumaEquilibrio / clientesConDato : 0,
                 appMasPopular: popularApp.toUpperCase(),
                 totalClientes: users.length,
+                clientesActivos, // Nuevo indicador de penetración de mercado
                 vencidos,
                 proximos
             };
@@ -131,8 +137,22 @@ const UserManager = {
                     consultor: data.consultor || []
                 },
                 expediente: {
-                    // Control de Vigencia Dinámico (SaaS Model)
-                    servicios: {}, 
+                    // Control de Vigencia Dinámico (Fase 3: Auto-Activación en Alta)
+                    servicios: (() => {
+                        const hoy = new Date();
+                        const venc = new Date();
+                        venc.setFullYear(hoy.getFullYear() + 1);
+                        const svcs = {};
+                        [...(data.cursos || []), ...(data.consultor || [])].forEach(id => {
+                            svcs[id] = {
+                                fechaActivacion: hoy.toISOString(),
+                                fechaVencimiento: venc.toISOString(),
+                                status: 'activo',
+                                modality: data.metadata?.[id]?.modality || 'ONLINE'
+                            };
+                        });
+                        return svcs;
+                    })(),
                     // Historial de Movimientos (Handshake Log)
                     trazabilidad: [{
                         fecha: new Date().toISOString(),
@@ -179,16 +199,24 @@ const UserManager = {
             const vencimientoSaaS = new Date();
             vencimientoSaaS.setFullYear(hoy.getFullYear() + 1);
 
-            // 2. CÁLCULO DE VIGENCIA
+            // 2. CÁLCULO DE VIGENCIA (Fase 3: Refactorización SaaS)
+            // TRACEABILIDAD: Ahora incluimos los Cursos en el motor de vigencia temporal
             const nuevosServicios = { ...(currentExpediente.servicios || {}) };
-            const serviciosActivados = [...(newAccess.apps || []), ...(newAccess.consultor || [])];
+            const serviciosActivados = [
+                ...(newAccess.cursos || []), // Inyección de IDs de Academia para control de caducidad
+                ...(newAccess.apps || []), 
+                ...(newAccess.consultor || [])
+            ];
             
             serviciosActivados.forEach(id => {
                 if (!nuevosServicios[id]) {
                     nuevosServicios[id] = {
                         fechaActivacion: hoy.toISOString(),
                         fechaVencimiento: vencimientoSaaS.toISOString(),
-                        status: 'activo'
+                        status: 'activo',
+                        // TRACEABILIDAD: Sincronización de Modalidad (Fase 3.3)
+                        // Registra si el curso es LIVE u ONLINE según el catálogo al momento de la compra
+                        modality: extraData.metadata?.[id]?.modality || 'ONLINE'
                     };
                 }
             });
@@ -213,14 +241,17 @@ const UserManager = {
                 descripcion: `Modificación manual. Rol: ${newRol.toUpperCase()}. Cuota usuarios: ${extraData.cuotaUsuarios}.`
             });
 
-            // 4. PERSISTENCIA ATÓMICA DEL EXPEDIENTE MAESTRO
+            // 4. PERSISTENCIA ATÓMICA DEL EXPEDIENTE MAESTRO (Fase 4.5: BI Persistence)
             await updateDoc(userRef, {
                 "accesos": newAccess,
                 "rol": newRol,
                 "ultimaModificacion": serverTimestamp(),
                 "expediente.servicios": nuevosServicios,
                 "expediente.usuariosAdicionales": parseInt(extraData.cuotaUsuarios) || 0,
+                // TRACEABILIDAD: Persistencia de indicadores para motor de BI
                 "expediente.finanzas.totalInvertido": totalInvertido,
+                "expediente.finanzas.puntoEquilibrio": extraData.puntoEquilibrio || 0,
+                "expediente.finanzas.margenUtilidad": extraData.margenUtilidad || 0,
                 "expediente.trazabilidad": logTrazabilidad
             });
             
@@ -257,8 +288,17 @@ window.prepareEditUser = async (uid) => {
         const userRef = doc(db, "usuarios", uid);
         const userSnap = await getDoc(userRef);
 
+        // FASE 2: Sincronización Total de Catálogos (Handshake v3.0)
+        const [coursesSnap, servicesSnap] = await Promise.all([
+            getDocs(collection(db, "config_ecosistema")),
+            getDocs(collection(db, "config_consultoria"))
+        ]);
+
+        const catalog = coursesSnap.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+        const consultingCatalog = servicesSnap.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+
         if (userSnap.exists()) {
-            renderEditModal(uid, userSnap.data());
+            renderEditModal(uid, userSnap.data(), catalog, consultingCatalog);
         } else {
             alert("🚨 Error: No se encontró el expediente del usuario.");
         }
@@ -267,19 +307,15 @@ window.prepareEditUser = async (uid) => {
     }
 };
 
-/**
- * renderEditModal - Interfaz de Gestión de Permisos (UI Prestige)
- * Construye dinámicamente el formulario con los accesos actuales del cliente.
- */
-const renderEditModal = (uid, user) => {
+const renderEditModal = (uid, user, catalog = [], consultingCatalog = []) => {
     // Limpieza de instancias previas para evitar duplicidad
     document.getElementById('modal-edit-container')?.remove();
 
     const modalHtml = `
-        <div id="modal-edit-container" style="display:flex; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(15, 52, 96, 0.8); z-index:9999; align-items:center; justify-content:center; backdrop-filter: blur(4px);">
-            <div style="background:#fff; width:450px; padding:30px; border-radius:12px; box-shadow: 0 20px 40px rgba(0,0,0,0.3); border-top: 6px solid var(--accent-gold);">
+        <div id="modal-edit-container" style="display:flex; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(15, 52, 96, 0.8); z-index:9999; align-items:flex-start; justify-content:center; backdrop-filter: blur(4px); overflow-y: auto; padding: 40px 0;">
+            <div style="background:#fff; width:450px; padding:30px; border-radius:12px; box-shadow: 0 20px 40px rgba(0,0,0,0.3); border-top: 6px solid var(--accent-gold); margin-bottom: 40px;">
                 <h3 style="margin-top:0; color:var(--primary-midnight); font-weight:900;">GESTIÓN DE ACCESOS</h3>
-                <p style="font-size:0.85rem; color:#666; margin-bottom:20px;">Cliente: <strong>${user.nombre}</strong></p>
+                <p style="font-size:0.85rem; color:#666; margin-bottom:20px;">Cliente: <strong>${user.nombre || 'Líder sin nombre'}</strong></p>
                 
                 <form id="form-edit-usuario">
                     <label style="display:block; font-size:0.75rem; font-weight:700; margin-bottom:5px;">ROL DEL PERFIL</label>
@@ -290,11 +326,14 @@ const renderEditModal = (uid, user) => {
                         <option value="Admin" ${user.rol?.toLowerCase() === 'admin' ? 'selected' : ''}>Administrador</option>
                     </select>
 
-                    <div style="margin-bottom:20px;">
+                    <div style="margin-bottom:20px; max-height: 150px; overflow-y: auto; padding-right: 5px;">
                         <label style="display:block; font-size:0.75rem; font-weight:700; margin-bottom:10px;">CURSOS EN ACADEMIA</label>
-                        <label style="display:block; margin-bottom:8px; font-size:0.9rem;"><input type="checkbox" value="academia-a" ${(user.accesos?.cursos || []).includes('academia-a') ? 'checked' : ''}> Sesión A: Cimientos</label>
-                        <label style="display:block; margin-bottom:8px; font-size:0.9rem;"><input type="checkbox" value="academia-b" ${(user.accesos?.cursos || []).includes('academia-b') ? 'checked' : ''}> Sesión B: Expansión</label>
-                        <label style="display:block; margin-bottom:8px; font-size:0.9rem;"><input type="checkbox" value="academia-c" ${(user.accesos?.cursos || []).includes('academia-c') ? 'checked' : ''}> Sesión C: Maestría</label>
+                        ${catalog.map(course => `
+                            <label style="display:block; margin-bottom:8px; font-size:0.9rem;">
+                                <input type="checkbox" value="${course.id}" ${(user.accesos?.cursos || []).includes(course.id) ? 'checked' : ''}> 
+                                ${course.title}
+                            </label>
+                        `).join('') || '<p style="font-size:0.75rem; color:#999;">No hay cursos en el catálogo.</p>'}
                     </div>
 
                     <div style="margin-bottom:20px; padding-top: 10px; border-top: 1px solid #eee;">
@@ -304,20 +343,36 @@ const renderEditModal = (uid, user) => {
                         <label style="display:block; margin-bottom:8px; font-size:0.9rem;"><input type="checkbox" value="app-process" ${(user.accesos?.apps || []).includes('app-process') ? 'checked' : ''}> Process Designer</label>
                     </div>
 
-                    <div style="margin-bottom:20px; padding:10px; background:#f9f5eb; border-radius:6px;">
-                        <label style="font-weight:700; font-size:0.8rem; color:var(--accent-gold);"><input type="checkbox" id="edit-ia" ${(user.accesos?.consultor || []).includes('ia-expert') ? 'checked' : ''}> ACTIVAR CONSULTOR IA</label>
+                    <div style="margin-bottom:20px; padding:15px; background:#f9f5eb; border-radius:10px; border-left: 4px solid var(--accent-gold);">
+                        <label style="display:block; font-size:0.75rem; font-weight:700; margin-bottom:10px; color:var(--accent-gold);">CONSULTORÍA Y STAFF</label>
+                        <div style="max-height: 100px; overflow-y: auto;">
+                            ${consultingCatalog.map(service => `
+                                <label style="display:block; margin-bottom:8px; font-size:0.9rem;">
+                                    <input type="checkbox" class="edit-check-consultor" value="${service.id}" ${(user.accesos?.consultor || []).includes(service.id) ? 'checked' : ''}> 
+                                    ${service.title}
+                                </label>
+                            `).join('') || '<p style="font-size:0.75rem; color:#999;">Sin servicios activos.</p>'}
+                        </div>
                     </div>
 
                     <div style="margin-bottom:25px; padding-top: 15px; border-top: 1px solid #eee;">
-                        <label style="display:block; font-size:0.75rem; font-weight:700; margin-bottom:12px; color:var(--primary-midnight);">FINANZAS Y ESCALABILIDAD</label>
-                        <div style="display:flex; gap:12px;">
-                            <div style="flex:1;">
+                        <label style="display:block; font-size:0.75rem; font-weight:700; margin-bottom:12px; color:var(--primary-midnight);">FINANZAS Y ESCALABILIDAD (BI DATA)</label>
+                        <div style="display:grid; grid-template-columns: 1fr 1fr; gap:12px;">
+                            <div>
                                 <label style="display:block; font-size:0.65rem; color:#999; margin-bottom:5px;">REGISTRAR NUEVO PAGO ($)</label>
                                 <input type="number" id="edit-pago" placeholder="0.00" step="0.01" style="width:100%; padding:10px; border:1px solid #ddd; border-radius:6px; font-size:0.85rem;">
                             </div>
-                            <div style="flex:1;">
+                            <div>
                                 <label style="display:block; font-size:0.65rem; color:#999; margin-bottom:5px;">CUOTA USUARIOS EXTRA</label>
                                 <input type="number" id="edit-cuota" value="${user.expediente?.usuariosAdicionales || 0}" min="0" style="width:100%; padding:10px; border:1px solid #ddd; border-radius:6px; font-size:0.85rem;">
+                            </div>
+                            <div>
+                                <label style="display:block; font-size:0.65rem; color:var(--accent-gold); font-weight:700; margin-bottom:5px;">PUNTO DE EQUILIBRIO ($)</label>
+                                <input type="number" id="edit-punto-equilibrio" value="${user.expediente?.finanzas?.puntoEquilibrio || 0}" placeholder="0.00" style="width:100%; padding:10px; border:1px solid #ddd; border-radius:6px; font-size:0.85rem;">
+                            </div>
+                            <div>
+                                <label style="display:block; font-size:0.65rem; color:var(--accent-gold); font-weight:700; margin-bottom:5px;">MARGEN UTILIDAD (%)</label>
+                                <input type="number" id="edit-margen" value="${user.expediente?.finanzas?.margenUtilidad || 0}" placeholder="0" style="width:100%; padding:10px; border:1px solid #ddd; border-radius:6px; font-size:0.85rem;">
                             </div>
                         </div>
                     </div>
@@ -340,21 +395,35 @@ const renderEditModal = (uid, user) => {
         btnSave.disabled = true;
         btnSave.innerText = "GUARDANDO...";
 
-        // TRACEABILIDAD: Captura segmentada de nuevos estados para actualización de perfil
-        const selectedCursos = Array.from(e.target.querySelectorAll('input[value^="academia-"]:checked')).map(el => el.value);
+        // TRACEABILIDAD: Captura Dinámica de Permisos (Fase 3: Handshake Total)
+        // Recuperamos los IDs de los contenedores dinámicos de Academia y Consultoría
+        const selectedCursos = Array.from(e.target.querySelectorAll('div[style*="max-height: 150px"] input:checked')).map(el => el.value);
         const selectedApps = Array.from(e.target.querySelectorAll('input[value^="app-"]:checked')).map(el => el.value);
-        const hasIA = e.target.querySelector('#edit-ia').checked;
+        const selectedConsultoria = Array.from(e.target.querySelectorAll('.edit-check-consultor:checked')).map(el => el.value);
         const newRol = document.getElementById('edit-rol').value;
 
         const newAccess = {
             cursos: selectedCursos,
-            apps: selectedApps, // Trazabilidad: Sincronización real de herramientas autorizadas
-            consultor: hasIA ? ['ia-expert'] : []
+            apps: selectedApps,
+            consultor: selectedConsultoria // Trazabilidad: Sincronización con IDs reales de config_consultoria
         };
+
+        // TRACEABILIDAD: Construcción de Metadatos de Modalidad (Fase 3.3)
+        const metadata = {};
+        selectedCursos.forEach(courseId => {
+            const courseInfo = catalog.find(c => c.id === courseId);
+            if (courseInfo) {
+                metadata[courseId] = { modality: courseInfo.modality || 'ONLINE' };
+            }
+        });
 
         const extraData = {
             nuevoPago: parseFloat(document.getElementById('edit-pago').value) || 0,
-            cuotaUsuarios: parseInt(document.getElementById('edit-cuota').value) || 0
+            cuotaUsuarios: parseInt(document.getElementById('edit-cuota').value) || 0,
+            // TRACEABILIDAD: Captura de indicadores de Negocio (Fase 4.4)
+            puntoEquilibrio: parseFloat(document.getElementById('edit-punto-equilibrio').value) || 0,
+            margenUtilidad: parseFloat(document.getElementById('edit-margen').value) || 0,
+            metadata 
         };
 
         try {
@@ -439,7 +508,12 @@ document.addEventListener('DOMContentLoaded', async () => {
             if (elBreakEven) elBreakEven.innerText = `$${stats.promedioPuntoEquilibrio.toLocaleString('es-MX', {minimumFractionDigits: 2})}`;
             if (elPopular) elPopular.innerText = stats.appMasPopular;
             if (elParticipation) {
-                const percent = Math.round((stats.totalClientes / 100) * 100);
+                // TRACEABILIDAD: Cálculo de Adopción Real (Fase 4: BI Intelligence)
+                // Proporción de clientes con servicios activos vs Total de la cartera
+                const percent = stats.totalClientes > 0 
+                    ? Math.round((stats.clientesActivos / stats.totalClientes) * 100) 
+                    : 0;
+                
                 elParticipation.innerText = `${percent}%`;
                 if (barParticipation) barParticipation.style.width = `${percent}%`;
             }
@@ -516,9 +590,9 @@ document.addEventListener('DOMContentLoaded', async () => {
                 return `
                 <tr style="border-bottom: 1px solid #f4f4f4; transition: background 0.2s;" onmouseover="this.style.background='#fafafa'" onmouseout="this.style.background='transparent'">
                     <td style="padding: 15px;">
-                        <div style="font-weight: 600; color: var(--primary-midnight);">${user.nombre}</div>
-                        <div style="font-size: 0.7rem; color: var(--accent-gold); font-weight: 700; text-transform: uppercase; margin-bottom: 2px;">${user.empresa || 'Empresa No Definida'}</div>
-                        <div style="font-size: 0.75rem; color: #999;">${user.email}</div>
+                        <div style="font-weight: 600; color: var(--primary-midnight);">${user.nombre || 'Líder sin nombre'}</div>
+                        <div style="font-size: 0.7rem; color: var(--accent-gold); font-weight: 700; text-transform: uppercase; margin-bottom: 2px;">${user.empresa || 'Organización No Registrada'}</div>
+                        <div style="font-size: 0.75rem; color: #999;">${user.email || 'Email no disponible'}</div>
                     </td>
                     <td style="padding: 15px;">
                         <span style="background: #eee; padding: 4px 8px; border-radius: 4px; font-size: 0.7rem; text-transform: uppercase;">${user.rol}</span>
@@ -641,8 +715,43 @@ document.addEventListener('DOMContentLoaded', async () => {
     // Nota: El disparo de loadAdminStats() y loadUsersList() ahora es gestionado
     // exclusivamente por el Guardia de Seguridad (Admin Guard) arriba.
 
-    // 1. CONTROL DE APERTURA (MODAL)
-    btnOpenAlta?.addEventListener('click', () => {
+    // 1. CONTROL DE APERTURA (MODAL) - v2.1 Handshake Dinámico (Cursos + Servicios)
+    btnOpenAlta?.addEventListener('click', async () => {
+        const cursosContainer = document.getElementById('alta-cursos-dinamicos');
+        const serviciosContainer = document.getElementById('alta-servicios-dinamicos');
+
+        // TRACEABILIDAD: Sincronización proactiva de Catálogo de Academia
+        if (cursosContainer) {
+            cursosContainer.innerHTML = '<p style="font-size:0.7rem; color:var(--accent-gold);">Sincronizando...</p>';
+            try {
+                const coursesSnap = await getDocs(collection(db, "config_ecosistema"));
+                cursosContainer.innerHTML = coursesSnap.docs.map(doc => `
+                    <label style="display: block; font-size: 0.85rem; margin-bottom: 4px;">
+                        <input type="checkbox" class="alta-check-curso" value="${doc.id}"> ${doc.data().title}
+                    </label>
+                `).join('') || '<p style="font-size:0.75rem; color:#999;">Sin cursos activos.</p>';
+            } catch (e) { 
+                console.error("Error catálogo cursos:", e);
+                cursosContainer.innerHTML = '<p style="color:red; font-size:0.7rem;">Error al sincronizar.</p>'; 
+            }
+        }
+
+        // TRACEABILIDAD: Sincronización proactiva de Catálogo de Consultoría y Staff
+        if (serviciosContainer) {
+            serviciosContainer.innerHTML = '<p style="font-size:0.7rem; color:var(--accent-gold);">Sincronizando...</p>';
+            try {
+                const servicesSnap = await getDocs(collection(db, "config_consultoria"));
+                serviciosContainer.innerHTML = servicesSnap.docs.map(doc => `
+                    <label style="display: block; font-size: 0.85rem; margin-bottom: 4px;">
+                        <input type="checkbox" class="alta-check-consultor" value="${doc.id}"> ${doc.data().title}
+                    </label>
+                `).join('') || '<p style="font-size:0.75rem; color:#999;">Sin servicios activos.</p>';
+            } catch (e) { 
+                console.error("Error catálogo servicios:", e);
+                serviciosContainer.innerHTML = '<p style="color:red; font-size:0.7rem;">Error al sincronizar.</p>'; 
+            }
+        }
+
         modalAlta.style.display = 'block';
     });
 
@@ -661,10 +770,18 @@ document.addEventListener('DOMContentLoaded', async () => {
             const userCredential = await createUserWithEmailAndPassword(secondaryAuth, email, password);
             const uid = userCredential.user.uid;
 
-            // TRACEABILIDAD: Captura segmentada de permisos (Academia, Apps, Consultoría)
-            const selectedCursos = Array.from(e.target.querySelectorAll('input[value^="academia-"]:checked')).map(el => el.value);
+            // TRACEABILIDAD: Captura Dinámica de Permisos (Fase 2 - Handshake de IDs)
+            const selectedCursos = Array.from(e.target.querySelectorAll('.alta-check-curso:checked')).map(el => el.value);
             const selectedApps = Array.from(e.target.querySelectorAll('input[value^="app-"]:checked')).map(el => el.value);
-            const hasConsultor = e.target.querySelector('input[value="consultor-ia"]:checked');
+            const selectedConsultoria = Array.from(e.target.querySelectorAll('.alta-check-consultor:checked')).map(el => el.value);
+
+            // FASE 3.4: Handshake de Metadatos en Alta (Sincronización de Modalidad)
+            const coursesSnap = await getDocs(collection(db, "config_ecosistema"));
+            const metadata = {};
+            selectedCursos.forEach(cid => {
+                const docMatch = coursesSnap.docs.find(d => d.id === cid);
+                if (docMatch) metadata[cid] = { modality: docMatch.data().modality || 'ONLINE' };
+            });
 
             const userData = {
                 nombre: document.getElementById('new-nombre').value,
@@ -672,8 +789,9 @@ document.addEventListener('DOMContentLoaded', async () => {
                 empresa: document.getElementById('new-empresa').value,
                 rol: document.getElementById('new-rol').value,
                 cursos: selectedCursos,
-                apps: selectedApps, // Trazabilidad: Inyección de herramientas digitales autorizadas
-                consultor: hasConsultor ? ['ia-expert'] : []
+                apps: selectedApps, 
+                consultor: selectedConsultoria,
+                metadata // Inyección para que el expediente nazca con Vigencia y Modalidad activas
             };
 
             // TRACEABILIDAD: Registro en Firestore, Disparo de Correo y Limpieza
