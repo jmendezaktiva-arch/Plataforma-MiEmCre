@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    
+    <title>Apps de Gestión | Mi Empresa Crece Platform</title>
+    
+    <link rel="stylesheet" href="assets/css/style.css">
+    <link rel="stylesheet" href="assets/css/bento.css">
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;700;900&display=swap" rel="stylesheet">
+<style>
+        /* TRACEABILIDAD: Estilos de búsqueda ahora delegados a clases compartidas. 
+           Se mantiene solo el ajuste de respiro superior para el contenedor principal. */
+        .container {
+            margin-top: 40px !important;
+        }
+
+        .aura-input {
+            border: none;
+            background: transparent;
+            outline: none;
+            font-family: 'Montserrat', sans-serif;
+            font-size: 0.9rem;
+            color: var(--primary-midnight);
+            width: 100%;
+        }
+
+        .search-icon {
+            font-size: 0.9rem;
+            margin-left: 10px;
+            filter: grayscale(1);
+            opacity: 0.6;
+        }
+
+        /* CORRECCIÓN GEOMÉTRICA V4.6 */
+        .container {
+            margin-top: calc(var(--navbar-height, 70px) + 20px) !important;
+        }
+    </style>
+</head>
+<body class="bg-ivory">
+
+    <div id="sidebar-container"></div>
+
+    <header class="navbar">
+        <div class="nav-left">
+            <span style="color: var(--primary-midnight); font-weight: 800; font-size: 0.7rem; letter-spacing: 2px; text-transform: uppercase;">Dreams</span>
+            <span style="color: var(--accent-gold); font-weight: 400; font-size: 0.7rem; letter-spacing: 2px; text-transform: uppercase;">Platform</span>
+        </div>
+
+        <div class="nav-center">
+            <h1 id="header-aura-title" style="color: var(--primary-midnight); font-weight: 700; font-size: 0.65rem; letter-spacing: 2px; text-transform: uppercase; margin: 0; opacity: 0.8;">
+                Ecosistema de Aplicaciones
+            </h1>
+        </div>
+
+        <div id="header-aura-actions" class="nav-right">
+            
+            <button id="btn-nav-ia" class="nav-btn-prestige" title="Consultoría IA">
+                <span class="icon">✨</span>
+            </button>
+            <button id="btn-nav-search" class="nav-btn-prestige" title="Buscador">
+                <span class="icon">🔍</span>
+            </button>
+            <button id="btn-nav-support" class="nav-btn-prestige" title="Soporte Técnico">
+                <span class="icon">✉️</span>
+            </button>
+        </div>
+    </header>
+
+    <main class="main-content" style="padding-top: 75px;">
+        <div class="container" style="margin-top: 30px;">
+            <header class="apps-header mb-4">
+                <h1 class="text-midnight font-black" style="font-size: var(--font-size-h1);">Ecosistema de Aplicaciones</h1>
+                <p class="text-midnight-light" style="font-size: var(--font-size-body);">Herramientas tácticas para la profesionalización de tu PyME.</p>
+            </header>
+
+            <div id="apps-grid" class="bento-grid">
+                <div id="loading-apps" class="loading-spinner">Cargando herramientas de autoridad...</div>
+            </div>
+        </div>
+    </main>
+
+    <script>
+        (function() {
+            var mainScript = document.createElement('script');
+            mainScript.src = '/src/shared/env-config.js';
+            mainScript.onerror = function() {
+                console.warn('⚠️ Configuración privada no encontrada. Cargando respaldo...');
+                var backupScript = document.createElement('script');
+                backupScript.src = '/src/shared/env-config.template.js';
+                document.head.appendChild(backupScript);
+            };
+            document.head.appendChild(mainScript);
+        })();
+    </script>
+    
+    <script src="src/shared/firebase-config.js" type="module"></script>
+    <script src="src/app.js" type="module"></script>
+    <script src="src/shared/sidebar-component.js" type="module"></script>
+    <script src="src/apps/apps-logic.js" type="module"></script>
+</body>
+</html>

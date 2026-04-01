@@ -2,7 +2,7 @@ rules_version = '2';
 service cloud.firestore {
   match /databases/{database}/documents {
     
-    // Función central de roles
+    // Función central de roles (Versión Estricta: Coincidencia con "Admin")
     function getRole() {
       return get(/databases/$(database)/documents/usuarios/$(request.auth.uid)).data.rol;
     }
@@ -91,6 +91,22 @@ service cloud.firestore {
       // Los usuarios pueden crear solicitudes; el Admin puede leerlas todas
       allow create: if request.auth != null;
       allow read, write: if request.auth != null && getRole() == 'Admin';
+    }
+
+    // --- COLECCIÓN DE CONFIGURACIÓN DE APPS (Catálogo SaaS) ---
+    match /config_apps/{appId} {
+      // Cualquier usuario autenticado puede leer el catálogo para renderizar su panel.
+      allow read: if request.auth != null;
+      // Solo el Admin Jorge puede dar de alta o modificar aplicaciones.
+      allow write: if request.auth != null && getRole() == 'Admin';
+    }
+
+    // --- COLECCIÓN DE EXPEDIENTES (Sentinel de Vigencia) ---
+    match /expedientes/{userId} {
+      // El cliente lee su propia vigencia; el Admin tiene supervisión total.
+      allow read: if request.auth != null && (request.auth.uid == userId || getRole() == 'Admin');
+      // Solo el Admin puede modificar fechas de vencimiento o asignar permisos.
+      allow write: if request.auth != null && getRole() == 'Admin';
     }
 
   }

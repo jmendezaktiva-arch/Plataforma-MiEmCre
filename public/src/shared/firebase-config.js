@@ -60,3 +60,10 @@ export const checkAccess = async (itemType, itemId) => {
 };
 
 export { doc, getDoc, setDoc, collection, getDocs, query, orderBy, where };
+
+// ANCLAJE QUIRÚRGICO PARA DEBUGGING (Solo en desarrollo)
+if (location.hostname === "localhost" || location.hostname === "127.0.0.1") {
+    window.auth = auth;
+    window.db = db;
+    console.log("🛠️ DREAMS DEBUG: Núcleo expuesto en window (auth, db).");
+}

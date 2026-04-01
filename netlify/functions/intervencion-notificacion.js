@@ -88,7 +88,36 @@ exports.handler = async (event) => {
         const footerStyle = "font-size: 0.75rem; color: #999; text-align: center; margin-top: 30px; font-family: 'Montserrat', sans-serif;";
         const buttonStyle = "display: inline-block; margin-top: 20px; padding: 15px 30px; background: #0F3460; color: #fff; text-decoration: none; border-radius: 8px; font-weight: 700; letter-spacing: 1px;";
 
-        if (tipo === 'CARRITO_COMPRA') {
+        if (tipo === 'PAGO_EXITOSO') {
+            emailSubject = `✅ ¡Bienvenido a bordo! Tu acceso a ${servicio.titulo} está activo`;
+            emailHtml = `
+                <div style="${headerStyle}">
+                    <div style="text-align: center; margin-bottom: 30px;">
+                        <img src="https://miempresacrece.com.mx/assets/img/logo-prestige.png" alt="Dreams Platform" style="width: 180px;">
+                    </div>
+                    <h2 style="font-weight: 900; text-transform: uppercase; color: #0F3460; text-align: center;">Inversión Confirmada</h2>
+                    <p>Estimado <strong>${cliente.nombre}</strong>,</p>
+                    <p>Es un honor darte la bienvenida oficial a este programa estratégico. En <strong>Mi Empresa Crece</strong>, sabemos que el liderazgo se demuestra con decisiones valientes, y hoy has dado un paso fundamental hacia el control total de tu PyME.</p>
+                    
+                    <div style="background: #f4f7f9; border-left: 4px solid #957C3D; padding: 25px; margin: 30px 0; border-radius: 8px;">
+                        <span style="font-size: 0.75rem; color: #957C3D; font-weight: 700; text-transform: uppercase;">Programa Adquirido:</span>
+                        <h3 style="margin: 5px 0; color: #0F3460;">${servicio.titulo}</h3>
+                        <p style="font-size: 0.85rem; color: #666; margin-bottom: 0;">Tu acceso ha sido habilitado automáticamente en tu Dashboard.</p>
+                    </div>
+
+                    <div style="text-align: center; margin: 40px 0;">
+                        <a href="https://dreams.miempresacrece.com.mx/dashboard.html" style="${buttonStyle}">INGRESAR A LA ACADEMIA</a>
+                    </div>
+
+                    <p style="font-size: 0.9rem; line-height: 1.6;">Si necesitas asistencia técnica inmediata o tienes dudas sobre la metodología, nuestro equipo de soporte senior está listo para atenderte respondiendo a este correo.</p>
+                    
+                    <hr style="border: 0; border-top: 1px solid #eee; margin: 40px 0;">
+                    <p style="font-size: 0.8rem; color: #999; text-align: center; font-style: italic;">"Arquitectos de Legados PyME: De la Operación a la Estrategia."</p>
+                    <div style="${footerStyle}">ME Crece Platform | Ecosistema de Alto Impacto</div>
+                </div>
+            `;
+        } else if (tipo === 'CARRITO_COMPRA') {
+            // Se mantiene el bloque anterior para seguimiento de carritos abandonados
             emailSubject = `✨ Todo listo para iniciar el crecimiento de ${cliente.empresa || 'tu negocio'}`;
             emailHtml = `
                 <div style="${headerStyle}">

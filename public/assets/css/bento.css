@@ -15,11 +15,15 @@
 /* --- MÓDULOS (CUADRANTES) --- */
 .bento-item {
     background: var(--card-bg);
-    border-radius: 24px;
-    padding: 30px;
-    border: 1px solid rgba(15, 52, 96, 0.05);
-    box-shadow: 0 10px 30px rgba(15, 52, 96, 0.04);
-    transition: all 0.4s cubic-bezier(0.165, 0.84, 0.44, 1);
+    /* Alineación con estándar .card (16px) para cohesión geométrica */
+    border-radius: 16px; 
+    padding: var(--dynamic-padding); /* Uso de espaciado institucional */
+    border: 1px solid rgba(15, 52, 96, 0.04);
+    /* Implementación de Soft Depth multicapa institucional */
+    box-shadow: 
+        0 4px 6px rgba(15, 52, 96, 0.02),
+        0 15px 35px rgba(15, 52, 96, 0.05);
+    transition: all 0.5s cubic-bezier(0.165, 0.84, 0.44, 1);
     display: flex;
     flex-direction: column;
 }
@@ -31,31 +35,65 @@
 }
 
 /* --- CONFIGURACIÓN DE JERARQUÍA (ADAPTATIVA PRESTIGE) --- */
-.bento-main { grid-column: span 2; grid-row: span 2; } 
+.bento-main { grid-column: span 2; grid-row: span 1; } /* Ajuste Quirúrgico: Altura unificada para eliminar el desorden visual */
 .bento-stat { grid-column: span 1; }                   
-.bento-wide { grid-column: span 2; }                   
+.bento-wide { grid-column: span 2; }                  
 
 /* Breakpoint para Tablets y Laptops pequeñas */
 @media (max-width: 1024px) {
     .bento-grid { grid-template-columns: repeat(2, 1fr); }
 }
 
-/* Breakpoint para Celulares (Suelo de Legibilidad) */
+/* Breakpoint para Celulares (Suelo de Legibilidad & Simetría Tactil) */
 @media (max-width: 600px) {
-    /* Homologación: Forzamos columna única para el Bento y la Grid de Consultoría */
+    /* Ajuste de Contenedor Maestro para Móvil */
+    .welcome-container { padding: 20px !important; }
+
+    /* Homologación: Forzamos columna única y respiros dinámicos */
     .bento-grid, .grid-recursos { 
         grid-template-columns: 1fr !important; 
-        gap: 20px;
+        gap: 20px; 
+        padding: 10px 0;
     }
+
+    /* Ajuste Quirúrgico de la Regleta Sticky en Móvil */
+    .sticky-shelf {
+        margin: 0 -20px 30px -20px; /* Sincronizado con el nuevo padding de 20px */
+        padding: 15px 20px;
+    }
+
+    /* Micro-Downsizing de Tarjetas en Carrusel para evitar cortes abruptos */
+    .glass-card {
+        min-width: 160px;
+        padding: 10px !important;
+    }
+
+    /* Reset de Jerarquías para flujo vertical absoluto */
     .bento-main, .bento-wide { 
         grid-column: span 1; 
         grid-row: auto; 
     }
-    .kpi-value { font-size: 2rem; } 
     
-    /* Optimización de respiro interno para tarjetas en pantallas pequeñas */
-    .card-recurso {
-        padding: 25px;
+    /* Refuerzo de Alineación para el micro-copy inyectado */
+    .bento-item p { margin-bottom: 15px !important; }
+
+    /* Sincronización con el Respiro Dinámico del Blueprint (1.5rem a 3rem) */
+    .bento-item, .card-recurso, .card {
+        padding: var(--dynamic-padding) !important; 
+        /* Ajuste de curvatura para maximizar el área útil en pantallas pequeñas */
+        border-radius: 12px; 
+    }
+
+    .kpi-value { font-size: 2rem; } 
+
+    /* Blindaje Tactil: Botones ocupan el ancho total en móvil */
+    .btn-primary, .btn-gold-sm, .btn-outline-sm {
+        width: 100% !important;
+        padding: 18px !important; /* Facilidad de clic con el pulgar */
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        box-sizing: border-box;
     }
 }
 
@@ -75,29 +113,30 @@
     font-weight: 600;
 }
 
-/* --- ESTILOS DE LOBBY (MIGRACIÓN DESDE HTML) --- */
+/* --- ESTILOS DE LOBBY (HOMOLOGACIÓN PRESTIGE) --- */
 .welcome-container { 
-    padding: 40px; 
-    max-width: 1200px; 
+    padding: var(--dynamic-padding); /* Respiro dinámico institucional */
+    max-width: var(--container-max-width); /* Alineación con ancho maestro */
     margin: 0 auto; 
 }
 
 .grid-recursos { 
     display: grid; 
     grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); 
-    gap: 30px; 
-    margin-top: 40px; 
+    gap: var(--content-gap); /* Espaciado estandarizado */
+    margin-top: var(--content-gap); 
 }
 
 .card-recurso { 
     background: var(--card-bg); 
-    border-radius: 24px; 
-    padding: 40px; 
-    border: 1px solid rgba(15, 52, 96, 0.05); 
+    border-radius: 16px; /* Sincronización con el estándar .card */
+    padding: var(--dynamic-padding); 
+    border: 1px solid rgba(15, 52, 96, 0.04); 
     display: flex; 
     flex-direction: column;
-    transition: all 0.4s cubic-bezier(0.165, 0.84, 0.44, 1);
-    box-shadow: 0 10px 30px rgba(15, 52, 96, 0.04);
+    transition: all 0.5s cubic-bezier(0.165, 0.84, 0.44, 1);
+    /* Soft Depth multicapa */
+    box-shadow: 0 4px 6px rgba(15, 52, 96, 0.02), 0 15px 35px rgba(15, 52, 96, 0.05);
 }
 
 .card-recurso:hover {
@@ -135,3 +174,314 @@
 
 .trend-up { color: var(--secondary-color); } /* Sincronización con Verde Institucional */
 .trend-down { color: var(--accent-gold); }    /* Sincronización con Oro Prestige (Ex-Terracotta) */
+
+/* --- ESTILOS DE APLICACIONES (SENTINEL & PRESTIGE) --- */
+
+/* Efecto Liquid Glass Homologado (Prestige) - MODALIDAD COMPACTA ODOO-STYLE */
+.glass-card {
+    background: rgba(255, 255, 255, 0.75) !important;
+    backdrop-filter: blur(20px) saturate(180%);
+    -webkit-backdrop-filter: blur(20px) saturate(180%);
+    border: 1px solid rgba(15, 52, 96, 0.08) !important;
+    border-radius: 16px; 
+    padding: 12px !important; /* Reducción de padding para mayor agilidad */
+    box-shadow: 0 4px 6px rgba(15, 52, 96, 0.02);
+    transition: all 0.5s cubic-bezier(0.165, 0.84, 0.44, 1);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+    min-height: 110px; /* Downsizing de altura inicial */
+    min-width: 170px;  /* Estandarización de ancho para evitar burbujas gigantes */
+    justify-content: center;
+    overflow: hidden;
+}
+
+/* --- BLOQUEO DE EXPANSIÓN: MI OPERATIVA INMEDIATA (FIXED STATE) --- */
+.carrusel-despegue .glass-card:hover {
+    min-height: 110px !important; /* Bloquea la expansión a 320px */
+    transform: none !important;    /* Elimina el salto hacia arriba */
+    padding: 12px !important;      /* Mantiene el respiro del Punto 2 */
+    justify-content: center !important;
+    border-color: var(--accent-gold) !important; /* Mantiene solo el feedback de color */
+    box-shadow: 0 5px 15px rgba(15, 52, 96, 0.08) !important; /* Sombra sutil sin movimiento */
+}
+
+/* Asegura que el contenido interno no intente revelar elementos inexistentes */
+.carrusel-despegue .glass-card:hover .app-icon-mini {
+    transform: scale(1.1); /* Micro-interacción elegante sin afectar el layout */
+}
+
+.glass-card:hover {
+    min-height: 320px; /* Expansión suave para revelar contenido */
+    padding: 25px !important;
+    transform: translateY(-8px);
+    box-shadow: 0 30px 60px rgba(15, 52, 96, 0.08);
+    border-color: var(--accent-gold) !important;
+    justify-content: space-between;
+}
+
+/* Estado Sentinel: Bloqueo por vigencia expirada */
+.locked-opacity {
+    opacity: 0.6;
+    filter: grayscale(0.8) blur(0.5px);
+    pointer-events: none; /* Blindaje: No permite clicks */
+    background: rgba(15, 52, 96, 0.05) !important;
+    border-style: dashed !important;
+}
+
+/* --- MICRO-ELEMENTOS TRANSICIONALES --- */
+.app-icon {
+    font-size: 1.8rem; /* Icono reducido en estado de reposo */
+    margin-bottom: 10px;
+    filter: drop-shadow(0 4px 8px rgba(15, 52, 96, 0.15));
+    transition: all 0.4s ease;
+}
+
+.glass-card:hover .app-icon {
+    font-size: 2.8rem; /* Recupera tamaño Prestige en hover */
+    margin-bottom: 15px;
+}
+
+/* Control de visibilidad de info secundaria (Descripción, Status y Botones) */
+.glass-card p, 
+.glass-card .status-tag, 
+.glass-card .btn-gold-sm {
+    opacity: 0;
+    max-height: 0;
+    margin: 0;
+    transition: all 0.4s ease-in-out;
+    pointer-events: none; /* Inactivo mientras está oculto */
+}
+
+.glass-card:hover p, 
+.glass-card:hover .status-tag, 
+.glass-card:hover .btn-gold-sm {
+    opacity: 1;
+    max-height: 200px; /* Permite el despliegue del contenido */
+    margin-top: 15px;
+    pointer-events: all;
+}
+
+.status-tag {
+    align-self: flex-start;
+    margin-top: auto;
+    /* Sincronización con Suelo Prestige (15px) */
+    font-size: var(--font-size-label); 
+    font-weight: 700;
+    text-transform: uppercase;
+    /* Padding equilibrado para el nuevo tamaño de fuente */
+    padding: 8px 16px; 
+    border-radius: 20px;
+    letter-spacing: 0.05em; /* Tracking optimizado para legibilidad en 15px */
+}
+
+.status-active {
+    background: rgba(46, 125, 50, 0.15);
+    color: var(--secondary-color);
+}
+
+.status-expired {
+    background: rgba(149, 124, 61, 0.15);
+    color: var(--accent-gold);
+}
+
+/* Botón reducido para Grid (Mismo ADN que btn-primary) */
+.btn-gold-sm {
+    background: var(--accent-gold);
+    color: white;
+    /* Ajuste de respiro para balancear el nuevo cuerpo tipográfico */
+    padding: 14px 24px; 
+    /* Sincronización geométrica con .btn-primary (12px) */
+    border-radius: 12px;
+    /* Adopción del Estándar Prestige (16px) */
+    font-size: var(--font-size-button); 
+    font-weight: 600;
+    text-decoration: none;
+    text-align: center;
+    /* Transición suave institucional */
+    transition: all 300ms ease-out;
+    border: none;
+}
+
+.btn-gold-sm:hover {
+    background: #7d6833;
+    transform: translateY(-2px);
+    box-shadow: 0 5px 15px rgba(149, 124, 61, 0.3);
+}
+
+/* --- COMPONENTES DE ACADEMIA (LOBBY FOCUS) --- */
+
+/* Contenedor Maestro de la Tarjeta de Curso */
+.card-lobby-item {
+    display: flex;
+    flex-direction: column;
+    height: auto;
+    max-height: 160px; /* Altura colapsada inicial */
+    overflow: hidden;
+    padding: 22px;
+    cursor: pointer;
+    border-top: 4px solid var(--accent-gold); /* Fallback institucional */
+}
+
+/* Títulos y Etiquetas */
+.card-header-app {
+    margin-bottom: 15px;
+}
+
+.card-title-app {
+    color: var(--primary-midnight);
+    font-size: 1.1rem;
+    margin: 0;
+    line-height: 1.2;
+    font-weight: 800;
+}
+
+/* Áreas de contenido dinámico (reveladas en Hover) */
+.card-body-app, .card-footer-app {
+    opacity: 0;
+    transition: opacity 0.3s ease;
+}
+
+.card-body-app {
+    margin-top: 10px;
+}
+
+.card-footer-app {
+    padding-top: 10px;
+}
+
+/* Botón de Acción interno */
+.btn-lobby-action {
+    width: 100%;
+    font-size: 0.75rem;
+    padding: 12px;
+    font-weight: 800;
+}
+
+/* --- CLASES DE ESTADO (HIDRATADAS POR JS) --- */
+.card-active {
+    filter: none !important;
+    opacity: 1 !important;
+    transform: scale(1.02) !important;
+    z-index: 10;
+}
+
+.card-inactive {
+    filter: blur(6px) grayscale(0.4) !important;
+    opacity: 0.4 !important;
+    transform: scale(0.96) !important;
+    pointer-events: none;
+}
+
+.card-expanded {
+    max-height: 600px !important; /* Expansión para revelar descripción y botón */
+}
+
+.card-content-visible {
+    opacity: 1 !important;
+}
+
+.card-price-tag {
+    font-size: 0.85rem;
+    font-weight: 800;
+    color: var(--accent-gold);
+    margin-bottom: 12px;
+}
+
+/* ========================================================================== */
+/* DREAMS DASHBOARD | LAYOUT ESPECÍFICO (PRESTIGE) */
+/* ========================================================================== */
+
+.user-identity-header { margin-bottom: 35px; animation: fadeInSlide 0.8s ease-out; }
+#user-display-name { font-weight: 700; color: var(--primary-midnight); font-size: 2.2rem; letter-spacing: -0.02em; display: block; }
+.identity-subtitle { font-size: 0.95rem; color: #666; margin-top: 6px; font-weight: 300; }
+
+.sticky-shelf {
+    position: sticky;
+    top: var(--navbar-height);
+    z-index: 998;
+    background: rgba(245, 245, 240, 0.95);
+    backdrop-filter: blur(15px);
+    margin: 0 -40px 40px -40px; 
+    padding: 20px 40px;
+    border-bottom: 1.5px solid rgba(149, 124, 61, 0.2);
+    box-shadow: 0 10px 30px rgba(15, 52, 96, 0.05);
+}
+
+/* --- ARQUITECTURA: SPLIT-PANEL OPERATIVO (ACTIVOS VS IA) --- */
+.split-operative-panel {
+    display: flex;
+    gap: 30px; /* Separación clara entre Gestión y Estrategia */
+    width: 100%;
+}
+
+.operative-column {
+    flex: 1; /* Distribución 50/50 equitativa */
+    display: flex;
+    flex-direction: column;
+}
+
+/* Contenedores de Listas Fixed (Sin Desplazamiento Horizontal) */
+.monitor-list, .ai-recommendation-feed {
+    display: flex;
+    gap: 12px;
+    flex-wrap: wrap; /* Permite que las tarjetas se acomoden si hay muchas */
+}
+
+/* Diferenciación Visual de la Zona de IA */
+.ai-glow-text {
+    color: var(--accent-gold) !important;
+    text-shadow: 0 0 15px rgba(149, 124, 61, 0.2);
+}
+
+.ai-insights-zone {
+    border-left: 1.5px dashed rgba(149, 124, 61, 0.3); /* Separador sutil de autoridad */
+    padding-left: 30px;
+}
+
+/* ANULACIÓN QUIRÚRGICA DE EXPANSIÓN (ESTADO FIJO) */
+.operative-column .glass-card:hover {
+    min-height: 110px !important;
+    transform: translateY(-2px) !important; /* Micro-elevación para feedback táctil solamente */
+    min-width: 170px !important;
+    box-shadow: 0 5px 15px rgba(15, 52, 96, 0.08) !important;
+}
+
+/* Responsividad: Apilado vertical para dispositivos móviles */
+@media (max-width: 991px) {
+    .split-operative-panel { flex-direction: column; gap: 40px; }
+    .ai-insights-zone { border-left: none; border-top: 1.5px dashed rgba(149, 124, 61, 0.3); padding-left: 0; padding-top: 30px; }
+}
+.app-icon-mini { font-size: 1.5rem; }
+
+.floating-dock { position: fixed; bottom: 40px; right: 40px; display: flex; flex-direction: column; gap: 20px; z-index: 5000; }
+.family-bubble {
+    width: 65px; height: 65px; background: rgba(255, 255, 255, 0.7);
+    backdrop-filter: blur(15px); border: 1px solid rgba(149, 124, 61, 0.3);
+    border-radius: 50%; display: flex; align-items: center; justify-content: center;
+    cursor: pointer; transition: all 0.5s cubic-bezier(0.19, 1, 0.22, 1);
+    box-shadow: 0 10px 30px rgba(15, 52, 96, 0.1);
+}
+.family-bubble:hover { width: 180px; border-radius: 30px; background: var(--primary-midnight); border-color: var(--accent-gold); }
+.bubble-icon { font-size: 1.5rem; transition: transform 0.3s ease; }
+.family-bubble:hover .bubble-icon { transform: translateX(-50px); filter: brightness(0) invert(1); }
+.bubble-label { position: absolute; right: 25px; opacity: 0; color: white; font-weight: 700; font-size: 0.9rem; text-transform: uppercase; letter-spacing: 1px; transition: opacity 0.3s ease; pointer-events: none; }
+.family-bubble:hover .bubble-label { opacity: 1; }
+
+@keyframes fadeInSlide { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+
+/* --- BLOQUEO DE EXPANSIÓN: MI OPERATIVA INMEDIATA (FIXED STATE) --- */
+.carrusel-despegue .glass-card:hover {
+    min-height: 110px !important; /* Bloquea la expansión a 320px */
+    transform: none !important;    /* Elimina el salto hacia arriba */
+    padding: 12px !important;      /* Mantiene el respiro del Punto 2 */
+    justify-content: center !important;
+    border-color: var(--accent-gold) !important; /* Mantiene solo el feedback de color */
+    box-shadow: 0 5px 15px rgba(15, 52, 96, 0.08) !important; /* Sombra sutil sin movimiento */
+}
+
+/* Asegura que el contenido interno no intente revelar elementos inexistentes */
+.carrusel-despegue .glass-card:hover .app-icon-mini {
+    transform: scale(1.1); /* Micro-interacción elegante sin afectar el layout */
+}

@@ -37,6 +37,7 @@ window.DREAMS_CONFIG = window.DREAMS_CONFIG || {
     APP_SCRIPT_URL: "${process.env.APP_SCRIPT_URL || ''}",
     FIREBASE_STORAGE_BASE: "${process.env.FIREBASE_STORAGE_BASE || ''}",
     YOUTUBE_BASE_URL: "${process.env.YOUTUBE_BASE_URL || ''}",
+    XPERTPAY_ID_TIENDA: "${process.env.XPERTPAY_ID_TIENDA || '10'}",
     MODO_DESARROLLO: false,
     resolvePath: ${resolvePathString}
 };`;

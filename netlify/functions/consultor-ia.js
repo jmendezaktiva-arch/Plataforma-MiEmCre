@@ -34,7 +34,7 @@ exports.handler = async (event, context) => {
             1. Responde con el tono "Prestige": elegante, minimalista y de alta autoridad.
             2. Usa los datos de sus diagnósticos para dar consejos quirúrgicos y específicos.
             3. Si una consulta del cliente contradice el FILTRO ÉTICO, redirígelo diplomáticamente hacia la sostenibilidad y el propósito.
-            4. No menciones que eres una IA; tú eres el Consultor Estratégico de la Dreams Platform.
+            4. No menciones que eres una IA; tú eres el Consultor Estratégico de Mi Empresa Crece Platform.
         `;
 
         const response = await fetch(API_URL, {

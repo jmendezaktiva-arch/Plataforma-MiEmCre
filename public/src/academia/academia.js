@@ -49,12 +49,11 @@ document.addEventListener('DOMContentLoaded', () => {
         }
 
         lobbyContainer.innerHTML = filteredCourses.map(course => {
-            // Trazabilidad de Acceso: Si el curso es de pago y no se tiene acceso, mostramos el precio
+            // Saneamiento: La etiqueta de precio ahora usa una clase CSS dedicada
             const priceDisplay = (!course.esGratis && !course.hasAccess) 
-                ? `<div style="font-size: 0.85rem; font-weight: 800; color: var(--accent-gold); margin-bottom: 12px;">INVERSIÓN: $${course.price?.toLocaleString()} MXN</div>` 
+                ? `<div class="card-price-tag">INVERSIÓN: $${course.price?.toLocaleString()} MXN</div>` 
                 : '';
 
-            // TRACEABILIDAD: Lógica de Botones según Modalidad (Fase 5.2)
             const buttonLabel = course.isComingSoon 
                 ? 'Próximamente' 
                 : (!course.hasAccess && !course.esGratis)
@@ -63,50 +62,175 @@ document.addEventListener('DOMContentLoaded', () => {
                         ? 'ACCEDER A MENTORÍA'
                         : 'ACCEDER AL PROGRAMA';
 
+            // TRACEABILIDAD: Se limpian los estilos inline. Solo se mantiene el color dinámico del borde superior.
             return `
-            <article class="card" style="${course.isComingSoon ? 'opacity: 0.6; border: 1px dashed #ccc;' : `border-top: 4px solid ${course.accentColor || 'var(--accent-gold)'};`}; display: flex; flex-direction: column; height: 100%;">
-                <header class="card-header" style="margin-bottom: 15px;">
-                    <span class="card-category" style="color: ${course.accentColor || '#999'}; font-size: 0.65rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.05em;">
-                        ${course.category} | <strong style="color:var(--accent-gold)">${course.modality}</strong>
-                    </span>
-                    <h3 style="margin: 5px 0 0; font-size: 1.15rem; ${course.isComingSoon ? 'color: #999;' : ''}">${course.title}</h3>
-                </header>
+            <article class="card bento-item glass-card card-lobby-item ${course.isComingSoon ? 'locked-opacity' : ''}" 
+                     style="border-top-color: ${course.accentColor || 'var(--accent-gold)'};">
+                
+                <div class="card-content">
+                    <header class="card-header-app">
+                        <span class="card-category">
+                            ${course.category} | ${course.modality}
+                        </span>
+                        <h3 class="card-title-app">${course.title}</h3>
+                    </header>
 
-                <div class="card-body" style="flex-grow: 1;">
-                    <p style="font-size: 0.85rem; line-height: 1.5; color: #4A5568; margin-bottom: 15px;">${course.description}</p>
-                    ${priceDisplay}
+                    <div class="card-body-app">
+                        <p>${course.description}</p>
+                        ${priceDisplay}
+                    </div>
+
+                    <footer class="card-footer-app">
+                        <button class="btn-primary btn-lobby-action" 
+                            ${course.isComingSoon ? 'disabled' : ''} 
+                            data-action="${course.hasAccess || course.esGratis ? 'open' : 'buy'}" 
+                            data-id="${course.id}">
+                            ${buttonLabel}
+                        </button>
+                    </footer>
                 </div>
-
-                <footer class="btn-group" style="display: flex; gap: 10px; align-items: center; margin-top: auto;">
-                    <button class="btn-primary" 
-                        ${course.isComingSoon ? 'disabled style="background: #e2e8f0; color: #94a3b8; cursor: not-allowed;"' : ''} 
-                        data-action="${course.hasAccess || course.esGratis ? 'open' : 'buy'}" 
-                        data-id="${course.id}" 
-                        style="flex: 1; font-size: 0.75rem; padding: 12px 8px; font-weight: 800; letter-spacing: 0.5px;">
-                        ${buttonLabel}
-                    </button>
-                </footer>
             </article>`;
         }).join('');
+
+        // --- MOTOR DE DESPLIEGUE EXCLUSIVO (ESTILO APPS FOCUS) ---
+        setTimeout(() => {
+            const courseCards = lobbyContainer.querySelectorAll('.card');
+            courseCards.forEach((card, i) => {
+                // Animación de entrada
+                card.style.opacity = '0';
+                card.style.transform = 'translateY(15px)';
+                card.style.transition = `all 0.6s ease ${i * 0.1}s`;
+                
+                requestAnimationFrame(() => {
+                    card.style.opacity = '1';
+                    card.style.transform = 'translateY(0)';
+                });
+
+                // MOTOR DE FOCO PRESTIGE (Optimizado por Clases CSS)
+                card.addEventListener('mouseenter', () => {
+                    courseCards.forEach(c => {
+                        const body = c.querySelector('.card-body-app');
+                        const footer = c.querySelector('.card-footer-app');
+                        
+                        if (c !== card) {
+                            c.classList.add('card-inactive');
+                            c.classList.remove('card-active', 'card-expanded');
+                            if(body) body.classList.remove('card-content-visible');
+                            if(footer) footer.classList.remove('card-content-visible');
+                        } else {
+                            c.classList.add('card-active', 'card-expanded');
+                            c.classList.remove('card-inactive');
+                            if(body) body.classList.add('card-content-visible');
+                            if(footer) footer.classList.add('card-content-visible');
+                        }
+                    });
+                });
+
+                card.addEventListener('mouseleave', () => {
+                    courseCards.forEach(c => {
+                        const body = c.querySelector('.card-body-app');
+                        const footer = c.querySelector('.card-footer-app');
+                        
+                        c.classList.remove('card-active', 'card-inactive', 'card-expanded');
+                        if(body) body.classList.remove('card-content-visible');
+                        if(footer) footer.classList.remove('card-content-visible');
+                    });
+                });
+            });
+        }, 50);
     };
 
-    // 2. ESCUCHADORES DE INTERACCIÓN PARA PILARES
+    // 2. MOTOR DE INTERACCIÓN DE PILARES (ESTILO BENTO FOCUS - HOMOLOGADO CON APPS)
+    const categoryGrid = document.getElementById('category-grid');
+    if (categoryGrid) {
+        const cards = categoryGrid.querySelectorAll('.card-category-btn');
+        
+        // A. Entrada Escalonada: Evita el despliegue simultáneo (Efecto Prestige)
+        cards.forEach((card, i) => {
+            card.style.opacity = '0';
+            card.style.transform = 'translateY(20px)';
+            card.style.transition = `all 0.6s cubic-bezier(0.23, 1, 0.32, 1) ${i * 0.1}s`;
+            requestAnimationFrame(() => {
+                setTimeout(() => {
+                    card.style.opacity = '1';
+                    card.style.transform = 'translateY(0)';
+                }, 100);
+            });
+        });
+
+        // B. Lógica de Foco Replicada: Solo la burbuja activa se mantiene nítida
+        categoryGrid.addEventListener('mouseover', (e) => {
+            const hoveredCard = e.target.closest('.card-category-btn');
+            if (!hoveredCard) return;
+
+            cards.forEach(card => {
+                card.style.transition = 'all 0.4s ease';
+                if (card !== hoveredCard) {
+                    card.style.filter = 'blur(6px) grayscale(0.3)';
+                    card.style.opacity = '0.4';
+                    card.style.transform = 'scale(0.96)';
+                } else {
+                    card.style.filter = 'none';
+                    card.style.opacity = '1';
+                    card.style.transform = 'scale(1.03)';
+                    card.style.zIndex = '10';
+                }
+            });
+        });
+
+        // C. Restauración de Nitidez al salir del grid
+        categoryGrid.addEventListener('mouseleave', () => {
+            cards.forEach(card => {
+                card.style.filter = 'none';
+                card.style.opacity = '1';
+                card.style.transform = 'scale(1)';
+                card.style.zIndex = '1';
+            });
+        });
+    }
+
+    // D. Gestión de Navegación por Clic (Sincronizada con Header Aura)
     document.addEventListener('click', (e) => {
-        // A. Al hacer clic en una tarjeta de categoría
         const catBtn = e.target.closest('.card-category-btn');
+        const headerTitle = document.getElementById('header-aura-title'); // Sincronización con Header Aura
+        const globalBackBtn = document.getElementById('btn-global-back');
+        const brandLogo = document.getElementById('header-logo-brand');
+
+        // 1. Entrada a Categoría
         if (catBtn) {
             const selectedCategory = catBtn.dataset.category;
+            
             document.getElementById('view-categories').style.display = 'none';
             document.getElementById('view-lobby').style.display = 'block';
+            
+            // FEEDBACK VISUAL: Ocultamos logo para dar prioridad al título en navegación profunda
+            if (brandLogo) brandLogo.style.display = 'none';
+            if (headerTitle) {
+                headerTitle.innerText = `PROGRAMAS: ${selectedCategory.toUpperCase()}`;
+                headerTitle.style.opacity = "1";
+            }
+            if (globalBackBtn) globalBackBtn.style.display = 'block';
+
             renderLobby(selectedCategory);
             window.scrollTo({ top: 0, behavior: 'smooth' });
         }
 
-        // B. Al hacer clic en el botón de "Volver a Pilares"
-        if (e.target.closest('#btn-back-to-categories')) {
-            document.getElementById('view-lobby').style.display = 'none';
-            document.getElementById('view-categories').style.display = 'block';
-            window.scrollTo({ top: 0, behavior: 'smooth' });
+        // 2. Lógica de Retroceso Dinámico (Lobby -> Categorías)
+        const isBackToCats = e.target.closest('#btn-back-to-categories') || e.target.closest('#btn-global-back');
+        if (isBackToCats) {
+            // Solo ejecutamos este retroceso si el usuario está viendo el Lobby de cursos
+            const viewLobby = document.getElementById('view-lobby');
+            if (viewLobby && viewLobby.style.display === 'block') {
+                viewLobby.style.display = 'none';
+                document.getElementById('view-categories').style.display = 'block';
+                
+                // RESET DE INTERFAZ: Restauramos logo y título base
+                if (brandLogo) brandLogo.style.display = 'flex';
+                if (headerTitle) headerTitle.innerText = 'Academia Dreams';
+                if (globalBackBtn) globalBackBtn.style.display = 'none';
+                
+                window.scrollTo({ top: 0, behavior: 'smooth' });
+            }
         }
     });
 
@@ -250,32 +374,41 @@ document.addEventListener('DOMContentLoaded', () => {
     // --- MOTOR DE CONTROL DE BURBUJAS (PERSISTENCIA TOTAL) ---
     const toggleBubble = (elementId, forceState = null) => {
         const el = document.getElementById(elementId);
+        const learningArea = document.getElementById('learning-content-area');
         if (!el) return;
 
-        // Si forceState es true -> Quitar 'podcast-hidden' (Mostrar)
-        // Si forceState es false -> Poner 'podcast-hidden' (Ocultar)
-        const shouldHide = forceState !== null ? !forceState : !el.classList.contains('podcast-hidden');
+        // Determinamos si el objetivo es MOSTRAR (isOpening)
+        const isOpening = forceState !== null ? forceState : el.classList.contains('podcast-hidden');
         
-        if (shouldHide) {
-            el.classList.add('podcast-hidden');
-            // Seguridad: Al ocultar la burbuja, pausamos el video de Firebase por si seguía sonando
-            if (elementId === 'video-tutorial') {
-                document.getElementById('tutorial-video')?.pause();
-            }
-        } else {
+        if (isOpening) {
+            // 1. EXCLUSIVIDAD: Cerramos otras burbujas activas para evitar que se amontonen
+            ['podcast-player', 'video-tutorial'].forEach(id => {
+                if (id !== elementId) document.getElementById(id)?.classList.add('podcast-hidden');
+            });
+
+            // 2. ACTIVACIÓN Y DESENFOQUE: Mostramos recurso y desenfocamos el fondo (Fase Cinema)
             el.classList.remove('podcast-hidden');
+            if (learningArea) {
+                learningArea.style.filter = 'blur(10px) brightness(0.9)';
+                learningArea.style.transition = 'filter 0.4s ease';
+                learningArea.style.pointerEvents = 'none'; // Evita clics en el fondo mientras la burbuja está activa
+            }
             
-            // Inteligencia de Reproducción: Detectamos cuál reproductor está activo
             if (elementId === 'video-tutorial') {
                 const video = document.getElementById('tutorial-video');
-                
-                // Si el video de Firebase es el que está visible, le damos Play automáticamente
                 if (video && window.getComputedStyle(video).display !== 'none') {
-                    video.play().catch(() => console.log("Interacción requerida para reproducir"));
-                    video.volume = 0.4; 
+                    video.play().catch(() => {});
+                    video.volume = 0.4;
                 }
-                // Nota: Los iframes de YouTube se gestionan solos o por interacción del usuario
             }
+        } else {
+            // 3. CIERRE Y NITIDEZ: Ocultamos recurso y restauramos la visibilidad del fondo
+            el.classList.add('podcast-hidden');
+            if (learningArea) {
+                learningArea.style.filter = 'none';
+                learningArea.style.pointerEvents = 'auto';
+            }
+            if (elementId === 'video-tutorial') document.getElementById('tutorial-video')?.pause();
         }
     };
 
@@ -329,34 +462,7 @@ document.addEventListener('DOMContentLoaded', () => {
     // Listener para el botón de cierre del podcast (Mantiene compatibilidad)
     document.getElementById('btn-close-podcast')?.addEventListener('click', () => toggleBubble('podcast-player', false));
 
-    // --- LÓGICA DE LA BURBUJA DE PROPÓSITO UNIVERSAL (DINÁMICA - FASE 3) ---
-    const showPurpose = (courseId) => {
-        const course = COURSES_CONFIG.find(c => c.id === courseId);
-        if (!course) return;
-
-        const overlay = document.getElementById('purpose-overlay-universal');
-        const titleEl = document.getElementById('universal-purpose-title');
-        const contentEl = document.getElementById('universal-purpose-content');
-
-        if (overlay && titleEl && contentEl) {
-            // Inyectamos la data de Firestore en el cascarón HTML
-            titleEl.innerText = course.purposeTitle || "Propósito del Programa";
-            contentEl.innerHTML = course.purposeDesc || course.description;
-            overlay.classList.add('active');
-        }
-    };
-
-    // Listener único para cerrar la burbuja universal
-    document.getElementById('btn-close-purpose-universal')?.addEventListener('click', () => {
-        document.getElementById('purpose-overlay-universal').classList.remove('active');
-    });
-
-    // Cerrar al hacer clic fuera del contenido (en el fondo oscuro)
-    document.getElementById('purpose-overlay-universal')?.addEventListener('click', (e) => {
-        if (e.target.id === 'purpose-overlay-universal') {
-            e.target.classList.remove('active');
-        }
-    });
+    // Trazabilidad: Lógica de Propósito Universal removida.
 
     // 2. DELEGACIÓN DE EVENTOS (OPTIMIZADA): El vigilante del Lobby
     const lobbyContainer = document.getElementById('course-lobby');
@@ -370,9 +476,7 @@ document.addEventListener('DOMContentLoaded', () => {
             if (action === 'open') {
                 startModule(id);
             }
-            else if (action === 'purpose') {
-                showPurpose(id);
-            }
+            // Trazabilidad: Acción 'purpose' eliminada por definición de producto.
             else if (action === 'buy') {
                 const course = COURSES_CONFIG.find(c => c.id === id);
                 const user = auth.currentUser;
@@ -394,11 +498,12 @@ document.addEventListener('DOMContentLoaded', () => {
                       .catch(err => console.error("🚨 Fallo en despacho automático:", err));
                 }
 
-                // 2. INTERFAZ: Activación de la pasarela visual
+                // 2. INTERFAZ: Activación de la pasarela visual (Dinamizada con Precio Firestore)
                 window.dispatchEvent(new CustomEvent('OPEN_SHOPPING_CART', { 
                     detail: { 
                         courseId: id,
-                        courseTitle: course?.title || 'Programa de Crecimiento'
+                        courseTitle: course?.title || 'Programa de Crecimiento',
+                        coursePrice: course?.price || 0 // Trazabilidad de Inversión
                     } 
                 }));
             }
@@ -581,10 +686,16 @@ document.addEventListener('DOMContentLoaded', () => {
             const currentModality = courseConfig.modality;
 
             // 3. ACTIVACIÓN DEL PANEL DE SESIONES (NUEVO FLUJO INTERMEDIO)
-            // En lugar de ir al contenido, mostramos el selector de sesiones
             const sessionSelector = document.getElementById('view-session-selector');
             if (sessionSelector) {
                 sessionSelector.style.display = 'block';
+
+                // SINCRONIZACIÓN DE HEADER AURA: Título del Programa
+                const headerTitle = document.getElementById('header-aura-title');
+                if (headerTitle) {
+                    headerTitle.innerText = courseConfig.title.toUpperCase();
+                }
+
                 // Pintamos las 3 tarjetas (A, B, C) con la info del curso seleccionado
                 renderSessions(courseConfig);
             }
@@ -633,6 +744,21 @@ document.addEventListener('DOMContentLoaded', () => {
                 </div>
             </article>
         `).join('');
+
+        // --- MOTOR DE ENTRADA ESCALONADA (SESIONES PRESTIGE) ---
+        setTimeout(() => {
+            const sessionCards = sessionList.querySelectorAll('.card');
+            sessionCards.forEach((card, i) => {
+                card.style.opacity = '0';
+                card.style.transform = 'translateY(20px)';
+                card.style.transition = `all 0.6s cubic-bezier(0.23, 1, 0.32, 1) ${i * 0.15}s`;
+                
+                requestAnimationFrame(() => {
+                    card.style.opacity = '1';
+                    card.style.transform = 'translateY(0)';
+                });
+            });
+        }, 50);
     };
 
     // 5. ESCUCHADOR PARA VOLVER AL LOBBY DESDE SESIONES
@@ -718,15 +844,7 @@ document.addEventListener('DOMContentLoaded', () => {
                     } else { btnZoom.style.display = 'none'; }
                 }
 
-                // 4. Propósito Dinámico
-                window.showPurpose = (id) => {
-                    const overlay = document.getElementById('purpose-overlay-universal');
-                    if (overlay && courseConfig.id === id) {
-                        document.getElementById('universal-purpose-title').innerText = courseConfig.purposeTitle || "Visión Estratégica";
-                        document.getElementById('universal-purpose-content').innerHTML = courseConfig.purposeDesc || courseConfig.description;
-                        overlay.classList.add('active');
-                    }
-                };
+                // 4. Propósito Dinámico: Funcionalidad removida para optimizar el flujo de carga.
             }
 
             // --- RECONEXIÓN MULTIMEDIA ---
@@ -737,8 +855,11 @@ document.addEventListener('DOMContentLoaded', () => {
                 const audioElement = document.getElementById('audio-element');
                 const videoElement = document.getElementById('tutorial-video');
 
-                if (podcastPlayer) podcastPlayer.style.display = 'block';
-                if (audioElement) audioElement.volume = 0.3;
+                // Sincronización Silenciosa: Preparamos los recursos sin forzar su despliegue visual
+                if (audioElement) {
+                    audioElement.volume = 0.3;
+                    audioElement.pause(); // Seguridad: Evita que el audio inicie sin interacción
+                }
 
                 if (currentSessionData.multimedia.playlist && selector) {
                     selector.innerHTML = '';
@@ -879,25 +1000,69 @@ document.addEventListener('DOMContentLoaded', () => {
  * Escucha el evento de compra y prepara la pasarela.
  */
 window.addEventListener('OPEN_SHOPPING_CART', (e) => {
-    const { courseId, courseTitle } = e.detail;
+    const { courseId, courseTitle, coursePrice } = e.detail;
     const overlay = document.getElementById('cart-overlay');
     const titleEl = document.getElementById('cart-course-title');
+    const priceEl = document.getElementById('cart-course-price'); // Nueva vinculación
     const btnPay = document.getElementById('btn-proceed-to-payment');
 
     if (overlay && titleEl) {
         titleEl.innerText = courseTitle;
+        if (priceEl) priceEl.innerText = `$${coursePrice.toLocaleString('es-MX', {minimumFractionDigits: 2})} MXN`;
+        
         overlay.style.display = 'flex';
         overlay.classList.add('active');
 
-        btnPay.onclick = () => {
-            console.log(`🚀 Redirigiendo a pasarela para el curso: ${courseId}`);
-            ejecutarProcesoDePago(courseId);
+        // Vinculación Quirúrgica: Evitamos múltiples listeners al abrir/cerrar el carrito
+        btnPay.onclick = async (e) => {
+            e.preventDefault();
+            console.log(`🚀 Dreams Sales: Iniciando protocolo de pago para ${courseId}`);
+            await ejecutarProcesoDePago(courseId);
         };
     }
 });
 
-function ejecutarProcesoDePago(courseId) {
-    alert(`Iniciando checkout para el ID: ${courseId}. (Aquí conectaremos tu pasarela de pago actual)`);
+async function ejecutarProcesoDePago(courseId) {
+    const user = auth.currentUser;
+    if (!user) {
+        alert("Por favor, inicia sesión para continuar con la compra.");
+        return;
+    }
+
+    const btnPay = document.getElementById('btn-proceed-to-payment');
+    const originalText = btnPay.innerText;
+    
+    try {
+        btnPay.disabled = true;
+        btnPay.innerText = "⏳ GENERANDO LINK DE PAGO...";
+
+        // LLAMADA AL PROXY SEGURO (Punto 2 del Roadmap)
+        const response = await fetch('/.netlify/functions/create-xpertpay-link', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+                courseId: courseId,
+                uid: user.uid,
+                email: user.email,
+                displayName: user.displayName
+            })
+        });
+
+        const data = await response.json();
+
+        if (data.url) {
+            console.log("🚀 Redirigiendo a XpertPay...");
+            window.location.href = data.url; // Redirección determinística a la pasarela
+        } else {
+            throw new Error(data.error || "No se pudo generar el link de pago.");
+        }
+
+    } catch (error) {
+        console.error("🚨 Error en Checkout:", error);
+        alert("Hubo un problema al conectar con la pasarela. Intenta de nuevo.");
+        btnPay.disabled = false;
+        btnPay.innerText = originalText;
+    }
 }
 
 document.getElementById('btn-close-cart')?.addEventListener('click', () => {

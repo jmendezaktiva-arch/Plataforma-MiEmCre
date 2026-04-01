@@ -1,5 +1,5 @@
 /**public/src/consultoria/consultoria.js
- * DREAMS PLATFORM | Consultoría Prestige Controller
+ * Mi Empresa Crece PLATFORM | Consultoría Prestige Controller
  * Objetivo: Gestionar la oferta de servicios y la activación del Consultor IA.
  */
 import { db, auth, collection, getDocs, query, where, checkAccess, doc, getDoc, setDoc } from '../shared/firebase-config.js';
@@ -9,6 +9,9 @@ let USER_STRATEGIC_CONTEXT = {}; // Trazabilidad: Almacén del ADN empresarial
 
 document.addEventListener('DOMContentLoaded', async () => {
     const productsContainer = document.getElementById('consulting-cards-container');
+    // 1. Referencia al Header Aura (Sincronización Prestige)
+    const auraTitle = document.getElementById('header-aura-title');
+    // Nota: La identidad visual ya reside de forma estable en el HTML para evitar parpadeos.
 
     /**
      * MOTOR DE CARGA: Sincronización con config_consultoria
@@ -79,45 +82,34 @@ document.addEventListener('DOMContentLoaded', async () => {
             }).join('');
 
             return `
-            <section class="card-recurso" style="grid-row: span 2; display: flex; flex-direction: column; justify-content: space-between; background: #fff; border: 1px solid rgba(15, 52, 96, 0.08); padding: 25px; border-radius: 16px; position: relative; overflow: hidden; height: 100%; box-sizing: border-box;">
-                <div style="position: absolute; top: 0; left: 0; width: 100%; height: 4px; background: var(--primary-midnight); opacity: 0.1;"></div>
-                <div style="overflow-y: hidden; display: flex; flex-direction: column; flex-grow: 1;">
-                    <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 15px;">
-                        <div style="flex: 1;">
-                            <h4 style="margin: 0; color: var(--primary-midnight); font-size: 1.1rem; font-weight: 700;">${service.title}</h4>
-                            <span style="color: var(--accent-gold); font-size: 0.65rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px;">Servicio Estratégico Especializado</span>
-                        </div>
-                        <div style="text-align: right; margin-left: 15px;">
-                            <span style="display: block; font-size: 0.6rem; color: #999; font-weight: 700; text-transform: uppercase;">Inversión:</span>
-                            <span style="font-weight: 800; color: var(--primary-midnight); font-size: 1.25rem;">
-                                $${(service.price || 0).toLocaleString('es-MX', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+            <section class="card bento-item glass-card bento-kpi-card animate-fade-in">
+                <div class="card-content" style="display: flex; flex-direction: column; height: 100%; width: 100%;">
+                    <header class="card-header-app" style="margin-bottom: 20px;">
+                        <span class="card-category" style="color: var(--accent-gold); display: block; margin-bottom: 5px; font-size: var(--font-size-label); font-weight: 700;">Servicio Especializado</span>
+                        <h3 style="color: var(--primary-midnight); margin: 0; font-size: var(--font-size-h3); font-weight: 700;">${service.title}</h3>
+                        <div style="margin-top: 10px;">
+                            <span style="font-size: var(--font-size-label); font-weight: 800; color: var(--primary-midnight);">
+                                Inversión: $${(service.price || 0).toLocaleString('es-MX', { minimumFractionDigits: 2 })} MXN
                             </span>
                         </div>
-                    </div>
+                    </header>
                     
-                    <div style="flex-grow: 1; margin-bottom: 20px;">
-                        <p style="font-size: 0.85rem; color: #666; line-height: 1.6; display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical; overflow: hidden; text-overflow: ellipsis;">
+                    <div class="card-body" style="flex-grow: 1; margin-bottom: 25px;">
+                        <p style="font-size: var(--font-size-body); line-height: 1.7; color: var(--text-color); font-weight: 400;">
                             ${service.description}
                         </p>
-                        <span style="font-size: 0.7rem; color: var(--accent-gold); font-weight: 600; text-transform: uppercase; letter-spacing: 0.5px; display: block; margin-top: 8px;">
-                            + Ver detalles y promesa de valor
-                        </span>
+                        <button class="btn-open-service-modal" data-id="${service.id}" 
+                                style="background: none; border: none; color: var(--accent-gold); font-size: var(--font-size-label); font-weight: 700; cursor: pointer; padding: 0; text-transform: uppercase; letter-spacing: 1px;">
+                            + Ver Roadmap Estratégico
+                        </button>
                     </div>
-                    
-                    <button class="btn-open-service-modal" 
-                            data-id="${service.id}"
-                            style="width: 100%; background: rgba(15, 52, 96, 0.03); border: 1px solid var(--accent-gold); padding: 12px; border-radius: 8px; color: var(--primary-midnight); font-size: 0.7rem; font-weight: 800; text-transform: uppercase; letter-spacing: 1px; cursor: pointer; margin-bottom: 15px; transition: all 0.3s ease; display: flex; justify-content: center; align-items: center; gap: 8px;">
-                        <span>Explorar Roadmap Estratégico</span>
-                        <span style="font-size: 1.1rem; line-height: 1;">⊕</span>
-                    </button>
-                </div>
 
-                <button class="btn-primary" 
-                        data-action="request" 
-                        data-id="${service.id}"
-                        style="width: 100%; margin-top: 10px; padding: 14px; font-size: 0.75rem; font-weight: 700; background: var(--primary-midnight); color: #fff; border-radius: 8px; flex-shrink: 0;">
-                    SOLICITAR INTERVENCIÓN
-                </button>
+                    <footer class="card-footer-app" style="margin-top: auto;">
+                        <button class="btn-primary" data-action="request" data-id="${service.id}" style="font-size: var(--font-size-button); padding: 16px;">
+                            SOLICITAR INTERVENCIÓN
+                        </button>
+                    </footer>
+                </div>
             </section>`;
         }).join('');
     };
@@ -131,14 +123,24 @@ document.addEventListener('DOMContentLoaded', async () => {
      */
     const syncIAAccess = async () => {
         const btnIA = document.getElementById('btn-ia-consultant');
+        const auraActions = document.getElementById('header-aura-actions'); // Conexión directa con la Zona de Acción del Header Aura
+        
         if (!btnIA) return;
 
         const hasIA = await checkAccess('consultor', 'ia-expert');
 
         if (hasIA) {
+            // 1. Sincronización en el Cuerpo (Tarjeta)
             btnIA.innerText = "INICIAR CONVERSACIÓN";
             btnIA.style.opacity = "1";
             btnIA.onclick = () => window.startIAConsultant();
+
+            // 2. Sincronización en Header Aura (Solo lógica, no HTML)
+            const navBtnIA = document.getElementById('btn-nav-ia');
+            if (navBtnIA) {
+                navBtnIA.onclick = () => window.startIAConsultant();
+                navBtnIA.style.borderColor = "var(--secondary-color)"; // Verde de éxito si ya tiene acceso
+            }
         } else {
             btnIA.innerText = "SOLICITAR ACCESO";
             btnIA.onclick = async (e) => {
@@ -345,110 +347,25 @@ document.addEventListener('DOMContentLoaded', async () => {
             notificarIntervencion();
         }
     });
+
+    /**
+     * REDIRECCIONAMIENTO DE RESILIENCIA (DREAMS CORE)
+     * Detecta si el socio llega desde otro módulo con la intención de consultar a la IA.
+     */
+    const detectExternalIntent = () => {
+        const urlParams = new URLSearchParams(window.location.search);
+        if (urlParams.get('action') === 'startIA') {
+            setTimeout(() => {
+                console.log("🎯 Dreams Resilience: Detectada intención de IA externa. Ejecutando handshake...");
+                if (typeof window.startIAConsultant === 'function') {
+                    window.startIAConsultant();
+                }
+            }, 800);
+        }
+    };
+
+    detectExternalIntent();
 });
 
-/**
- * MOTOR DE INTELIGENCIA ESTRATÉGICA (IA PRESTIGE)
- * Objetivo: Orquestar la comunicación entre el expediente del usuario y Gemini.
- */
-window.startIAConsultant = async () => {
-    const chatContainer = document.getElementById('ai-chat-container');
-    const chatMessages = document.getElementById('ai-chat-messages');
-    const user = auth.currentUser;
-    
-    chatContainer.style.display = 'flex';
-
-    if (!user) return;
-
-    try {
-        // 1. MOTOR DE EXTRACCIÓN: Recuperamos Perfil y Workbooks
-        const loadingMsg = document.createElement('div');
-        loadingMsg.id = 'ai-loading-dna';
-        loadingMsg.style.cssText = "font-size: 0.7rem; color: var(--accent-gold); font-style: italic; margin-bottom: 15px;";
-        loadingMsg.innerText = "Sincronizando expediente estratégico...";
-        chatMessages.appendChild(loadingMsg);
-
-        // A. Obtenemos datos de perfil (Nombre, Empresa, Rol)
-        const profileSnap = await getDoc(doc(db, "usuarios", user.uid));
-        const profileData = profileSnap.exists() ? profileSnap.data() : {};
-
-        // B. Obtenemos todas las respuestas de sus workbooks
-        const workbooksSnap = await getDocs(collection(db, "usuarios", user.uid, "progreso_workbooks"));
-        const workbookData = {};
-        workbooksSnap.forEach(doc => {
-            workbookData[doc.id] = doc.data();
-        });
-
-        // 2. MOTOR DE IDENTIDAD: Cargamos el ADN institucional (JSON)
-        const dnaResponse = await fetch('../shared/cultura-dna.json');
-        const dnaData = await dnaResponse.json();
-
-        // 3. CONSOLIDACIÓN DE CONTEXTO: Fusionamos ADN Cultural + ADN Empresarial
-        USER_STRATEGIC_CONTEXT = {
-            usuario: {
-                nombre: profileData.nombre || "Líder ME Crece",
-                empresa: profileData.empresa || "Empresa en Crecimiento",
-                diagnosticos: workbookData
-            },
-            culturaInstitucional: dnaData // El Consultor IA ahora "bebe" de tu fuente de verdad
-        };
-
-        loadingMsg.innerText = `✅ ADN de ${USER_STRATEGIC_CONTEXT.empresa} sincronizado.`;
-        setTimeout(() => loadingMsg.remove(), 2000);
-
-    } catch (error) {
-        console.error("🚨 Error al sincronizar contexto IA:", error);
-    }
-};
-
-// --- ESCUCHADOR DE MENSAJES DEL CHAT ---
-document.getElementById('ai-chat-form')?.addEventListener('submit', async (e) => {
-    e.preventDefault();
-    const input = document.getElementById('ai-user-input');
-    const chatMessages = document.getElementById('ai-chat-messages');
-    const userMessage = input.value.trim();
-
-    if (!userMessage) return;
-
-    // A. Renderizado del Mensaje del Usuario (Estilo Fino)
-    const userBubble = `
-        <div style="align-self: flex-end; background: var(--primary-midnight); color: white; padding: 12px 18px; border-radius: 18px 0 18px 18px; font-size: 0.85rem; max-width: 80%; box-shadow: 0 4px 15px rgba(15, 52, 96, 0.1);">
-            ${userMessage}
-        </div>
-    `;
-    chatMessages.insertAdjacentHTML('beforeend', userBubble);
-    input.value = '';
-    chatMessages.scrollTop = chatMessages.scrollHeight;
-
-    // B. Handshake Seguro con Netlify Function
-    try {
-        // Indicador de "IA escribiendo..."
-        const typingId = 'ai-typing-' + Date.now();
-        chatMessages.insertAdjacentHTML('beforeend', `<div id="${typingId}" style="font-size: 0.7rem; color: var(--accent-gold); font-style: italic; margin-bottom: 15px;">El Consultor está analizando...</div>`);
-        chatMessages.scrollTop = chatMessages.scrollHeight;
-
-        const response = await fetch('/.netlify/functions/consultor-ia', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({
-                prompt: userMessage,
-                userContext: USER_STRATEGIC_CONTEXT
-            })
-        });
-
-        const data = await response.json();
-        document.getElementById(typingId).remove(); // Quitamos el indicador
-
-        // C. Renderizado de la respuesta Prestige
-        const aiBubble = `
-            <div style="align-self: flex-start; background: rgba(15, 52, 96, 0.05); padding: 15px 20px; border-radius: 0 18px 18px 18px; color: var(--primary-midnight); max-width: 85%; font-size: 0.85rem; border: 0.5px solid rgba(15, 52, 96, 0.1);">
-                ${data.text}
-            </div>
-        `;
-        chatMessages.insertAdjacentHTML('beforeend', aiBubble);
-        chatMessages.scrollTop = chatMessages.scrollHeight;
-
-    } catch (error) {
-        console.error("🚨 Error de conexión IA:", error);
-    }
-});
+// TRACEABILIDAD: El motor IA ha sido migrado al SidebarPrestige para permitir consultas cross-module.
+// El controlador local ahora solo gestiona la oferta de servicios staff y el estado del acceso.

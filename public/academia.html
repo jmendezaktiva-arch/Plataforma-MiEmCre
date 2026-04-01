@@ -35,21 +35,36 @@
 <body>
     <div id="app">
         <header class="navbar">
-    <div class="nav-left" style="width: 180px;">
-        </div>
+            <div class="nav-left">
+                <button class="btn-nav-back" id="btn-global-back" style="display: none; margin-right: 15px;">
+                    ← VOLVER
+                </button>
+                <div id="header-logo-brand" style="display: flex; align-items: center; gap: 8px;">
+                    <span style="color: var(--primary-midnight); font-weight: 800; font-size: 0.7rem; letter-spacing: 2px; text-transform: uppercase;">Dreams</span>
+                    <span style="color: var(--accent-gold); font-weight: 400; font-size: 0.7rem; letter-spacing: 2px; text-transform: uppercase;">Platform</span>
+                </div>
+            </div>
 
-    <div class="logo-container">
-        <img id="main-logo" data-asset="logo.png" alt="Dreams Logo" class="logo-header opacity-0 transition-opacity duration-300">
-    </div>
+            <div class="nav-center">
+                <h1 id="header-aura-title" style="color: var(--primary-midnight); font-weight: 700; font-size: 0.65rem; letter-spacing: 2px; text-transform: uppercase; margin: 0; opacity: 0.8;">
+                    Academia Dreams
+                </h1>
+            </div>
 
-    <div class="contact-container" style="width: 180px; display: flex; justify-content: flex-end;">
-        <button id="btn-open-contact" class="btn-contact-trigger" title="Asistencia y Soporte">
-            <span class="btn-text">Asistencia</span> ✉️
-        </button>
-    </div>
-</header>
+            <div id="header-aura-actions" class="nav-right">
+                <button id="btn-nav-ia" class="nav-btn-prestige" title="Consultoría IA">
+                    <span class="icon">✨</span>
+                </button>
+                <button id="btn-nav-search" class="nav-btn-prestige" title="Buscador">
+                    <span class="icon">🔍</span>
+                </button>
+                <button id="btn-nav-support" class="nav-btn-prestige" title="Soporte Técnico">
+                    <span class="icon">✉️</span>
+                </button>
+            </div>
+        </header>
 
-       <main class="container" style="max-width: 1400px; margin: 40px auto; padding: 0 20px;">
+       <main class="main-content container">
             
             <div id="view-categories" style="display: block; animation: fadeIn 0.5s ease-out;">
                 <header class="section-header" style="margin-bottom: 50px; text-align: center;">
@@ -57,36 +72,36 @@
                     <p style="max-width: 800px; margin: 15px auto 0;">Selecciona el área estratégica que deseas fortalecer para visualizar los programas disponibles.</p>
                 </header>
 
-                <div id="category-grid" style="margin-top: 30px; display: flex; flex-wrap: wrap; justify-content: center; gap: 25px; max-width: 1100px; margin-left: auto; margin-right: auto;">
+                <div id="category-grid" style="margin-top: 30px; display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 20px; max-width: 1200px; margin: 30px auto;">
                     
-                    <section class="card-recurso card-category-btn" data-category="Dirección" style="flex: 0 1 320px; display: flex; flex-direction: column; cursor: pointer;">
+                    <section class="card-recurso glass-card card-category-btn" data-category="Dirección" style="cursor: pointer;">
                         <h3>1. Dirección</h3>
                         <p>Estrategia corporativa y visión de alto nivel para el crecimiento sostenible.</p>
-                        <button class="btn-primary" style="margin-top: auto; pointer-events: none;">SELECCIONAR ÁREA</button>
+                        <button class="btn-primary" style="pointer-events: none;">SELECCIONAR ÁREA</button>
                     </section>
 
-                    <section class="card-recurso card-category-btn" data-category="Productividad" style="flex: 0 1 320px; display: flex; flex-direction: column; cursor: pointer;">
-                        <h3>2. Productividad y mejora</h3>
-                        <p>Optimización de procesos y eficiencia operativa en cada eslabón del negocio.</p>
-                        <button class="btn-primary" style="margin-top: auto; pointer-events: none;">SELECCIONAR ÁREA</button>
+                    <section class="card-recurso glass-card card-category-btn" data-category="Productividad" style="cursor: pointer;">
+                        <h3>2. Productividad</h3>
+                        <p>Optimización de procesos y eficiencia operativa en el negocio.</p>
+                        <button class="btn-primary" style="pointer-events: none;">SELECCIONAR ÁREA</button>
                     </section>
 
-                    <section class="card-recurso card-category-btn" data-category="Liderazgo" style="flex: 0 1 320px; display: flex; flex-direction: column; cursor: pointer;">
-                        <h3>3. Liderazgo y gestión del talento</h3>
-                        <p>Desarrollo de habilidades directivas y formación de equipos proactivos.</p>
-                        <button class="btn-primary" style="margin-top: auto; pointer-events: none;">SELECCIONAR ÁREA</button>
+                    <section class="card-recurso glass-card card-category-btn" data-category="Liderazgo" style="cursor: pointer;">
+                        <h3>3. Liderazgo</h3>
+                        <p>Desarrollo de habilidades directivas y formación de equipos.</p>
+                        <button class="btn-primary" style="pointer-events: none;">SELECCIONAR ÁREA</button>
                     </section>
 
-                    <section class="card-recurso card-category-btn" data-category="Comercial" style="flex: 0 1 320px; display: flex; flex-direction: column; cursor: pointer;">
-                        <h3>4. Gestión comercial y atención al cliente</h3>
-                        <p>Estrategias de venta y fidelización para maximizar el valor del cliente.</p>
-                        <button class="btn-primary" style="margin-top: auto; pointer-events: none;">SELECCIONAR ÁREA</button>
+                    <section class="card-recurso glass-card card-category-btn" data-category="Comercial" style="cursor: pointer;">
+                        <h3>4. Comercial</h3>
+                        <p>Estrategias de venta y fidelización de clientes.</p>
+                        <button class="btn-primary" style="pointer-events: none;">SELECCIONAR ÁREA</button>
                     </section>
 
-                    <section class="card-recurso card-category-btn" data-category="Generales" style="flex: 0 1 320px; display: flex; flex-direction: column; cursor: pointer;">
+                    <section class="card-recurso glass-card card-category-btn" data-category="Generales" style="cursor: pointer;">
                         <h3>5. Generales</h3>
-                        <p>Programas transversales y de inducción al ecosistema Dreams.</p>
-                        <button class="btn-primary" style="margin-top: auto; pointer-events: none;">SELECCIONAR ÁREA</button>
+                        <p>Programas transversales y de inducción al ecosistema.</p>
+                        <button class="btn-primary" style="pointer-events: none;">SELECCIONAR ÁREA</button>
                     </section>
                 </div>
             </div>
@@ -158,7 +173,7 @@
             <div style="background: rgba(255, 255, 255, 0.7); backdrop-filter: blur(25px); -webkit-backdrop-filter: blur(25px); border-radius: 40px; padding: 60px 40px; border: 1px solid rgba(255, 255, 255, 0.5); box-shadow: 0 30px 60px rgba(15, 52, 96, 0.1); text-align: center;">
                 
                 <header style="margin-bottom: 40px;">
-                    <span style="color: var(--accent-gold); font-weight: 700; text-transform: uppercase; letter-spacing: 4px; display: block; margin-bottom: 12px;">Experiencia Elevada</span>
+                    <span style="color: var(--accent-gold); font-weight: 700; text-transform: uppercase; letter-spacing: 4px; display: block; margin-bottom: 12px;">Experiencia Mi Empresa Crece</span>
                     <h2 style="letter-spacing: -1px; line-height: 1.2;">HERRAMIENTAS DE ALTO IMPACTO</h2>
                     <p style="max-width: 850px; margin-left: auto; margin-right: auto;">Para mejorar tu experiencia durante el curso hemos diseñado estos recursos estratégicos para transformar tu gestión empresarial.</p>
                 </header>
@@ -258,23 +273,6 @@
                 </div>
             </div>
 
-            <div id="view-workbook" style="display: none; height: 90vh;">
-                <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 15px;">
-                    <div style="display: flex; justify-content: space-between; align-items: center; width: 100%;">
-                        <div>
-                            <button id="btn-back-to-lobby" style="background: none; border: none; color: var(--primary-color); cursor: pointer; font-weight: 600; font-size: 0.9rem;">← VOLVER AL CURSO</button>
-                            <br>
-                            <span id="status-message" style="font-size: 0.75rem; color: #999; margin-left: 5px;"></span>
-                        </div>
-                        <button class="btn-contact-trigger" title="Soporte técnico" style="background: none; border: 1px solid var(--accent-gold); color: var(--primary-midnight); padding: 8px 15px; border-radius: 8px; font-size: 0.65rem; font-weight: 600; cursor: pointer; display: flex; align-items: center; gap: 5px;">
-                            AYUDA ✉️
-                        </button>
-                    </div>
-                    
-                </div>
-                
-                <iframe id="workbook-iframe" src="" style="width: 100%; height: 100%; border: none; border-radius: 16px; box-shadow: 0 10px 30px rgba(0,0,0,0.1);"></iframe>
-            </div>
         </main>
 
         <div id="podcast-player" class="podcast-hidden" style="position: fixed; bottom: 20px; right: 20px; background: #fff; padding: 15px; border-radius: 12px; box-shadow: 0 10px 30px rgba(0,0,0,0.15); z-index: 1000; width: 300px; border: 1px solid #eee;">
@@ -318,7 +316,7 @@
                 CONFIRMAR Y PAGAR
             </button>
             
-            <p style="font-size: 0.7rem; color: #999; margin-top: 15px;">💳 Pago seguro procesado por Dreams Platform</p>
+            <p style="font-size: 0.7rem; color: #999; margin-top: 15px;">💳 Pago seguro procesado por Mi Empresa Crece Platform</p>
         </div>
     </div>
 

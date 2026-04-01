@@ -9,18 +9,23 @@
     top: 0;
     height: 100vh;
     width: 260px;
-    /* TRACEABILIDAD: Incremento de Z-index para superar capas de Liquid Glass y Navbar */
+    /* TRACEABILIDAD: Blindaje de capa superior sobre Navbar (1000) y Cards */
     z-index: 9999 !important; 
-    display: block !important;
-    background: rgba(15, 52, 96, 0.92); /* Midnight con transparencia */
-    backdrop-filter: blur(15px);        /* Liquid Glass effect */
-    border-right: 1.5px solid var(--accent-gold);
-    color: var(--bg-base);
-    z-index: 2000;
-    transition: transform 0.4s cubic-bezier(0.19, 1, 0.22, 1);
-    display: flex;
+    display: flex !important;
     flex-direction: column;
-    box-shadow: 10px 0 30px rgba(15, 52, 96, 0.15);
+    background: rgba(15, 52, 96, 0.95); /* Midnight con mayor opacidad para legibilidad */
+    backdrop-filter: blur(20px) saturate(180%); /* Enfoque profundo Prestige */
+    border-right: 2px solid var(--accent-gold);
+    color: var(--bg-base);
+    transition: transform 0.5s cubic-bezier(0.165, 0.84, 0.44, 1); /* Sincronizado con hover de cards */
+    box-shadow: 15px 0 45px rgba(0, 0, 0, 0.3); /* Sombra de profundidad real */
+}
+
+/* Blindaje de desplazamiento para el contenido principal */
+main, .main-content {
+    position: relative; /* Crea un nuevo contexto de apilamiento controlado */
+    z-index: 1; 
+    transition: margin-left 0.5s cubic-bezier(0.165, 0.84, 0.44, 1);
 }
 
 /* Estado oculto: Se deja una "Manija de Oro" de 8px visible para servir de disparador técnico y visual */
@@ -165,9 +170,10 @@
    Asegúrate de que tu contenido esté dentro de un <main> o clase similar.
 */
 /* --- NÚCLEO DE LAYOUT RESPONSIVO (DREAMS CORE) --- */
+/* SINCRONIZACIÓN GEOMÉTRICA: El margen ahora responde al Token Maestro */
 main, .main-content, .workbook-container {
-    margin-left: 260px;
-    width: calc(100% - 260px);
+    margin-left: var(--sidebar-width);
+    width: calc(100% - var(--sidebar-width));
     min-height: 100vh;
     transition: margin-left 0.4s cubic-bezier(0.19, 1, 0.22, 1), width 0.4s cubic-bezier(0.19, 1, 0.22, 1);
 }
@@ -177,18 +183,8 @@ main, .main-content, .workbook-container {
     main, .main-content, .workbook-container {
         margin-left: 0 !important;
         width: 100% !important;
-        padding: 0 15px; /* Respiro lateral para el contenido */
+        padding: 0 15px;
     }
-}
-
-/* ESTADO EXPANDIDO: Cuando el body detecta el colapso, 
-   el contenido ocupa el 100% menos los 8px de la Manija de Oro.
-*/
-body.sidebar-is-collapsed main, 
-body.sidebar-is-collapsed .main-content, 
-body.sidebar-is-collapsed .workbook-container {
-    margin-left: 8px; 
-    width: calc(100% - 8px);
 }
 
 /* --- COMPORTAMIENTO TÁCTIL (OVERLAY PRESTIGE) --- */

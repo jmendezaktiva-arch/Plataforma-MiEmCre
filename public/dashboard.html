@@ -10,57 +10,134 @@
 </head>
 <body>
     <div id="app">
-        <header class="navbar" style="padding: 12px 40px; border-bottom: 1px solid rgba(15, 52, 96, 0.08); display: flex; justify-content: space-between; align-items: center; background: rgba(255, 255, 255, 0.85); backdrop-filter: blur(12px); position: sticky; top: 0; z-index: 1000;">
-    <div style="width: 140px;" class="hidden md:block"></div> 
-    
-    <div class="logo-container">
-        <img id="main-logo" data-asset="logo.png" alt="Mi Empresa Crece" class="logo-header opacity-0 transition-opacity duration-300">
-    </div>
+        <header class="navbar">
+            <div class="nav-left">
+                <span style="color: var(--primary-midnight); font-weight: 800; font-size: 0.7rem; letter-spacing: 2px; text-transform: uppercase;">Dreams</span>
+                <span style="color: var(--accent-gold); font-weight: 400; font-size: 0.7rem; letter-spacing: 2px; text-transform: uppercase;">Platform</span>
+            </div>
 
-    <div class="nav-actions-container" style="width: 160px; display: flex; justify-content: flex-end; gap: 12px;">
-        <button id="btn-open-contact" title="Soporte" style="background: var(--primary-midnight); color: white; width: 42px; height: 42px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 1.1rem; border: 1px solid var(--accent-gold); cursor: pointer; transition: all 0.3s ease; box-shadow: 0 4px 12px rgba(15, 52, 96, 0.15);">
-            ✉️
-        </button>
-    </div>
-</header>
+            <div class="nav-center">
+                <h1 id="header-aura-title" style="color: var(--primary-midnight); font-weight: 700; font-size: 0.65rem; letter-spacing: 2px; text-transform: uppercase; margin: 0; opacity: 0.8;">
+                    Panel de Crecimiento
+                </h1>
+            </div>
+
+            <div class="nav-right" id="header-aura-actions">
+                <button id="btn-nav-ia" class="nav-btn-prestige" title="Consultoría IA">
+                    <span class="icon">✨</span>
+                </button>
+                <button id="btn-nav-search" class="nav-btn-prestige" title="Buscador">
+                    <span class="icon">🔍</span>
+                </button>
+                <button id="btn-nav-support" class="nav-btn-prestige" title="Soporte Técnico">
+                    <span class="icon">✉️</span>
+                </button>
+            </div>
+        </header>
 
         <main class="welcome-container">
-            <h2 style="color: var(--primary-midnight); font-weight: 700;">Panel de Crecimiento</h2>
-            <p style="color: #555; max-width: 800px; line-height: 1.6;">
-                <span id="user-display-name" style="font-weight: 600; color: var(--accent-gold); display: block; margin-bottom: 8px; font-size: 1.2rem; transition: opacity 0.5s ease;">Bienvenido...</span>
-                Bienvenido a tu centro de mando empresarial. Este ecosistema ha sido diseñado para evolucionar tu crecimiento con el de tu negocio. Selecciona el pilar en el que deseas trabajar hoy:
-            </p>
+            <div class="dashboard-section" id="welcome-section" style="margin-top: 20px;">
+                <h2 style="color: var(--primary-midnight); font-weight: 700;">Panel de Crecimiento</h2>
+                <div class="user-identity-header">
+                    <span id="user-display-name">Cargando identidad...</span>
+                    <p class="identity-subtitle">Gestiona tus activos, resultados y acelera el crecimiento ordenado y sotenido de tu empresa.</p>
+                </div>
+            </div>
+
+            <section class="quick-access-zone sticky-shelf">
+                <div class="split-operative-panel">
+                    
+                    <div class="operative-column">
+                        <h4 class="shelf-title">Mis Activos</h4>
+                        <div class="monitor-list">
+                            <div class="glass-card" data-product="app-crm" style="display: none;">
+                                <span class="app-icon-mini">📊</span>
+                                <div class="glass-card-info">
+                                    <span>CRM Ventas</span>
+                                    <span class="status-label">...</span>
+                                </div>
+                            </div>
+                            <div class="glass-card" data-product="app-erp" style="display: none;">
+                                <span class="app-icon-mini">💰</span>
+                                <div class="glass-card-info">
+                                    <span>ERP Finanzas</span>
+                                    <span class="status-label">...</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="operative-column ai-insights-zone">
+                        <h4 class="shelf-title ai-glow-text">Sugerencias IA</h4>
+                        <div class="ai-recommendation-feed">
+                            <div class="glass-card" data-product="app-process" style="display: none;">
+                                <span class="app-icon-mini">⚙️</span>
+                                <div class="glass-card-info">
+                                    <span>Process Designer</span>
+                                    <span class="status-label">...</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                </div>
+            </section>
             
-            <div class="grid-recursos" style="margin-top: 30px;">
-                <section class="card-recurso" style="display: flex; flex-direction: column;">
-                    <h3 style="color: var(--primary-midnight);">Academia</h3>
-                    <p style="font-size: 0.9rem; color: #666; line-height: 1.5;">Impulsa tu formación con acceso a materiales de cursos, programas y talleres (tanto gratuitos como de especialización) diseñados para fortalecer tu liderazgo y la resiliencia de tu empresa ante el mercado orientada al crecimiento continuo.</p>
-                    <button class="btn-primary" 
-                            onclick="window.location.href='academia.html'" 
-                            style="margin-top: auto; padding-top: 15px; font-size: 0.85rem; letter-spacing: 0.5px;">
-                        INGRESAR A CURSOS
-                    </button>
+            <div class="dashboard-section">
+                <h3 style="color: var(--primary-midnight); font-weight: 700; margin-bottom: 20px;">Tablero de Resultados</h3>
+                <div class="bento-grid">
+
+                <section class="bento-item bento-main bento-kpi-card">
+                    <span class="kpi-label">Salud Financiera</span>
+                    <h3 style="margin: 10px 0 5px 0;">Punto de Equilibrio</h3>
+                    <div class="kpi-value" id="kpi-balance-point">$0.00</div>
+                    <p style="font-size: 0.85rem; color: #666; margin-bottom: 20px;">Ventas necesarias para cubrir gastos fijos y operar sin pérdidas.</p>
+                    <div class="kpi-trend trend-up">↑ Calculado dinámicamente</div>
+                    <button class="btn-gold-sm" style="margin-top: auto; width: fit-content;" onclick="window.location.href='apps.html'">ANALIZAR ERP</button>
                 </section>
 
-                <section class="card-recurso" style="display: flex; flex-direction: column;">
-                    <h3 style="color: var(--primary-midnight);">Apps de Gestión</h3>
-                    <p style="font-size: 0.9rem; color: #666; line-height: 1.5;">Toma el control total de tu operación seleccionando las apps que te permitan implementar el conocimiento adquirido en los programas de desarrollo. Configura tu ecosistema ERP y CRM integral conforme a tus necesidades integrando las aplicaciones personalizadas que ponemos a tu disposición.</p>
-                    <button id="btn-apps-access" class="btn-primary" style="margin-top: auto; padding-top: 15px; font-size: 0.85rem; letter-spacing: 0.5px;">
-                        VERIFICANDO ACCESO...
-                    </button>
+                <section class="bento-item bento-stat">
+                    <span class="kpi-label">Formación</span>
+                    <div class="kpi-value" id="kpi-academy-progress">0%</div>
+                    <h3 style="font-size: 1.1rem; margin-top: 5px;">Progreso Academia</h3>
+                    <p style="font-size: 0.75rem; color: #666; flex-grow: 1;">Avance en tus Workbooks para fortalecer tu criterio estratégico.</p>
+                    <button class="btn-primary" onclick="window.location.href='academia.html'" style="padding: 12px; font-size: 0.75rem; margin-top: 15px;">CONTINUAR</button>
                 </section>
 
-                <section class="card-recurso" style="display: flex; flex-direction: column;">
-                    <h3 style="color: var(--primary-midnight);">Consultoría</h3>
-                    <p style="font-size: 0.9rem; color: #666; line-height: 1.5;">Optimiza tu toma de decisiones estratégicas. Interactúa con nuestro Consultor IA 24/7 o solicita sesiones personalizadas con tu staff de expertos para hacer crecer tu negocio de manera planifica.</p>
-                    <button class="btn-primary" 
-                            onclick="window.location.href='consultoria.html'" 
-                            style="margin-top: auto; padding-top: 15px; font-size: 0.85rem; letter-spacing: 0.5px;">
-                        SOLICITAR CONSULTORÍA
-                    </button>
+                <section class="bento-item bento-stat">
+                    <span class="kpi-label">Operativa</span>
+                    <div class="kpi-value" id="kpi-apps-usage">--</div>
+                    <h3 style="font-size: 1.1rem; margin-top: 5px;">Eficiencia Apps</h3>
+                    <p style="font-size: 0.75rem; color: #666; flex-grow: 1;">Nivel de digitalización y uso de herramientas en tus procesos.</p>
+                    <button id="btn-apps-access" class="btn-primary" style="padding: 12px; font-size: 0.75rem; margin-top: 15px;">GESTIONAR</button>
+                </section>
+
+                <section class="bento-item bento-stat">
+                    <span class="kpi-label">Estrategia</span>
+                    <div id="kpi-consultancy-status" style="font-size: 1.1rem; font-weight: 700; color: var(--primary-midnight); margin: 15px 0;">Fase de Diagnóstico</div>
+                    <h3 style="font-size: 0.9rem; font-weight: 400; color: #666; margin-top: -10px;">Hito Actual</h3>
+                    <p style="font-size: 0.75rem; color: #666; flex-grow: 1;">Estado de tus sesiones de consultoría personalizada.</p>
+                    <button class="btn-primary" onclick="window.location.href='consultoria.html'" style="padding: 12px; font-size: 0.75rem; margin-top: auto;">REVISAR SESIÓN</button>
                 </section>
             </div>
         </main>
+
+        <div id="expansion-ecosystem" class="floating-dock">
+            <div class="family-bubble academia" title="Academia Dreams" id="bubble-academia">
+                <span class="bubble-icon">🎓</span>
+                <span class="bubble-label">Academia</span>
+            </div>
+
+            <div class="family-bubble apps" title="Ecosistema de Apps" id="bubble-apps">
+                <span class="bubble-icon">🛠️</span>
+                <span class="bubble-label">Apps</span>
+            </div>
+
+            <div class="family-bubble consultoria" title="Consultoría Estratégica" id="bubble-consultoria">
+                <span class="bubble-icon">🤝</span>
+                <span class="bubble-label">Consultoría</span>
+            </div>
+        </div>
     </div>
     <script>
     (function() {

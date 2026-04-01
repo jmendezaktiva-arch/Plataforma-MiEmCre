@@ -41,15 +41,43 @@
     /* Padding Dinámico: escala suavemente de 1.5rem (p-6) a 3rem (p-12) según la pantalla */
     --dynamic-padding: clamp(1.5rem, 5vw, 3rem); 
     --content-gap: 1.5rem;
+
+    /* --- ARCHITECTURAL TOKENS: HEADER & SIDEBAR (GEOMETRÍA PRESTIGE) --- */
+    --navbar-height: 75px; /* Sincronizado con Standard Gold de Consultoría */
+    --navbar-bg: rgba(255, 255, 255, 0.90);
+    --navbar-button-gap: 25px;
+
+    /* TOKENS DE GEOMETRÍA DINÁMICA: La base de la simetría del ecosistema */
+    --sidebar-width-expanded: 260px;
+    --sidebar-width-collapsed: 8px;
+    
+    /* Esta es la variable maestra que usaremos en todos los contenedores 'main' */
+    --sidebar-width: var(--sidebar-width-expanded);
+}
+
+/* REGLA DE SINCRONIZACIÓN: Cambia el valor del token según el estado del body */
+body.sidebar-is-collapsed {
+    --sidebar-width: var(--sidebar-width-collapsed);
 }
 
 /* Expansión del Canvas de Trabajo y Normalización */
-.container, .main-content {
+.container {
     width: 100%;
     max-width: var(--container-max-width);
-    margin: 0 auto;
+    margin-left: auto;
+    margin-right: auto;
     padding: 0 var(--content-gap);
     box-sizing: border-box;
+}
+
+/* BLINDAJE DE SIMETRÍA: Asegura que el contenido principal siempre respete el Sidebar */
+.main-content, .workbook-container {
+    width: calc(100% - var(--sidebar-width)) !important;
+    margin-left: var(--sidebar-width) !important;
+    /* Sincronización milimétrica: 40px de respiro superior para evitar el encimado con la Navbar sticky */
+    margin-top: 40px !important; 
+    padding-bottom: 80px; /* Respiro inferior institucional */
+    transition: all 0.4s cubic-bezier(0.19, 1, 0.22, 1);
 }
 
 /* Corrección de Hiper-densidad: Se aplica el estándar dinámico p-6/p-12 */
@@ -164,22 +192,120 @@ strong, b, .calculation-label {
     display: block; /* Restablece el flujo vertical para las pantallas internas */
 }
 
-/* --- HEADER / NAVBAR (Normalizado) --- */
+/* --- HEADER AURA: ARQUITECTURA DE TRES ZONAS (PRESTIGE) --- */
 .navbar {
-    padding: 12px 40px;
-    background: rgba(255, 255, 255, 0.85); /* Transparencia sofisticada */
-    backdrop-filter: blur(12px);          /* Efecto de cristal esmerilado */
-    border-bottom: 1px solid rgba(15, 52, 96, 0.08); /* Línea capilar casi invisible */
+    height: var(--navbar-height) !important;
+    padding: 0 40px;
+    background: rgba(255, 255, 255, 0.7) !important;
+    backdrop-filter: blur(20px) saturate(180%);
+    -webkit-backdrop-filter: blur(20px) saturate(180%);
+    border-bottom: 1px solid rgba(15, 52, 96, 0.08);
     display: flex;
     justify-content: space-between;
     align-items: center;
-    position: sticky;
-    top: 0;
-    z-index: 1000;
-    /* Soft Depth: Sombra multicapa orgánica */
-    box-shadow: 
-        0 1px 2px rgba(0,0,0,0.02),
-        0 4px 12px rgba(15, 52, 96, 0.06); 
+    position: sticky !important;
+    top: 0 !important;
+    z-index: 9000;
+    transition: all 0.4s ease;
+}
+
+/* --- COMPONENTES NAV-ACTIONS (ICON-ONLY PRESTIGE) --- */
+.nav-btn-minimal {
+    background: rgba(15, 52, 96, 0); /* Fondo inicial invisible */
+    border: none;
+    color: var(--primary-midnight);
+    width: 42px; /* Área de contacto optimizada */
+    height: 42px;
+    border-radius: 50%; /* Orbe perfecto */
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    opacity: 0.7;
+    position: relative;
+}
+
+.nav-btn-minimal:hover {
+    opacity: 1;
+    color: var(--accent-gold);
+    background: rgba(15, 52, 96, 0.04); /* Sutil rastro de cristal al pasar el cursor */
+    transform: scale(1.1); /* Micro-expansión elástica */
+}
+
+.nav-btn-minimal .icon {
+    font-size: 1.2rem; /* El icono ahora tiene el protagonismo total */
+    display: block;
+    line-height: 1;
+}
+
+.nav-btn-minimal:hover {
+    opacity: 1;
+    color: var(--accent-gold);
+    transform: translateY(-1px);
+}
+
+.nav-btn-minimal .icon {
+    font-size: 1.1rem; /* El icono es el guía, el texto es la confirmación */
+    margin-bottom: 2px;
+}
+
+/* BLINDAJE DE ALINEACIÓN: Regla de los Tres Tercios */
+.nav-left, .nav-right {
+    flex: 1 1 30%; /* Garantiza que los extremos tengan el mismo peso */
+}
+.nav-center {
+    flex: 1 1 40%; /* El centro tiene el espacio necesario para el título sin asfixiarse */
+}
+
+/* ESTÁNDAR PRESTIGE: Botones de Comando (Alta Visibilidad) */
+/* ESTÁNDAR PRESTIGE: Botones de Comando de Alta Visibilidad */
+.nav-btn-prestige {
+    background-color: #0F3460 !important; /* Azul Medianoche Sólido */
+    border: 2px solid #957C3D !important;   /* Borde Oro Grueso */
+    color: #957C3D !important;              /* Icono Oro */
+    width: 44px !important;
+    height: 44px !important;
+    border-radius: 10px !important;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    box-shadow: 0 4px 15px rgba(15, 52, 96, 0.4) !important;
+}
+
+.nav-btn-prestige:hover {
+    background-color: #164275 !important;
+    border-color: #FFFFFF !important;       /* Brillo Blanco */
+    transform: translateY(-3px) scale(1.05);
+    box-shadow: 0 10px 25px rgba(149, 124, 61, 0.5) !important;
+}
+
+.nav-btn-prestige .icon {
+    font-size: 1.25rem !important;
+    color: inherit;
+}
+
+.nav-btn-prestige:hover .icon {
+    color: #FFFFFF !important; /* El icono brilla en blanco */
+}
+
+/* Zonas de Control: Blindaje de Simetría y Escalabilidad */
+.nav-left, .nav-right {
+    display: flex;
+    align-items: center;
+    gap: var(--navbar-button-gap); /* 25px: Espacio para expansión futura */
+    flex: 1; /* Fuerza al centro a mantenerse en el eje real */
+}
+
+.nav-right { justify-content: flex-end; }
+
+.nav-center {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex: 0 0 auto; /* El eje de marca es prioritario e inamovible */
 }
 
 /* --- ESTILIZACIÓN DEL LOGO INSTITUCIONAL (IMPACTO PREMIUM) --- */
@@ -429,8 +555,10 @@ strong, b, .calculation-label {
     align-items: center;
     justify-content: center;
     padding: 40px;
-    background: rgba(255, 255, 255, 0.5);
-    backdrop-filter: blur(10px);
+    background: rgba(255, 255, 255, 0.5) !important; /* BLINDAJE: Mantiene la transparencia suave contra cambios externos */
+    backdrop-filter: blur(12px) saturate(160%) !important;
+    -webkit-backdrop-filter: blur(12px) saturate(160%) !important; /* PARIDAD: Activa el efecto de cristal en Safari e iOS */
+    border-left: 1px solid rgba(15, 52, 96, 0.05); /* Refuerzo de borde sutil */
 }
 
 #auth-card {
@@ -598,12 +726,30 @@ select:focus {
     cursor: pointer;
 }
 
+/* --- FOCUS MODE: AISLAMIENTO DE ORBES PRESTIGE --- */
+
+/* 1. Solo la burbuja bajo el cursor se expande */
+.bento-grid:has(.glass-card:hover) .glass-card:not(:hover),
+.welcome-container:has(.btn-show-podcast:hover) .btn-show-podcast:not(:hover),
+.grid-recursos:has(.card-recurso:hover) .card-recurso:not(:hover) {
+    filter: blur(4px) saturate(50%); /* El efecto de desenfoque que sugeriste */
+    opacity: 0.4;
+    transform: scale(0.95); /* Encogimiento sutil para dar paso a la principal */
+    pointer-events: none; /* Evita distracciones táctiles */
+}
+
+/* 2. Refinamiento de la Burbuja (Orbe) individual */
+#btn-show-podcast {
+    transition: all 0.6s cubic-bezier(0.19, 1, 0.22, 1) !important;
+}
+
 #btn-show-podcast:hover {
-    transform: scale(1.15) rotate(12deg);
-    border-color: #FFFFFF !important; /* El borde brilla al contacto */
+    transform: scale(1.25) rotate(5deg); /* Expansión elástica más pronunciada */
+    border-color: #FFFFFF !important;
+    z-index: 100; /* Asegura que la activa esté siempre al frente */
     box-shadow: 
-        0 15px 30px rgba(15, 52, 96, 0.3),
-        0 0 15px rgba(149, 124, 61, 0.4) !important; /* Aura de Oro suave */
+        0 25px 50px rgba(15, 52, 96, 0.4),
+        0 0 30px rgba(149, 124, 61, 0.6) !important;
 }
 
 /* --- CLASE DE CONTROL DE VISIBILIDAD (EL "ALMA" DE LA ANIMACIÓN) --- */
@@ -846,21 +992,22 @@ audio::-webkit-media-controls-play-button {
 }
 
 .purpose-bubble {
-    /* Efecto Liquid Glass (Cápsula Esmerilada) */
     background: rgba(255, 255, 255, 0.75) !important;
     backdrop-filter: blur(30px) saturate(180%) !important;
     -webkit-backdrop-filter: blur(30px) saturate(180%) !important;
-    
-    max-width: 550px;
-    width: 100%;
-    padding: 50px;
-    border-radius: 32px;
-    border: 1px solid rgba(255, 255, 255, 0.5);
-    
-    /* Soft Depth: Elevación de importancia estratégica */
+    max-width: 550px !important; /* BLINDAJE: Geometría fija */
+    width: 100% !important;
+    padding: 50px !important; /* BLINDAJE: Espaciado Prestige garantizado */
+    border-radius: 32px !important;
+    border: 1px solid rgba(255, 255, 255, 0.5) !important;
+    position: relative;
+    transform: scale(0.95) translateY(20px);
+    opacity: 0;
+    transition: all 0.6s cubic-bezier(0.19, 1, 0.22, 1);
+/* Soft Depth: Elevación de importancia estratégica */
     box-shadow: 
         0 40px 100px rgba(15, 52, 96, 0.15),
-        inset 0 0 20px rgba(255, 255, 255, 0.4);
+        inset 0 0 20px rgba(255, 255, 255, 0.4) !important; /* BLINDAJE: Sombra Prestige garantizada */
         
     position: relative;
     transform: scale(0.95) translateY(20px);
@@ -1044,13 +1191,8 @@ audio::-webkit-media-controls-play-button {
     box-shadow: 0 6px 16px rgba(15, 52, 96, 0.25) !important;
 }
 
-/* Equilibrio simétrico para el logo centralizado */
-.navbar {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    padding: 12px 40px;
-}
+/* BLOQUE ELIMINADO POR AUDITORÍA: La simetría y el padding (0 40px) ya están 
+   blindados en el CORE (Línea 203) para garantizar los 90px de altura real. */
 
 /* ========================================================================== */
 /* MODO CINEMA: EXPANSIÓN PARA MAXIMIZAR VIDEO Y WORKBOOK */
@@ -1171,17 +1313,18 @@ body.cinema-mode #view-workbook {
 /* --- CONTENEDOR DE MODAL GENÉRICO (LIQUID GLASS) --- */
 /* Reutilizamos la lógica de purpose-overlay para consistencia */
 .help-overlay {
-    position: fixed;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    background: rgba(15, 52, 96, 0.25);
-    backdrop-filter: blur(15px);
-    display: none; /* Controlado por JS */
+    position: fixed !important; /* BLINDAJE: Bloquea la capa sobre todo el viewport sin excepciones */
+    top: 0 !important;
+    left: 0 !important;
+    width: 100% !important;
+    height: 100% !important;
+    background: rgba(15, 52, 96, 0.25) !important; /* BLINDAJE: Tinte Midnight persistente para inmersión */
+    backdrop-filter: blur(15px) !important;
+    -webkit-backdrop-filter: blur(15px) !important; /* PARIDAD: Activa el efecto esmerilado en iOS/Safari */
+    display: none; 
     justify-content: center;
     align-items: center;
-    z-index: 3000;
+    z-index: 3000 !important; /* BLINDAJE: Prioridad absoluta sobre el contenido dinámico del Workbook */
     padding: 20px;
     opacity: 0;
     transition: opacity 0.4s ease;
@@ -1193,14 +1336,15 @@ body.cinema-mode #view-workbook {
 }
 
 .help-bubble {
-    background: rgba(255, 255, 255, 0.85) !important;
+    background: rgba(255, 255, 255, 0.85) !important; 
     backdrop-filter: blur(30px) saturate(180%) !important;
-    max-width: 600px;
-    width: 100%;
-    padding: 40px;
-    border-radius: 28px;
-    border: 1px solid rgba(255, 255, 255, 0.5);
-    box-shadow: 0 40px 100px rgba(15, 52, 96, 0.2);
+    -webkit-backdrop-filter: blur(30px) saturate(180%) !important; /* PARIDAD: Consistencia del cristal en iOS/Safari */
+    max-width: 600px !important; /* BLINDAJE: Evita desbordes horizontales en layouts complejos */
+    width: 100% !important;
+    padding: 40px !important; /* BLINDAJE: Mantiene el "aire" institucional del Estándar Prestige */
+    border-radius: 28px !important;
+    border: 1px solid rgba(255, 255, 255, 0.5) !important;
+    box-shadow: 0 40px 100px rgba(15, 52, 96, 0.2) !important;
     position: relative;
     transform: translateY(20px);
     transition: transform 0.4s cubic-bezier(0.19, 1, 0.22, 1);
@@ -1263,18 +1407,14 @@ body.cinema-mode #view-workbook {
 }
 
 .mindset-bubble {
+    background: rgba(255, 255, 255, 0.9) !important;
+    backdrop-filter: blur(20px) saturate(160%) !important;
+    -webkit-backdrop-filter: blur(20px) saturate(160%) !important;
+    border: 1px solid rgba(255, 255, 255, 0.5) !important;
+    border-radius: 20px !important;
+    padding: 25px !important;
     position: absolute;
-    top: calc(100% + 15px);
-    left: 0;
-    width: 100%;
-    max-width: 450px;
-    background: rgba(255, 255, 255, 0.9); /* Efecto Liquid Glass */
-    backdrop-filter: blur(20px) saturate(160%);
-    -webkit-backdrop-filter: blur(20px) saturate(160%);
-    border: 1px solid rgba(255, 255, 255, 0.5);
-    border-radius: 20px;
-    padding: 25px;
-    z-index: 100;
+    z-index: 100 !important; /* BLINDAJE: Siempre por encima de elementos del Workbook */
     box-shadow: 0 20px 40px rgba(15, 52, 96, 0.12);
     
     /* Estado Inicial (Oculto) */
@@ -1346,3 +1486,99 @@ body.cinema-mode #view-workbook {
     padding: 18px 15px; /* Incremento de respiro vertical para equilibrar el tamaño */
     text-align: center;
 }
+
+/* REPARACIÓN NAV-ACTIONS PRESTIGE */
+#header-aura-actions .nav-btn-prestige {
+    background-color: #0F3460 !important; /* Azul Medianoche Sólido */
+    border: 2px solid #957C3D !important;   /* Borde Oro Grueso */
+    color: #957C3D !important;              /* Icono Oro */
+    width: 44px !important;
+    height: 44px !important;
+    border-radius: 10px !important;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    box-shadow: 0 4px 15px rgba(15, 52, 96, 0.4) !important;
+    opacity: 1 !important;
+}
+
+#header-aura-actions .nav-btn-prestige:hover {
+    background-color: #164275 !important;
+    border-color: #FFFFFF !important;       /* Brillo Blanco */
+    transform: translateY(-3px) scale(1.05);
+}
+
+#header-aura-actions .nav-btn-prestige .icon {
+    font-size: 1.25rem !important;
+}
+
+/* ========================================================================== */
+/* ESPECIALIZACIÓN: MODAL DE SOPORTE COMPACTO (PRESTIGE ASSIST) */
+/* ========================================================================== */
+
+/* Overlay más sutil para no perder contexto de fondo */
+#contact-overlay {
+    background: rgba(15, 52, 96, 0.15) !important; 
+    backdrop-filter: blur(8px) !important;
+}
+
+/* Reducción de escala y balance de blancos */
+#contact-overlay .purpose-bubble {
+    max-width: 380px !important; 
+    padding: 30px 25px !important;
+    border: 1px solid rgba(149, 124, 61, 0.4) !important;
+    background: rgba(255, 255, 255, 0.95) !important;
+    box-shadow: 0 30px 60px rgba(15, 52, 96, 0.12) !important;
+}
+
+/* Blindaje de visibilidad del botón de cierre */
+#contact-overlay .close-bubble {
+    position: absolute !important;
+    top: -12px !important;
+    right: -12px !important;
+    background: var(--accent-gold) !important; 
+    color: white !important;
+    width: 34px !important;
+    height: 34px !important;
+    font-size: 1.2rem !important;
+    border-radius: 50% !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    cursor: pointer !important;
+    z-index: 10001 !important; /* Por encima de cualquier inyección */
+    border: 2px solid white !important;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.15) !important;
+    opacity: 1 !important;
+    visibility: visible !important;
+}
+
+#contact-overlay .close-bubble:hover {
+    background: var(--primary-midnight) !important;
+    transform: scale(1.1) rotate(90deg);
+}
+
+/* Compactación de Inputs y Tipografía */
+#contact-overlay .form-group input, 
+#contact-overlay .form-group select, 
+#contact-overlay .form-group textarea {
+    margin-bottom: 10px !important;
+    padding: 10px 14px !important;
+    font-size: 0.85rem !important;
+    border-radius: 8px !important;
+}
+
+#contact-overlay header h2 {
+    font-size: 1.15rem !important;
+    color: var(--primary-midnight) !important;
+    margin-bottom: 4px !important;
+}
+
+#contact-overlay header p {
+    font-size: 0.75rem !important;
+    line-height: 1.4 !important;
+    margin-bottom: 15px !important;
+}
+

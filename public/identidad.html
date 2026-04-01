@@ -3,30 +3,26 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Nuestro ADN | Dreams Platform</title>
+    <title>Nuestro ADN | Mi Empresa Crece</title>
     <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;600;700;900&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="assets/css/style.css">
     <link rel="stylesheet" href="assets/css/bento.css">
     <style>
+        /* SINCRONIZACIÓN QUIRÚRGICA: Eliminación de márgenes fijos (Audit v4.6) */
         .dna-container {
             padding: 60px 40px;
-            max-width: 1100px;
-            margin: 0 auto;
+            max-width: 1200px; /* Amplitud optimizada para el estándar Prestige */
+            /* CÁLCULO DE INTEGRIDAD: Sidebar (260px) + Gap (8px) */
+            margin-left: calc(var(--sidebar-width, 260px) + 8px);
+            margin-right: 8px; 
             display: flex;
             flex-direction: column;
-            align-items: center; /* Centrado horizontal real */
+            align-items: center;
             text-align: center;
-            transition: margin-left 0.3s ease; /* Sincronía con el Sidebar */
-            margin-left: 70px; /* Espacio base para el Sidebar Prestige */
+            transition: all 0.4s cubic-bezier(0.19, 1, 0.22, 1);
         }
 
-        /* Ajuste para pantallas grandes: Evita que el margin-left rompa el centrado absoluto */
-        @media (min-width: 1400px) {
-            .dna-container {
-                margin-left: auto;
-                padding-left: 70px;
-            }
-        }
+        /* Eliminamos el override de 1400px para mantener la trazabilidad del Sidebar en monitores Ultra-Wide */
 
         /* 1. CONTENEDOR MAESTRO (Layout de 3 Columnas) */
         .golden-circle-wrapper {
@@ -47,14 +43,14 @@
             flex-shrink: 0;
         }
 
-        /* COLUMNA 2: CONTROL (Cápsulas de Título) */
+        /* COLUMNA 2: CONTROL (Layout de Ingeniería Narrativa) */
         .panels-column {
             display: flex;
             flex-direction: column;
-            gap: 25px; /* Espacio fijo entre botones */
-            width: 200px;
-            padding-top: 250px; /* Alinea el centro de la primera cápsula con el centro del círculo */
+            gap: 15px; /* Gap optimizado para permitir el offset individual */
+            width: auto;
             text-align: left;
+            padding-top: 150px; /* Punto de anclaje calculado para simetría con el Círculo */
         }
 
         /* ESTILO DE CÁPSULA (Botón) */
@@ -179,24 +175,8 @@
             50% { transform: scale(1.05); opacity: 0.8; }
         }
 
-        .info-panel:hover p,
-        .info-panel.is-active p {
-            opacity: 1;
-            transform: translateX(0);
-        }
-
         /* Eliminamos el salto visual del contenedor */
         html { scroll-behavior: smooth; }
-
-        /* ALINEACIÓN MILIMÉTRICA POR NIVEL (Offset vertical) */
-        .panels-column {
-            display: flex;
-            flex-direction: column;
-            gap: 15px; /* Gap reducido para permitir el offset */
-            width: auto;
-            text-align: left;
-            padding-top: 150px; /* Punto de inicio ajustado */
-        }
 
         /* Posicionamiento relativo al radio de cada anillo */
         .panel-why { border-left: 4px solid var(--accent-gold); margin-top: 90px; }
@@ -217,9 +197,6 @@
         .panel-why::before { width: 268px; left: -268px; background: var(--accent-gold); }
         .panel-how::before { width: 185px; left: -185px; background: rgba(230, 126, 34, 0.6); }
         .panel-what::before { width: 100px; left: -100px; background: var(--primary-midnight); }
-
-        h4 { margin: 0 0 10px 0; color: var(--primary-midnight); font-weight: 700; text-transform: uppercase; font-size: 0.8rem; letter-spacing: 1px; }
-        p { margin: 0; font-size: 0.85rem; color: #555; line-height: 1.6; }
 
         /* --- SECCIÓN STORYTELLING: IMPACTO Y AUTORIDAD --- */
         .storytelling-header { 
@@ -376,6 +353,9 @@
                 padding: 40px 20px; 
             }
 
+            /* AJUSTE PRESTIGE: Título responsivo para evitar saltos de línea bruscos */
+            .prestige-title { font-size: 1.8rem; }
+
             .golden-circle-wrapper {
                 flex-direction: column;
                 align-items: center;
@@ -384,16 +364,17 @@
             }
 
             .circle-column {
-                width: 320px; /* Escala optimizada para dispositivos móviles */
-                height: 320px;
-                order: 1; /* El Círculo Dorado encabeza la narrativa */
+                /* ESCALA DINÁMICA: Nunca mayor a 320px, pero nunca mayor al 80% del ancho de pantalla */
+                width: min(320px, 80vw); 
+                height: min(320px, 80vw);
+                order: 1;
             }
 
-            /* Re-escala de los anillos Prestige para el nuevo contenedor */
-            .circle-what { width: 320px; height: 320px; }
-            .circle-how { width: 220px; height: 220px; }
-            .circle-why { width: 130px; height: 130px; }
-            .label-why { font-size: 1rem; }
+            /* Re-escala proporcional basada en la unidad dinámica del contenedor padre */
+            .circle-what { width: 100%; height: 100%; }
+            .circle-how { width: 70%; height: 70%; }
+            .circle-why { width: 40%; height: 40%; }
+            .label-why { font-size: 0.9rem; letter-spacing: 2px; }
 
             .panels-column {
                 width: 100%;
@@ -442,12 +423,29 @@
 </head>
 <body>
     <div id="app">
-        <header class="navbar" style="padding: 12px 40px; border-bottom: 1px solid rgba(15, 52, 96, 0.08); display: flex; justify-content: space-between; align-items: center; background: rgba(255, 255, 255, 0.85); backdrop-filter: blur(12px); position: sticky; top: 0; z-index: 1000;">
-            <div style="width: 140px;" class="hidden md:block"></div> 
-            <div class="logo-container">
-                <img id="main-logo" data-asset="logo.png" alt="Mi Empresa Crece" class="logo-header">
+        <header class="navbar">
+            <div class="nav-left">
+                <span style="color: var(--primary-midnight); font-weight: 800; font-size: 0.7rem; letter-spacing: 2px; text-transform: uppercase;">Dreams</span>
+                <span style="color: var(--accent-gold); font-weight: 400; font-size: 0.7rem; letter-spacing: 2px; text-transform: uppercase;">Platform</span>
             </div>
-            <div style="width: 160px;"></div>
+
+            <div class="nav-center">
+                <h1 id="header-aura-title" style="color: var(--primary-midnight); font-weight: 700; font-size: 0.65rem; letter-spacing: 2px; text-transform: uppercase; margin: 0; opacity: 0.8;">
+                    Nuestro ADN
+                </h1>
+            </div>
+
+            <div class="nav-right" id="header-aura-actions">
+                <button id="btn-nav-ia" class="nav-btn-prestige" title="Consultoría IA">
+                    <span class="icon">✨</span>
+                </button>
+                <button id="btn-nav-search" class="nav-btn-prestige" title="Buscador">
+                    <span class="icon">🔍</span>
+                </button>
+                <button id="btn-nav-support" class="nav-btn-prestige" title="Soporte Técnico">
+                    <span class="icon">✉️</span>
+                </button>
+            </div>
         </header>
 
         <main class="dna-container">
@@ -467,7 +465,7 @@
                         Adoptamos la metodología que transformó a <strong>Apple y Pixar</strong> para aplicarla al crecimiento de tu PyME. 
                         A través del Círculo Dorado de Simon Sinek, aseguramos que cada acción de tu organización nazca de una convicción inquebrantable.
                     </p>
-                    <a href="https://www.ted.com/talks/simon_sinek_how_great_leaders_inspire_action" target="_blank" class="sinek-video-btn">
+                    <a href="javascript:void(0)" class="sinek-video-btn">
                         Ver video de Masterclass de Sinek
                     </a>
                 </div>
@@ -544,7 +542,44 @@
     <script type="module" src="src/app.js"></script>
     <script type="module" src="src/shared/sidebar-component.js"></script>
 
+    <div id="contact-overlay" class="purpose-overlay">
+        <div class="purpose-bubble" style="max-width: 500px;">
+            <button class="close-bubble" id="btn-close-contact">&times;</button>
+            <header style="margin-bottom: 25px;">
+                <h2 style="color: var(--primary-midnight); font-weight: 700; font-size: 1.5rem; margin-bottom: 8px;">Conecta con tu Crecimiento</h2>
+                <p style="font-weight: 300; font-size: 0.9rem; color: #666; line-height: 1.4;">¿Deseas escalar tu PyME o tienes alguna duda sobre tu ADN? Estamos para servirte.</p>
+            </header>
+            <form id="contact-form" style="display: flex; flex-direction: column; gap: 10px;">
+                <div class="form-group">
+                    <input type="text" id="contact-name" placeholder="Nombre completo" required>
+                </div>
+                <div class="form-group">
+                    <input type="email" id="contact-email" placeholder="Correo electrónico" required>
+                </div>
+                <div class="form-group">
+                    <select id="contact-interest" required style="width: 100%; padding: 16px 20px; border-radius: 12px; border: 1.5px solid rgba(15, 52, 96, 0.12); font-family: 'Montserrat';">
+                        <option value="" disabled selected>¿En qué podemos apoyarte?</option>
+                        <option value="Duda ADN">Duda sobre mi propósito</option>
+                        <option value="Consultoría">Consultoría estratégica</option>
+                        <option value="Soporte">Problema de acceso</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <textarea id="contact-message" placeholder="Escribe tu duda aquí..." required style="min-height: 120px; resize: none;"></textarea>
+                </div>
+                <button type="submit" class="btn-primary" id="btn-send-contact">ENVIAR MENSAJE</button>
+                <p id="contact-status" style="font-size: 0.75rem; text-align: center; margin-top: 10px; font-weight: 600; min-height: 20px;"></p>
+            </form>
+        </div>
+    </div>
+
     <script type="module">
+        import { SupportService } from './src/shared/support-service.js';
+        document.addEventListener('DOMContentLoaded', () => {
+            // Inicializamos el motor de soporte con IA (Paridad con Academia)
+            SupportService.init();
+        });
+
         async function loadPrestigeDNA() {
             try {
                 // Trazabilidad: Leemos la fuente única de verdad
@@ -582,6 +617,9 @@
                 
                 // INYECCIÓN DE INTERACCIÓN PRESTIGE
                 setupCapsuleInteractions();
+
+                // SINCRONIZACIÓN DE VIDEO: Conectamos el ID del JSON con el motor del modal
+                setupVideoModal(dna.masterclass_video_id);
             } catch (e) {
                 console.error("🚨 Error al sincronizar el ADN visual:", e);
             }
@@ -606,14 +644,17 @@
             });
         }
 
-        function setupVideoModal() {
+        function setupVideoModal(videoId) {
             const videoBtn = document.querySelector('.sinek-video-btn');
             const videoModal = document.getElementById('videoModal');
             const closeBtn = document.getElementById('closeVideo');
             const iframe = document.getElementById('sinekIframe');
             
-            // ID del video de la Masterclass (YouTube Embed por compatibilidad)
-            const videoId = "qp0HIF3SfI4"; 
+            // VALIDACIÓN DE TRAZABILIDAD: Verificamos que el ID venga del JSON antes de activar el modal
+            if (!videoId) {
+                console.warn("⚠️ Dreams Identity: No se detectó un ID de video en la Fuente de Verdad (JSON).");
+                return;
+            }
 
             if (videoBtn && videoModal) {
                 videoBtn.addEventListener('click', (e) => {
@@ -641,8 +682,9 @@
         }
 
         document.addEventListener('DOMContentLoaded', () => {
+            // Solo disparamos la carga de datos. 
+            // El video se configurará automáticamente una vez que el JSON sea procesado con éxito.
             loadPrestigeDNA();
-            setupVideoModal();
         });
     </script>
 </body>

@@ -1,7 +1,7 @@
 //public/src/admin/admin-controller.js
 // TRACEABILIDAD: Conexión con el Núcleo del Sistema (src/shared)
 // Nota: Se omite la importación de UserManager ya que su lógica reside al final de este archivo.
-// TRACEABILIDAD: Conexión unificada con el Ecosistema "Dreams Platform" (src/shared)
+// TRACEABILIDAD: Conexión unificada con el Ecosistema "Mi Empresa Crece Platform" (src/shared)
 // TRACEABILIDAD: Importación de Instancia Principal (auth) y Monitor de Sesión (onAuthStateChanged)
 import { db, auth, secondaryAuth } from '../../src/shared/firebase-config.js';
 import { 
@@ -127,7 +127,7 @@ const UserManager = {
                 email: data.email,
                 rol: data.rol, // Trazabilidad: Se elimina toLowerCase para respetar la capitalización de Security Rules
                 nombre: data.nombre || '',
-                empresa: data.empresa || 'Dreams Platform',
+                empresa: data.empresa || 'Mi Empresa Crece Platform',
                 status: 'activo',
                 requiereCambioPassword: true, 
                 fechaCreacion: serverTimestamp(),
@@ -222,9 +222,10 @@ const UserManager = {
                         fechaActivacion: hoy.toISOString(),
                         fechaVencimiento: vencimientoSaaS.toISOString(),
                         status: 'activo',
-                        modality: extraData.metadata?.[id]?.modality || 'ONLINE'
+                        modality: extraData.metadata?.[id]?.modality || 'ONLINE',
+                        metodoAdquisicion: 'Manual (Admin)' // Trazabilidad de Origen Prestige
                     };
-                    console.log(`✨ Alta de servicio: ${id}`);
+                    console.log(`✨ Alta de servicio manual: ${id}`);
                 }
             });
 
@@ -249,7 +250,10 @@ const UserManager = {
             });
 
             // 4. PERSISTENCIA ATÓMICA DEL EXPEDIENTE MAESTRO (Fase 4.5: BI Persistence)
+            // TRACEABILIDAD: Se integran 'nombre' y 'empresa' al payload de actualización desde extraData
             await updateDoc(userRef, {
+                "nombre": extraData.nombre || currentData.nombre || '',
+                "empresa": extraData.empresa || currentData.empresa || 'Mi Empresa Crece Platform',
                 "accesos": newAccess,
                 "rol": newRol,
                 "ultimaModificacion": serverTimestamp(),
@@ -315,140 +319,93 @@ window.prepareEditUser = async (uid) => {
 };
 
 const renderEditModal = (uid, user, catalog = [], consultingCatalog = []) => {
-    // Limpieza de instancias previas para evitar duplicidad
-    document.getElementById('modal-edit-container')?.remove();
+    const modal = document.getElementById('modal-edit');
+    const form = document.getElementById('form-edit-usuario-refactor');
 
-    const modalHtml = `
-        <div id="modal-edit-container" style="display:flex; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(15, 52, 96, 0.8); z-index:9999; align-items:flex-start; justify-content:center; backdrop-filter: blur(4px); overflow-y: auto; padding: 40px 0;">
-            <div style="background:#fff; width:450px; padding:30px; border-radius:12px; box-shadow: 0 20px 40px rgba(0,0,0,0.3); border-top: 6px solid var(--accent-gold); margin-bottom: 40px;">
-                <h3 style="margin-top:0; color:var(--primary-midnight); font-weight:900;">GESTIÓN DE ACCESOS</h3>
-                <p style="font-size:0.85rem; color:#666; margin-bottom:20px;">Cliente: <strong>${user.nombre || 'Líder sin nombre'}</strong></p>
-                
-                <form id="form-edit-usuario">
-                    <label style="display:block; font-size:0.75rem; font-weight:700; margin-bottom:5px;">ROL DEL PERFIL</label>
-                    <select id="edit-rol" style="width:100%; padding:10px; margin-bottom:20px; border:1px solid #ddd; border-radius:4px;">
-                        <option value="Cliente" ${user.rol?.toLowerCase() === 'cliente' ? 'selected' : ''}>Cliente Estándar</option>
-                        <option value="Capacitador" ${user.rol?.toLowerCase() === 'capacitador' ? 'selected' : ''}>Capacitador</option>
-                        <option value="Consultor" ${user.rol?.toLowerCase() === 'consultor' ? 'selected' : ''}>Consultor</option>
-                        <option value="Admin" ${user.rol?.toLowerCase() === 'admin' ? 'selected' : ''}>Administrador</option>
-                    </select>
+    // 1. POBLADO DE IDENTIDAD Y ROLES
+    document.getElementById('edit-uid').value = uid;
+    document.getElementById('edit-nombre').value = user.nombre || '';
+    document.getElementById('edit-empresa').value = user.empresa || '';
+    document.getElementById('edit-rol').value = user.rol || 'Cliente';
 
-                    <div style="margin-bottom:20px; max-height: 150px; overflow-y: auto; padding-right: 5px;">
-                        <label style="display:block; font-size:0.75rem; font-weight:700; margin-bottom:10px;">CURSOS EN ACADEMIA</label>
-                        ${catalog.map(course => `
-                            <label style="display:block; margin-bottom:8px; font-size:0.9rem;">
-                                <input type="checkbox" value="${course.id}" ${(user.accesos?.cursos || []).includes(course.id) ? 'checked' : ''}> 
-                                ${course.title}
-                            </label>
-                        `).join('') || '<p style="font-size:0.75rem; color:#999;">No hay cursos en el catálogo.</p>'}
-                    </div>
+    // 2. POBLADO DE FINANZAS (BI CORE)
+    document.getElementById('edit-pago').value = ''; // Se limpia para nuevo registro de ingreso
+    document.getElementById('edit-cuota').value = user.expediente?.usuariosAdicionales || 0;
+    document.getElementById('edit-punto-equilibrio').value = user.expediente?.finanzas?.puntoEquilibrio || 0;
+    document.getElementById('edit-margen').value = user.expediente?.finanzas?.margenUtilidad || 0;
 
-                    <div style="margin-bottom:20px; padding-top: 10px; border-top: 1px solid #eee;">
-                        <label style="display:block; font-size:0.75rem; font-weight:700; margin-bottom:10px;">APLICACIONES (HERRAMIENTAS)</label>
-                        <label style="display:block; margin-bottom:8px; font-size:0.9rem;"><input type="checkbox" value="app-crm" ${(user.accesos?.apps || []).includes('app-crm') ? 'checked' : ''}> CRM Ventas</label>
-                        <label style="display:block; margin-bottom:8px; font-size:0.9rem;"><input type="checkbox" value="app-erp" ${(user.accesos?.apps || []).includes('app-erp') ? 'checked' : ''}> ERP Finanzas</label>
-                        <label style="display:block; margin-bottom:8px; font-size:0.9rem;"><input type="checkbox" value="app-process" ${(user.accesos?.apps || []).includes('app-process') ? 'checked' : ''}> Process Designer</label>
-                    </div>
+    // 3. RENDERIZADO DINÁMICO DE CATÁLOGOS (CURSOS Y SERVICIOS)
+    const cursosContainer = document.getElementById('edit-cursos-dinamicos');
+    cursosContainer.innerHTML = catalog.map(course => `
+        <label style="display:block; margin-bottom:8px; cursor:pointer;">
+            <input type="checkbox" class="edit-check-curso" value="${course.id}" ${(user.accesos?.cursos || []).includes(course.id) ? 'checked' : ''}> ${course.title}
+        </label>
+    `).join('') || '<p style="font-size:0.7rem; color:#999;">Catálogo de academia no disponible.</p>';
 
-                    <div style="margin-bottom:20px; padding:15px; background:#f9f5eb; border-radius:10px; border-left: 4px solid var(--accent-gold);">
-                        <label style="display:block; font-size:0.75rem; font-weight:700; margin-bottom:10px; color:var(--accent-gold);">CONSULTORÍA Y STAFF</label>
-                        <div style="max-height: 100px; overflow-y: auto;">
-                            ${consultingCatalog.map(service => `
-                                <label style="display:block; margin-bottom:8px; font-size:0.9rem;">
-                                    <input type="checkbox" class="edit-check-consultor" value="${service.id}" ${(user.accesos?.consultor || []).includes(service.id) ? 'checked' : ''}> 
-                                    ${service.title}
-                                </label>
-                            `).join('') || '<p style="font-size:0.75rem; color:#999;">Sin servicios activos.</p>'}
-                        </div>
-                    </div>
+    const appsContainer = document.getElementById('edit-apps-dinamicas');
+    appsContainer.querySelectorAll('input[type="checkbox"]').forEach(input => {
+        input.checked = (user.accesos?.apps || []).includes(input.value);
+    });
 
-                    <div style="margin-bottom:25px; padding-top: 15px; border-top: 1px solid #eee;">
-                        <label style="display:block; font-size:0.75rem; font-weight:700; margin-bottom:12px; color:var(--primary-midnight);">FINANZAS Y ESCALABILIDAD (BI DATA)</label>
-                        <div style="display:grid; grid-template-columns: 1fr 1fr; gap:12px;">
-                            <div>
-                                <label style="display:block; font-size:0.65rem; color:#999; margin-bottom:5px;">REGISTRAR NUEVO PAGO ($)</label>
-                                <input type="number" id="edit-pago" placeholder="0.00" step="0.01" style="width:100%; padding:10px; border:1px solid #ddd; border-radius:6px; font-size:0.85rem;">
-                            </div>
-                            <div>
-                                <label style="display:block; font-size:0.65rem; color:#999; margin-bottom:5px;">CUOTA USUARIOS EXTRA</label>
-                                <input type="number" id="edit-cuota" value="${user.expediente?.usuariosAdicionales || 0}" min="0" style="width:100%; padding:10px; border:1px solid #ddd; border-radius:6px; font-size:0.85rem;">
-                            </div>
-                            <div>
-                                <label style="display:block; font-size:0.65rem; color:var(--accent-gold); font-weight:700; margin-bottom:5px;">PUNTO DE EQUILIBRIO ($)</label>
-                                <input type="number" id="edit-punto-equilibrio" value="${user.expediente?.finanzas?.puntoEquilibrio || 0}" placeholder="0.00" style="width:100%; padding:10px; border:1px solid #ddd; border-radius:6px; font-size:0.85rem;">
-                            </div>
-                            <div>
-                                <label style="display:block; font-size:0.65rem; color:var(--accent-gold); font-weight:700; margin-bottom:5px;">MARGEN UTILIDAD (%)</label>
-                                <input type="number" id="edit-margen" value="${user.expediente?.finanzas?.margenUtilidad || 0}" placeholder="0" style="width:100%; padding:10px; border:1px solid #ddd; border-radius:6px; font-size:0.85rem;">
-                            </div>
-                        </div>
-                    </div>
+    const servicesContainer = document.getElementById('edit-servicios-dinamicos');
+    servicesContainer.innerHTML = consultingCatalog.map(service => `
+        <label style="display:block; margin-bottom:8px; cursor:pointer;">
+            <input type="checkbox" class="edit-check-consultor" value="${service.id}" ${(user.accesos?.consultor || []).includes(service.id) ? 'checked' : ''}> ${service.title}
+        </label>
+    `).join('') || '<p style="font-size:0.7rem; color:#999;">Catálogo de servicios no disponible.</p>';
 
-                    <div style="display:flex; gap:10px; justify-content:flex-end;">
-                        <button type="button" onclick="document.getElementById('modal-edit-container').remove()" style="background:none; border:none; color:#999; cursor:pointer; font-weight:600;">CANCELAR</button>
-                        <button type="submit" style="background:var(--primary-midnight); color:white; border:none; padding:12px 20px; border-radius:6px; cursor:pointer; font-weight:700; font-size:0.8rem;">ACTUALIZAR PERMISOS</button>
-                    </div>
-                </form>
-            </div>
-        </div>
-    `;
+    // ACTIVACIÓN VISUAL
+    modal.style.display = 'block';
 
-    document.body.insertAdjacentHTML('beforeend', modalHtml);
-    
-    // Vinculación al motor de persistencia
-    document.getElementById('form-edit-usuario').addEventListener('submit', async (e) => {
+    // 4. MOTOR DE PERSISTENCIA (SUBMIT REFACTORIZADO)
+    form.onsubmit = async (e) => {
         e.preventDefault();
-        const btnSave = e.target.querySelector('button[type="submit"]');
-        btnSave.disabled = true;
-        btnSave.innerText = "GUARDANDO...";
+        e.stopImmediatePropagation(); // Mantenemos Hotfix de trazabilidad
 
-        // TRACEABILIDAD: Captura Dinámica de Permisos (Fase 3: Handshake Total)
-        // Recuperamos los IDs de los contenedores dinámicos de Academia y Consultoría
-        const selectedCursos = Array.from(e.target.querySelectorAll('div[style*="max-height: 150px"] input:checked')).map(el => el.value);
-        const selectedApps = Array.from(e.target.querySelectorAll('input[value^="app-"]:checked')).map(el => el.value);
-        const selectedConsultoria = Array.from(e.target.querySelectorAll('.edit-check-consultor:checked')).map(el => el.value);
-        const newRol = document.getElementById('edit-rol').value;
+        const btnSave = e.target.querySelector('button[type="submit"]');
+        const originalBtnText = btnSave.innerText;
+        btnSave.disabled = true;
+        btnSave.innerText = "SINCRONIZANDO...";
+
+        const selectedCursos = Array.from(document.querySelectorAll('.edit-check-curso:checked')).map(el => el.value);
+        const selectedApps = Array.from(document.querySelectorAll('#edit-apps-dinamicas input:checked')).map(el => el.value);
+        const selectedConsultoria = Array.from(document.querySelectorAll('.edit-check-consultor:checked')).map(el => el.value);
 
         const newAccess = {
             cursos: selectedCursos,
             apps: selectedApps,
-            consultor: selectedConsultoria // Trazabilidad: Sincronización con IDs reales de config_consultoria
+            consultor: selectedConsultoria
         };
 
-        // TRACEABILIDAD: Construcción de Metadatos de Modalidad (Fase 3.3)
         const metadata = {};
         selectedCursos.forEach(courseId => {
             const courseInfo = catalog.find(c => c.id === courseId);
-            if (courseInfo) {
-                metadata[courseId] = { modality: courseInfo.modality || 'ONLINE' };
-            }
+            if (courseInfo) metadata[courseId] = { modality: courseInfo.modality || 'ONLINE' };
         });
 
         const extraData = {
+            nombre: document.getElementById('edit-nombre').value,
+            empresa: document.getElementById('edit-empresa').value,
             nuevoPago: parseFloat(document.getElementById('edit-pago').value) || 0,
             cuotaUsuarios: parseInt(document.getElementById('edit-cuota').value) || 0,
-            // TRACEABILIDAD: Captura de indicadores de Negocio (Fase 4.4)
             puntoEquilibrio: parseFloat(document.getElementById('edit-punto-equilibrio').value) || 0,
             margenUtilidad: parseFloat(document.getElementById('edit-margen').value) || 0,
-            metadata 
+            metadata
         };
 
         try {
-            await UserManager.updateAccess(uid, newAccess, newRol, extraData);
-            
+            await UserManager.updateAccess(uid, newAccess, document.getElementById('edit-rol').value, extraData);
             alert("✅ Expediente Maestro actualizado con éxito.");
-            document.getElementById('modal-edit-container').remove();
-            
-            // Refresco de tabla y métricas para reflejar cambios
-            loadUsersList();
-            loadAdminStats(); 
+            modal.style.display = 'none';
+            if (typeof window.initAdminData === 'function') window.initAdminData();
         } catch (error) {
-            alert("🚨 Error al guardar cambios. Revisa la consola.");
+            console.error("🚨 Error Crítico en Guardado:", error);
+            alert(`🚨 Error al guardar: ${error.message}`);
         } finally {
             btnSave.disabled = false;
-            btnSave.innerText = "ACTUALIZAR PERMISOS";
+            btnSave.innerText = originalBtnText;
         }
-    });
+    };
 };
 
 document.addEventListener('DOMContentLoaded', async () => {
@@ -586,6 +543,13 @@ document.addEventListener('DOMContentLoaded', async () => {
                 
                 // TRACEABILIDAD: Evaluación de Vigencia vía ExpirationEngine
                 // Delegamos la inteligencia de colores al motor central para mantener consistencia.
+                // Motor de Iconografía de Trazabilidad (🛒 = Automático | 👤 = Manual)
+                const getSourceIcon = (id) => {
+                    const svc = servicios[id] || {};
+                    const isAuto = svc.metodoAdquisicion?.includes('XpertPay');
+                    return isAuto ? '🛒' : '👤';
+                };
+
                 const getStatusColor = (id) => {
                     const svc = servicios[id];
                     const analysis = ExpirationEngine.evaluate(svc?.fechaVencimiento);
@@ -605,12 +569,22 @@ document.addEventListener('DOMContentLoaded', async () => {
                         <span style="background: #eee; padding: 4px 8px; border-radius: 4px; font-size: 0.7rem; text-transform: uppercase;">${user.rol}</span>
                     </td>
                     <td style="padding: 15px;">
-                        <div style="font-size: 0.75rem; display: flex; align-items: center; gap: 12px;">
-                            <span title="Cursos en Academia">📚 <strong>${totalCursos}</strong></span>
+                        <div style="font-size: 0.75rem; display: flex; align-items: center; gap: 15px;">
+                            <div style="display: flex; flex-direction: column; gap: 4px;">
+                                ${(user.accesos?.cursos || []).map(cid => `
+                                    <div style="display: flex; align-items: center; gap: 5px;">
+                                        <span style="font-size: 0.9rem;" title="Origen: ${servicios[cid]?.metodoAdquisicion || 'Manual'}">${getSourceIcon(cid)}</span>
+                                        <span title="Curso Activo" style="color: ${getStatusColor(cid)}; font-weight: 700;">📚</span>
+                                    </div>
+                                `).join('')}
+                            </div>
                             |
-                            <div style="display: flex; gap: 6px;">
+                            <div style="display: flex; gap: 8px;">
                                 ${(user.accesos?.apps || []).map(app => 
-                                    `<span style="color: ${getStatusColor(app)}; cursor: help; font-size: 1.1rem;" title="App: ${app}">📱</span>`
+                                    `<div style="display: flex; flex-direction: column; align-items: center; gap: 2px;">
+                                        <span style="font-size: 0.6rem; opacity: 0.6;">${getSourceIcon(app)}</span>
+                                        <span style="color: ${getStatusColor(app)}; cursor: help; font-size: 1.1rem;" title="App: ${app}">📱</span>
+                                    </div>`
                                 ).join('')}
                                 ${tieneIA ? `<span style="color: ${getStatusColor('ia-expert')}; cursor: help; font-size: 1.1rem;" title="Consultor IA Expert">✨</span>` : ''}
                             </div>
@@ -637,7 +611,7 @@ document.addEventListener('DOMContentLoaded', async () => {
      * Trazabilidad: Ejecuta el borrado en Firestore y actualiza el dashboard.
      */
     window.confirmDeleteUser = async (uid, nombre) => {
-        const confirmacion = confirm(`⚠️ ADVERTENCIA DE SEGURIDAD:\n¿Estás seguro de eliminar permanentemente a "${nombre}"?\n\nEsta acción borrará su expediente y accesos de la Dreams Platform de forma irreversible.`);
+        const confirmacion = confirm(`⚠️ ADVERTENCIA DE SEGURIDAD:\n¿Estás seguro de eliminar permanentemente a "${nombre}"?\n\nEsta acción borrará su expediente y accesos de la Mi Empresa Crece Platform de forma irreversible.`);
         
         if (confirmacion) {
             try {
@@ -646,9 +620,13 @@ document.addEventListener('DOMContentLoaded', async () => {
                 
                 alert("🗑️ Expediente eliminado con éxito.");
                 
-                // Sincronización inmediata de la interfaz
-                await loadUsersList();
-                await loadAdminStats();
+                // Trazabilidad: Limpiamos la caché local para forzar una sincronización real con la nube post-borrado
+                allUsersCache = []; 
+                
+                // Sincronización inmediata de la interfaz vía Orquestador Global (Evita errores de Scope)
+                if (typeof window.initAdminData === 'function') {
+                    window.initAdminData();
+                }
             } catch (error) {
                 console.error("🚨 Error en el flujo de borrado:", error);
                 alert("🚨 Error: No se pudo eliminar el usuario. Verifique su conexión o permisos.");
@@ -680,43 +658,32 @@ document.addEventListener('DOMContentLoaded', async () => {
      * Construye un Timeline cronológico inverso (lo más reciente arriba).
      */
     const renderTimelineModal = (nombre, logs) => {
-        document.getElementById('modal-logs-container')?.remove();
+        const modal = document.getElementById('modal-logs');
+        const nameEl = document.getElementById('log-cliente-nombre');
+        const contentEl = document.getElementById('logs-timeline-content');
 
-        const sortedLogs = [...logs].reverse(); // Prioridad a los hitos recientes
+        // 1. ACTUALIZACIÓN DE ENCABEZADO
+        if (nameEl) nameEl.innerText = `Líder: ${nombre}`;
 
-        const logsHtml = sortedLogs.map(log => `
+        // 2. PROCESAMIENTO DE HITOS (REVERSO CRONOLÓGICO)
+        const sortedLogs = [...logs].reverse();
+
+        const itemsHtml = sortedLogs.map(log => `
             <div style="border-left: 3px solid var(--accent-gold); padding-left: 20px; margin-bottom: 25px; position: relative; animation: fadeIn 0.4s ease-out;">
                 <div style="width: 12px; height: 12px; background: var(--accent-gold); border-radius: 50%; position: absolute; left: -8px; top: 4px; box-shadow: 0 0 10px rgba(149, 124, 61, 0.4);"></div>
-                <div style="font-size: 0.7rem; color: #999; font-weight: 700; letter-spacing: 0.5px;">${new Date(log.fecha).toLocaleString('es-MX')}</div>
-                <div style="font-size: 0.85rem; font-weight: 800; color: var(--primary-midnight); text-transform: uppercase; margin: 4px 0;">${log.evento.replace(/_/g, ' ')}</div>
-                <div style="font-size: 0.9rem; color: #444; line-height: 1.5; font-weight: 400;">${log.descripcion}</div>
+                <div style="font-size: 0.65rem; color: #999; font-weight: 700; letter-spacing: 0.5px;">${new Date(log.fecha).toLocaleString('es-MX')}</div>
+                <div style="font-size: 0.8rem; font-weight: 800; color: var(--primary-midnight); text-transform: uppercase; margin: 4px 0;">${log.evento.replace(/_/g, ' ')}</div>
+                <div style="font-size: 0.85rem; color: #444; line-height: 1.5; font-weight: 400;">${log.descripcion}</div>
             </div>
-        `).join('') || '<div style="text-align:center; padding:40px; color:#999; font-style:italic;">No existen registros históricos para este cliente.</div>';
+        `).join('') || '<div style="text-align:center; padding:40px; color:#999; font-style:italic;">No existen registros históricos para este cliente en Dreams Cloud.</div>';
 
-        const modalHtml = `
-            <div id="modal-logs-container" style="display:flex; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(15, 52, 96, 0.9); z-index:10001; align-items:center; justify-content:center; backdrop-filter: blur(10px);">
-                <div style="background:#fff; width:550px; max-height: 85vh; border-radius:24px; box-shadow: 0 40px 100px rgba(0,0,0,0.5); display:flex; flex-direction:column; overflow:hidden; border: 1px solid rgba(255,255,255,0.2);">
-                    <header style="background: var(--primary-midnight); padding: 30px; color: #fff; border-bottom: 5px solid var(--accent-gold);">
-                        <h3 style="margin:0; font-size: 1.2rem; font-weight: 900; letter-spacing: 1.5px;">DOSSIER DE TRAZABILIDAD</h3>
-                        <p style="margin: 8px 0 0 0; font-size: 0.8rem; color: var(--accent-gold); font-weight: 700; text-transform: uppercase;">Líder: ${nombre}</p>
-                    </header>
-                    
-                    <div style="flex: 1; overflow-y: auto; padding: 40px; background: #fdfdfd;">
-                        ${logsHtml}
-                    </div>
-
-                    <footer style="padding: 25px; border-top: 1px solid #eee; text-align: right; background: #fff;">
-                        <button onclick="document.getElementById('modal-logs-container').remove()" 
-                                style="background: var(--primary-midnight); color: white; border: 1px solid var(--accent-gold); padding: 14px 30px; border-radius: 12px; font-weight: 700; cursor: pointer; font-size: 0.8rem; letter-spacing: 1px; transition: 0.3s;"
-                                onmouseover="this.style.background='#164275'" onmouseout="this.style.background='var(--primary-midnight)'">
-                            CERRAR EXPEDIENTE
-                        </button>
-                    </footer>
-                </div>
-            </div>
-        `;
-
-        document.body.insertAdjacentHTML('beforeend', modalHtml);
+        // 3. INYECCIÓN Y ACTIVACIÓN
+        if (contentEl) {
+            contentEl.innerHTML = itemsHtml;
+            contentEl.scrollTop = 0; // Reset de scroll para ver lo más nuevo arriba
+        }
+        
+        modal.style.display = 'flex';
     };
 
     // Nota: El disparo de loadAdminStats() y loadUsersList() ahora es gestionado
@@ -896,9 +863,11 @@ document.addEventListener('DOMContentLoaded', async () => {
             alert("✅ Programa guardado con éxito en Dreams Cloud.");
             modalCurso.style.display = 'none';
             
-            // Aquí dispararemos el refresco de la tabla en el siguiente paso
-            // Recarga quirúrgica del catálogo tras guardar
-            loadCoursesList(); 
+            // Trazabilidad: Sincronización total del ecosistema post-edición de programa.
+            // Aseguramos que Usuarios, BI y Catálogos se hablen entre sí tras la persistencia.
+            if (typeof window.initAdminData === 'function') {
+                window.initAdminData();
+            }
             
         } catch (error) {
             alert("🚨 Error al guardar el programa. Revisa la consola.");
@@ -1214,7 +1183,12 @@ document.addEventListener('DOMContentLoaded', async () => {
             await ServiceManager.saveService(serviceData, editingId);
             alert("✅ Servicio de Consultoría guardado con éxito.");
             modalServicio.style.display = 'none';
-            loadServicesList(); // Refresco quirúrgico
+            
+            // Trazabilidad: Sincronización total del ecosistema post-edición de servicio.
+            // Invocamos al Orquestador Maestro para que la tabla de servicios y el BI se hablen entre sí.
+            if (typeof window.initAdminData === 'function') {
+                window.initAdminData();
+            }
         } catch (error) {
             alert("🚨 Error al guardar el servicio.");
         } finally {
@@ -1339,10 +1313,12 @@ document.addEventListener('DOMContentLoaded', async () => {
             tableBody.innerHTML = querySnapshot.docs.map(docSnap => {
                 const req = docSnap.data();
                 
-                // TRACEABILIDAD: Unificación de Identidad (Garantiza que el nombre viaje al correo)
+                // TRACEABILIDAD: Unificación de Identidad Prestige (Fase 3.7)
                 const nombreSeguro = req.nombre || req.clienteNombre || "Líder Dreams";
                 const emailSeguro = req.email || req.clienteEmail;
                 const servicioSeguro = req.interes || req.servicioTitulo || "Servicio Dreams";
+                const empresaSegura = req.empresa || req.clienteEmpresa || ""; // Trazabilidad de Identidad
+                const uidSeguro = req.usuarioId || ""; // Trazabilidad de Handshake
 
                 const rawDate = req.fechaEnvio || req.fechaSolicitud || new Date().toISOString();
                 const fecha = new Date(rawDate).toLocaleDateString('es-MX', {
@@ -1353,6 +1329,7 @@ document.addEventListener('DOMContentLoaded', async () => {
                 <tr style="border-bottom: 1px solid #f4f4f4; transition: background 0.2s;" onmouseover="this.style.background='#fafafa'" onmouseout="this.style.background='transparent'">
                     <td style="padding: 15px;">
                         <div style="font-weight: 600; color: var(--primary-midnight);">${nombreSeguro}</div>
+                        <div style="font-size: 0.7rem; color: var(--accent-gold); font-weight: 700; text-transform: uppercase; margin-bottom: 2px;">${empresaSegura}</div>
                         <div style="font-size: 0.75rem; color: #999;">${emailSeguro}</div>
                     </td>
                     <td style="padding: 15px;">
@@ -1371,10 +1348,10 @@ document.addEventListener('DOMContentLoaded', async () => {
                         `}
                     </td>
                     <td style="padding: 15px; text-align: right; display: flex; gap: 10px; justify-content: flex-end;">
-                        <button onclick="sendPurchaseCart('${emailSeguro}', '${nombreSeguro}', '${servicioSeguro}')" 
+                        <button onclick="sendPurchaseCart('${emailSeguro}', '${nombreSeguro}', '${servicioSeguro}', '${empresaSegura}', '${uidSeguro}')" 
                                 style="background: #f0f4f8; border: none; cursor: pointer; color: var(--primary-midnight); font-size: 1rem; padding: 5px; border-radius: 4px; display: flex; align-items: center; border: 1px solid rgba(15, 52, 96, 0.1);" 
                                 title="Enviar Carrito de Compra">
-                            ✉️ <span style="font-size: 0.6rem; margin-left: 6px; font-weight: 800;">ENVIAR CARRITO</span>
+                            ✉️ <span style="font-size: 0.6rem; margin-left: 6px; font-weight: 800;">ENVIAR RESPUESTA</span>
                         </button>
                         <button onclick="confirmDeleteIntervention('${docSnap.id}')" style="background: none; border: none; cursor: pointer; color: #dc2626; font-size: 1.1rem;" title="Eliminar Registro">🗑️</button>
                     </td>
@@ -1407,16 +1384,25 @@ document.addEventListener('DOMContentLoaded', async () => {
      * sendPurchaseCart - Protocolo Comercial Prestige
      * Dispara el flujo de correo con el enlace al carrito de compras.
      */
-    window.sendPurchaseCart = async (email, nombre, servicio) => {
-        if (!confirm(`🚀 ¿Enviar enlace de compra para "${servicio}" a ${nombre}?`)) return;
+    window.sendPurchaseCart = async (email, nombre, servicio, empresa = '', uid = '') => {
+        if (!confirm(`🚀 ¿Enviar respuesta estratégica para "${servicio}" a ${nombre} (${empresa})?`)) return;
 
         try {
+            // TRACEABILIDAD: Discriminador de Intenciones Dinámico (Apps vs Consultoría)
+            const esApp = servicio.toLowerCase().includes('app') || servicio.toLowerCase().includes('designer');
+            const intentType = esApp ? 'INTERES_APPS' : 'CARRITO_COMPRA';
+
             // PROTOCOLO COMERCIAL: Conexión con el Servidor de Notificaciones (Dreams Prestige Engine)
             const payload = {
                 destinatario: email,
-                cliente: { email: email, nombre: nombre },
+                cliente: { 
+                    email: email, 
+                    nombre: nombre, 
+                    empresa: empresa, 
+                    uid: uid 
+                },
                 servicio: { titulo: servicio, id: 'link_carrito' },
-                tipo: 'CARRITO_COMPRA',
+                tipo: intentType,
                 omitirRegistroFirestore: true
             };
 
