@@ -1044,7 +1044,7 @@ async function ejecutarProcesoDePago(courseId) {
                 courseId: courseId,
                 uid: user.uid,
                 email: user.email,
-                displayName: user.displayName
+                displayName: user.displayName || user.email.split('@')[0] || 'Líder Dreams'
             })
         });
 

@@ -12,5 +12,8 @@
     "nodemailer": "^6.9.13"
   },
   "author": "Jorge - Mi Empresa Crece",
-  "license": "ISC"
+  "license": "ISC",
+  "devDependencies": {
+    "netlify-cli": "^24.9.0"
+  }
 }

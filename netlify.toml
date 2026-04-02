@@ -3,9 +3,10 @@
   functions = "netlify/functions"
 
 [dev]
-  command = "npm run build" # O el comando que uses para levantar tu front
   port = 8888
   publish = "public"
+  # Eliminamos 'command' porque usaremos el servidor estático nativo de Netlify
+  # para evitar que el proceso se cierre antes de tiempo.
 
 [[redirects]]
   from = "/api/*"
