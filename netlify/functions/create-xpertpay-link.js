@@ -26,10 +26,11 @@ exports.handler = async (event) => {
 const normalizedId = String(courseId).trim().toUpperCase();
 const idNumericoSimple = Math.abs(normalizedId.split('').reduce((a, b) => { a = ((a << 5) - a) + b.charCodeAt(0); return a & a }, 0)) % 100000;
 
+        // Generamos un ID de sesión compatible con PHP (Alfanumérico sin caracteres especiales)
         const headersXpert = {
             'X-Requested-With': 'xmlhttprequest',
             'Content-Type': 'application/x-www-form-urlencoded',
-            'Cookie': 'PHPSESSID=dreams_session_2026'
+            'Cookie': 'PHPSESSID=dreamsPlatform2026Session' 
         };
 
         // PASO 1: Generador
