@@ -51,9 +51,13 @@ exports.handler = async (event) => {
         // PASO 2: Asociación
         const paramsClient = new URLSearchParams();
         paramsClient.append('clientes[clientes_email]', email);
-        paramsClient.append('clientes[clientes_nombres]', displayName || 'Líder');
-        paramsClient.append('clientes[clientes_apellido_paterno]', 'Dreams');
-        paramsClient.append('clientes[clientes_apellido_materno]', 'Socio'); // Requerido [cite: 61]
+        // Aseguramos nombres y apellidos limpios para cumplir con el validador de XpertPay 
+        const nombreLimpio = (displayName || 'Líder').split(' ')[0];
+        const apellidoLimpio = (displayName || 'Dreams').split(' ')[1] || 'Socio';
+
+        paramsClient.append('clientes[clientes_nombres]', nombreLimpio);
+        paramsClient.append('clientes[clientes_apellido_paterno]', apellidoLimpio);
+        paramsClient.append('clientes[clientes_apellido_materno]', 'Dreams Platform');
         paramsClient.append('token_tienda', process.env.XPERTPAY_TOKEN);
 
         console.log("📡 Enviando Paso 2 a XpertPay...");
