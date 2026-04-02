@@ -22,7 +22,9 @@ exports.handler = async (event) => {
 
         // --- AJUSTE: Convertimos el ID de texto a un número entero para XpertPay ---
         // Usamos un algoritmo simple para generar un número único basado en el texto del ID
-        const idNumericoSimple = Math.abs(courseId.split('').reduce((a, b) => { a = ((a << 5) - a) + b.charCodeAt(0); return a & a }, 0)) % 100000;
+        // Normalizamos el ID (Slug) para garantizar que el hash numérico sea determinístico
+const normalizedId = String(courseId).trim().toUpperCase();
+const idNumericoSimple = Math.abs(normalizedId.split('').reduce((a, b) => { a = ((a << 5) - a) + b.charCodeAt(0); return a & a }, 0)) % 100000;
 
         const headersXpert = {
             'X-Requested-With': 'xmlhttprequest',
