@@ -49,7 +49,13 @@ const idNumericoSimple = Math.abs(normalizedId.split('').reduce((a, b) => { a = 
             throw new Error(`XpertPay: ${resGen.data.result}`);
         }
 
-        const tokenId = resGen.data.token_id;
+        // TRACEABILIDAD: Corregimos la ruta del token según el estándar del proveedor (res.data.result.token_id)
+        const tokenId = resGen.data.result?.token_id || resGen.data.token_id;
+
+        if (!tokenId) {
+            console.error("🚨 Error Crítico: XpertPay no devolvió un token_id válido.", resGen.data);
+            throw new Error("No se recibió identificador de pago del proveedor.");
+        }
 
         // PASO 2: Asociación
         const paramsClient = new URLSearchParams();
