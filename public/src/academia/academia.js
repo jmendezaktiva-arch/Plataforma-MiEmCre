@@ -489,7 +489,11 @@ document.addEventListener('DOMContentLoaded', () => {
                         headers: { 'Content-Type': 'application/json' },
                         body: JSON.stringify({
                             destinatario: user.email,
-                            cliente: { nombre: user.displayName || 'Líder', email: user.email },
+                            cliente: { 
+                            nombre: user.displayName || 'Líder Dreams', 
+                            email: user.email,
+                            uid: user.uid // Inyección crítica para Trazabilidad en Firestore
+                        },
                             servicio: { titulo: course?.title || 'Programa Estratégico', id: id },
                             tipo: 'CARRITO_COMPRA',
                             omitirRegistroFirestore: false // Creamos el registro en la bandeja de intervenciones
