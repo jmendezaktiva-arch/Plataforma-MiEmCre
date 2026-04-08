@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Dashboard | Dreams</title>
-    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;600&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="assets/css/style.css">
     <link rel="stylesheet" href="assets/css/bento.css">
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
@@ -38,7 +38,7 @@
 
         <main class="welcome-container">
             <div class="dashboard-section" id="welcome-section" style="margin-top: 20px;">
-                <h2 style="color: var(--primary-midnight); font-weight: 700;">Resumen ejecutivo de tu negocio</h2>
+                <h2 class="dashboard-block-title">Un vistazo de los frutos de tu desarrollo y el crecimiento de tu empresa</h2>
                 <div class="user-identity-header">
                     <span id="user-display-name">Cargando identidad...</span>
                     <p class="identity-subtitle">Todo lo que mueve tu PyME en un solo panel: formación, operación y consultoría. Prioriza con datos y avanza con orden, no con improvisación.</p>
@@ -48,8 +48,8 @@
             <section class="quick-access-zone sticky-shelf" id="operative-shelf">
                 <div class="shelf-control-header">
                     <div class="shelf-header-titles">
-                        <h4 class="shelf-title">Panel Operativo</h4>
-                        <span class="shelf-subtitle">Tu expediente y la oferta de crecimiento</span>
+                        <h4 class="dashboard-block-title dashboard-block-title--shelf">Panel Operativo</h4>
+                        <span class="dashboard-block-tagline">Tu expediente y la oferta de crecimiento</span>
                     </div>
                     <button id="btn-toggle-shelf" class="btn-minimal-toggle" title="Minimizar/Expandir">
                         <span id="toggle-icon">▼</span>
@@ -74,7 +74,7 @@
             </section>
             
             <div class="dashboard-section">
-                <h3 style="color: var(--primary-midnight); font-weight: 700; margin-bottom: 12px; text-align: center; letter-spacing: 1px; text-transform: uppercase; font-size: 0.9rem;">Centro de Resultados Estratégicos</h3>
+                <h3 class="dashboard-block-title dashboard-block-title--hub">Centro de Resultados Estratégicos</h3>
                 <p id="hub-executive-summary" class="hub-executive-summary" aria-live="polite"></p>
                 
                 <div class="dreams-axis-hub">

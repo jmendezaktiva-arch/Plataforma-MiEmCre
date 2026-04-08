@@ -116,15 +116,21 @@
     border-top: 1px solid rgba(15, 52, 96, 0.08);
 }
 
+.dashboard-block-tagline,
 .hub-executive-summary {
-    text-align: center;
+    font-family: 'Montserrat', sans-serif;
     font-size: 0.78rem;
     font-weight: 600;
-    color: rgba(15, 52, 96, 0.72);
+    letter-spacing: 0.04em;
+    color: rgba(15, 52, 96, 0.68);
     line-height: 1.45;
+    text-transform: none;
+}
+
+.hub-executive-summary {
+    text-align: center;
     max-width: 640px;
     margin: 0 auto 8px;
-    letter-spacing: 0.02em;
 }
 
 .node-kpi-sub {
@@ -637,6 +643,49 @@
 #user-display-name { font-weight: 700; color: var(--primary-midnight); font-size: 2.2rem; letter-spacing: -0.02em; display: block; }
 .identity-subtitle { font-size: 0.95rem; color: #666; margin-top: 6px; font-weight: 300; }
 
+/* --- Dashboard: títulos de bloque unificados (bienvenida, panel operativo, hub) --- */
+.dashboard-block-title {
+    font-family: 'Montserrat', sans-serif;
+    font-weight: 700;
+    font-size: clamp(0.98rem, 0.35vw + 0.92rem, 1.2rem);
+    color: var(--primary-midnight);
+    letter-spacing: 0.025em;
+    line-height: 1.38;
+    margin: 0 0 10px;
+    text-transform: none;
+}
+
+#welcome-section .dashboard-block-title {
+    text-align: left;
+    max-width: 42rem;
+}
+
+.dashboard-block-title--shelf,
+.dashboard-block-title--hub {
+    text-align: center;
+}
+
+.dashboard-block-title--shelf {
+    margin-bottom: 6px;
+}
+
+.dashboard-block-title--hub {
+    margin-bottom: 12px;
+}
+
+.shelf-header-titles .dashboard-block-tagline {
+    max-width: 36rem;
+    margin-left: auto;
+    margin-right: auto;
+}
+
+@media (max-width: 600px) {
+    #welcome-section .dashboard-block-title {
+        text-align: center;
+        max-width: none;
+    }
+}
+
 /* --- ZONA OPERATIVA: CONTROLES Y COLAPSO --- */
 .sticky-shelf {
     position: sticky;
@@ -659,24 +708,13 @@
     border-bottom: 1px solid rgba(15, 52, 96, 0.05);
 }
 
-.shelf-header-titles { display: flex; flex-direction: column; }
-
-.shelf-title {
-    margin: 0 !important;
-    font-size: 0.75rem !important;
-    text-transform: uppercase;
-    letter-spacing: 2px;
-    font-weight: 800;
-    color: var(--primary-midnight);
-}
-
-.shelf-subtitle {
-    font-size: 0.6rem;
-    color: var(--accent-gold);
-    font-weight: 600;
-    text-transform: uppercase;
-    letter-spacing: 1px;
-    margin-top: 2px;
+.shelf-header-titles {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    flex: 1;
+    text-align: center;
+    min-width: 0;
 }
 
 .btn-minimal-toggle {
