@@ -1,0 +1,213 @@
+/*public/assets/css/sidebar-prestige.css
+/* ========================================================================== */
+/* DREAMS | SIDEBAR PRESTIGE (MINIMALISMO Y AUTORIDAD) */
+/* ========================================================================== */
+
+.sidebar-prestige {
+    position: fixed;
+    left: 0;
+    top: 0;
+    height: 100vh;
+    width: 260px;
+    /* TRACEABILIDAD: Blindaje de capa superior sobre Navbar (1000) y Cards */
+    z-index: 9999 !important; 
+    display: flex !important;
+    flex-direction: column;
+    background: rgba(15, 52, 96, 0.95); /* Midnight con mayor opacidad para legibilidad */
+    backdrop-filter: blur(20px) saturate(180%); /* Enfoque profundo Prestige */
+    border-right: 2px solid var(--accent-gold);
+    color: var(--bg-base);
+    transition: transform 0.5s cubic-bezier(0.165, 0.84, 0.44, 1); /* Sincronizado con hover de cards */
+    box-shadow: 15px 0 45px rgba(0, 0, 0, 0.3); /* Sombra de profundidad real */
+}
+
+/* Blindaje de desplazamiento para el contenido principal */
+main, .main-content {
+    position: relative; /* Crea un nuevo contexto de apilamiento controlado */
+    z-index: 1; 
+    transition: margin-left 0.5s cubic-bezier(0.165, 0.84, 0.44, 1);
+}
+
+/* Estado oculto: Se deja una "Manija de Oro" de 8px visible para servir de disparador técnico y visual */
+.sidebar-prestige.sidebar-hidden {
+    transform: translateX(-252px); /* Ancho 260px - 8px de manija = 252px */
+}
+
+/* Micro-interacción: La manija se ilumina sutilmente al pasar el cursor antes de expandirse */
+.sidebar-prestige.sidebar-hidden:hover {
+    border-right-width: 4px;
+    background: rgba(15, 52, 96, 1);
+}
+
+/* --- IDENTIDAD DE SESIÓN (PRESTIGE) --- */
+.sidebar-user-identity {
+    padding: 30px 20px 10px 35px; /* Alineación con el margen izquierdo de los links */
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+}
+
+.user-greeting {
+    font-size: 11px;
+    text-transform: uppercase;
+    letter-spacing: 2px;
+    color: rgba(245, 245, 240, 0.5); /* Marfil de Lino con transparencia sutil */
+    font-weight: 500;
+}
+
+.user-name {
+    font-size: 19px;
+    font-weight: 700;
+    color: var(--accent-gold); /* Oro Bronceado para resaltar la identidad */
+    font-family: 'Montserrat', sans-serif;
+    letter-spacing: -0.02em;
+}
+
+/* Área de Navegación */
+.sidebar-nav {
+    flex-grow: 1;
+    padding: 20px 20px 40px 20px; /* Ajuste de padding superior para equilibrar el bloque de identidad */
+}
+
+.sidebar-link {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+    padding: 15px;
+    color: var(--bg-base);
+    text-decoration: none;
+    font-size: var(--font-size-label); /* 15px (0.938rem): Suelo Prestige de Legibilidad */
+    font-weight: 400; /* Incremento a Regular para evitar que el texto se "pierda" en el fondo oscuro */
+    border-radius: 12px;
+    transition: all 0.3s ease;
+    margin-bottom: 8px;
+}
+
+.sidebar-link:hover {
+    background: rgba(149, 124, 61, 0.15);
+    color: var(--accent-gold);
+    padding-left: 20px;
+}
+
+.sidebar-link.disabled {
+    opacity: 0.4;
+    cursor: not-allowed;
+    filter: grayscale(1);
+}
+
+/* Footer y Logout */
+.sidebar-footer {
+    padding: 20px;
+    border-top: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.btn-logout-sidebar {
+    width: 100%;
+    padding: 14px; /* Incremento para equilibrar el nuevo tamaño de fuente */
+    background: transparent;
+    border: 1.5px solid rgba(149, 124, 61, 0.4); /* Sincronización con Oro Prestige (#957C3D) */
+    color: #FFFFFF;
+    border-radius: 8px;
+    cursor: pointer;
+    font-size: var(--font-size-button); /* 16px (1rem): Estándar Prestige para botones */
+    font-weight: 600; /* Peso Semi-bold para garantizar legibilidad en el pie de página */
+    text-transform: uppercase;
+    letter-spacing: 1.5px; /* Tracking ligeramente aumentado para mayor distinción */
+    transition: all 0.3s;
+}
+
+.btn-logout-sidebar:hover {
+    background: #ef4444; /* Rojo crítico para logout */
+    border-color: #ef4444;
+}
+
+/* --- AJUSTE QUIRÚRGICO: PEEK LOGO (MEDIO CÍRCULO) --- */
+
+.sidebar-brand-peek {
+    position: absolute;
+    right: -30px; /* Desborda la mitad de su ancho (60px) */
+    top: 55px;    /* Alineación visual con el botón 'Regresar' */
+    width: 60px;
+    height: 60px;
+    background: var(--primary-midnight, #0F3460);
+    border: 1.5px solid var(--accent-gold, #957C3D);
+    border-radius: 50%;
+    display: flex;
+    justify-content: flex-end; /* Empuja el logo hacia la parte visible (derecha) */
+    align-items: center;
+    padding-right: 8px;
+    cursor: pointer;
+    box-shadow: 5px 0 15px rgba(0, 0, 0, 0.2);
+    z-index: -1; /* Se posiciona detrás del sidebar para que la unión sea limpia */
+    transition: all 0.3s ease;
+}
+
+/* Ajuste del logo dentro del medio círculo */
+.sidebar-brand-peek img {
+    width: 25px;
+    height: 25px;
+    object-fit: contain;
+    filter: brightness(1.2); /* Realce sutil para visibilidad */
+}
+
+/* Efecto Hover: El círculo 'late' ligeramente al pasar el mouse */
+.sidebar-prestige.sidebar-hidden:hover .sidebar-brand-peek {
+    right: -35px;
+    box-shadow: 8px 0 20px rgba(149, 124, 61, 0.3);
+}
+
+/* Ocultar la pestaña cuando el sidebar está totalmente abierto para limpiar la interfaz */
+.sidebar-prestige:not(.sidebar-hidden) .sidebar-brand-peek {
+    opacity: 0;
+    pointer-events: none;
+}
+
+/* ========================================================================== */
+/* SINCRONIZACIÓN DE LAYOUT (EXPANSIÓN DINÁMICA DEL WORKBOOK) */
+/* ========================================================================== */
+
+/* TRACER: Esta regla busca el contenedor principal. 
+   Asegúrate de que tu contenido esté dentro de un <main> o clase similar.
+*/
+/* --- NÚCLEO DE LAYOUT RESPONSIVO (DREAMS CORE) --- */
+/* SINCRONIZACIÓN GEOMÉTRICA: El margen ahora responde al Token Maestro */
+main, .main-content, .workbook-container {
+    margin-left: var(--sidebar-width);
+    width: calc(100% - var(--sidebar-width));
+    min-height: 100vh;
+    transition: margin-left 0.4s cubic-bezier(0.19, 1, 0.22, 1), width 0.4s cubic-bezier(0.19, 1, 0.22, 1);
+}
+
+/* Intervención Quirúrgica para Pantallas Móviles/Tablets */
+@media (max-width: 991px) {
+    main, .main-content, .workbook-container {
+        margin-left: 0 !important;
+        width: 100% !important;
+        padding: 0 15px;
+    }
+}
+
+/* --- COMPORTAMIENTO TÁCTIL (OVERLAY PRESTIGE) --- */
+@media (max-width: 991px) {
+    .sidebar-prestige {
+        width: 280px; /* Un poco más ancho para facilitar el toque */
+        background: rgba(15, 52, 96, 0.98); /* Mayor opacidad para legibilidad sobre el contenido */
+        box-shadow: 20px 0 50px rgba(0, 0, 0, 0.3);
+    }
+
+    /* En móviles, ocultamos el sidebar completamente (fuera de pantalla) 
+       pero mantenemos el Peek Logo como disparador táctil */
+    .sidebar-prestige.sidebar-hidden {
+        transform: translateX(-100%); 
+    }
+
+    /* Ajuste del Peek Logo para que sea el "botón" de apertura en móviles */
+    .sidebar-brand-peek {
+        right: -50px; /* Lo sacamos un poco más para que sea fácil de presionar */
+        width: 50px;
+        height: 50px;
+        z-index: 10000;
+        opacity: 1 !important; /* Siempre visible en móvil si el sidebar está oculto */
+        pointer-events: all !important;
+    }
+}

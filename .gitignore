@@ -1,0 +1,4 @@
+node_modules/
+service_account.json
+public/src/shared/env-config.js
+.DS_Store

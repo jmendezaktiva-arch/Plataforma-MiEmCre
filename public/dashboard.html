@@ -1,0 +1,221 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard | Dreams</title>
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;600&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="assets/css/style.css">
+    <link rel="stylesheet" href="assets/css/bento.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+<body>
+    <div id="app">
+        <header class="navbar">
+            <div class="nav-left">
+                <span style="color: var(--primary-midnight); font-weight: 800; font-size: 0.7rem; letter-spacing: 2px; text-transform: uppercase;">Dreams</span>
+                <span style="color: var(--accent-gold); font-weight: 400; font-size: 0.7rem; letter-spacing: 2px; text-transform: uppercase;">Platform</span>
+            </div>
+
+            <div class="nav-center">
+                <h1 id="header-aura-title" style="color: var(--primary-midnight); font-weight: 700; font-size: 0.65rem; letter-spacing: 2px; text-transform: uppercase; margin: 0; opacity: 0.8;">
+                    Panel de Crecimiento
+                </h1>
+            </div>
+
+            <div class="nav-right" id="header-aura-actions">
+                <button id="btn-nav-ia" class="nav-btn-prestige" title="Consultoría IA">
+                    <span class="icon">✨</span>
+                </button>
+                <button id="btn-nav-search" class="nav-btn-prestige" title="Buscador">
+                    <span class="icon">🔍</span>
+                </button>
+                <button id="btn-nav-support" class="nav-btn-prestige" title="Soporte Técnico">
+                    <span class="icon">✉️</span>
+                </button>
+            </div>
+        </header>
+
+        <main class="welcome-container">
+            <div class="dashboard-section" id="welcome-section" style="margin-top: 20px;">
+                <h2 style="color: var(--primary-midnight); font-weight: 700;">Panel de Crecimiento</h2>
+                <div class="user-identity-header">
+                    <span id="user-display-name">Cargando identidad...</span>
+                    <p class="identity-subtitle">Gestiona tus activos, resultados y acelera el crecimiento ordenado y sotenido de tu empresa.</p>
+                </div>
+            </div>
+
+            <section class="quick-access-zone sticky-shelf" id="operative-shelf">
+                <div class="shelf-control-header">
+                    <div class="shelf-header-titles">
+                        <h4 class="shelf-title">Panel Operativo</h4>
+                        <span class="shelf-subtitle">Activos y Estrategia IA</span>
+                    </div>
+                    <button id="btn-toggle-shelf" class="btn-minimal-toggle" title="Minimizar/Expandir">
+                        <span id="toggle-icon">▼</span>
+                    </button>
+                </div>
+
+                <div class="shelf-content-wrapper" id="shelf-content">
+                    <div class="split-operative-panel">
+                        
+                        <div class="operative-column">
+                            <h5 class="column-sticky-title">Mis Activos</h5>
+                            <div class="monitor-list">
+                                <div class="glass-card" data-product="app-crm" style="display: none;">
+                                    <span class="app-icon-mini">📊</span>
+                                    <div class="glass-card-info">
+                                        <span>CRM Ventas</span>
+                                        <span class="status-label">...</span>
+                                    </div>
+                                </div>
+                                <div class="glass-card" data-product="app-erp" style="display: none;">
+                                    <span class="app-icon-mini">💰</span>
+                                    <div class="glass-card-info">
+                                        <span>ERP Finanzas</span>
+                                        <span class="status-label">...</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="operative-column ai-insights-zone">
+                            <h5 class="column-sticky-title ai-glow-text">Sugerencias IA</h5>
+                            <div class="ai-recommendation-feed">
+                                <div class="glass-card" data-product="app-process" style="display: none;">
+                                    <span class="app-icon-mini">⚙️</span>
+                                    <div class="glass-card-info">
+                                        <span>Process Designer</span>
+                                        <span class="status-label">...</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                    </div>
+                </div>
+            </section>
+            
+            <div class="dashboard-section">
+                <h3 style="color: var(--primary-midnight); font-weight: 700; margin-bottom: 30px; text-align: center; letter-spacing: 1px; text-transform: uppercase; font-size: 0.9rem;">Centro de Resultados Estratégicos</h3>
+                
+                <div class="dreams-axis-hub">
+                    <div class="axis-node" data-axis="academia" onclick="window.location.href='academia.html'">
+                        <div class="node-icon">🎓</div>
+                        <div class="node-content">
+                            <span class="node-label">Academia</span>
+                            <div class="node-chart-container">
+                                <canvas id="chart-academia"></canvas>
+                            </div>
+                            <div class="node-kpi" id="kpi-val-academia">0%</div>
+                        </div>
+                    </div>
+
+                    <div class="axis-node" data-axis="apps" onclick="window.location.href='apps.html'">
+                        <div class="node-icon">🛠️</div>
+                        <div class="node-content">
+                            <span class="node-label">Operativa</span>
+                            <div class="node-chart-container">
+                                <canvas id="chart-apps"></canvas>
+                            </div>
+                            <div class="node-kpi" id="kpi-val-apps">--</div>
+                        </div>
+                    </div>
+
+                    <div class="axis-node" data-axis="consultoria" onclick="window.location.href='consultoria.html'">
+                        <div class="node-icon">🤝</div>
+                        <div class="node-content">
+                            <span class="node-label">Consultoría</span>
+                            <div class="node-chart-container">
+                                <canvas id="chart-consultoria"></canvas>
+                            </div>
+                            <div class="node-kpi" id="kpi-val-consultoria">Fase 1</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+    <script>
+    (function() {
+        var mainScript = document.createElement('script');
+        mainScript.src = '/src/shared/env-config.js';
+        mainScript.onerror = function() {
+            console.warn('⚠️ Configuración privada no encontrada. Cargando respaldo...');
+            var backupScript = document.createElement('script');
+            backupScript.src = '/src/shared/env-config.template.js';
+            document.head.appendChild(backupScript);
+        };
+        document.head.appendChild(mainScript);
+    })();
+</script>
+    
+   <script type="module" src="src/app.js"></script>
+    <script type="module" src="src/shared/sidebar-component.js"></script>
+
+    <div id="contact-overlay" class="purpose-overlay">
+        <div class="purpose-bubble" style="max-width: 500px;">
+            <button class="close-bubble" id="btn-close-contact">&times;</button>
+            
+            <header style="margin-bottom: 25px;">
+                <h2 style="color: var(--primary-midnight); font-weight: 700; font-size: 1.5rem; margin-bottom: 8px;">Conecta con tu Crecimiento</h2>
+                <p style="font-weight: 300; font-size: 0.9rem; color: #666; line-height: 1.4;">¿Deseas escalar tu PyME o tienes alguna duda sobre nuestros programas? Estamos para servirte.</p>
+            </header>
+
+            <form id="contact-form" style="display: flex; flex-direction: column; gap: 10px;">
+                <div class="form-group">
+                    <input type="text" id="contact-name" placeholder="Nombre completo" required>
+                </div>
+                
+                <div class="form-group">
+                    <input type="email" id="contact-email" placeholder="Correo electrónico" required>
+                </div>
+
+                <div class="form-group">
+                    <select id="contact-interest" required style="width: 100%; padding: 16px 20px; border-radius: 12px; border: 1.5px solid rgba(15, 52, 96, 0.12); font-family: 'Montserrat';">
+                        <option value="" disabled selected>¿En qué podemos apoyarte?</option>
+                        <option value="Duda Técnica">Duda con el Workbook</option>
+                        <option value="Consultoría">Consultoría estratégica</option>
+                        <option value="Soporte">Problema de acceso</option>
+                        <option value="Otro">Otro asunto</option>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <textarea id="contact-message" placeholder="Escribe tu duda o mensaje aquí..." required style="min-height: 120px; resize: none;"></textarea>
+                </div>
+                
+                <button type="submit" class="btn-primary" id="btn-send-contact" style="margin-top: 10px;">
+                    ENVIAR MENSAJE
+                </button>
+                
+                <p id="contact-status" style="font-size: 0.75rem; text-align: center; margin-top: 10px; font-weight: 600; min-height: 20px;"></p>
+            </form>
+        </div>
+    </div>
+
+    <div id="breakdown-overlay" class="purpose-overlay">
+        <div class="purpose-bubble" style="max-width: 550px; border-top: 6px solid var(--accent-gold);">
+            <button class="close-bubble" id="btn-close-breakdown">&times;</button>
+            
+            <header style="margin-bottom: 25px;">
+                <div style="display: flex; align-items: center; gap: 15px; margin-bottom: 10px;">
+                    <span id="breakdown-icon" style="font-size: 2rem;">📊</span>
+                    <h2 id="breakdown-title" style="color: var(--primary-midnight); font-weight: 700; font-size: 1.4rem; margin: 0; text-transform: uppercase;">Desglose de Resultados</h2>
+                </div>
+                <p id="breakdown-subtitle" style="font-weight: 300; font-size: 0.85rem; color: #666; line-height: 1.4;">Monitoreo de indicadores clave detectados en tu implementación estratégica.</p>
+            </header>
+
+            <div id="breakdown-list" style="display: flex; flex-direction: column; gap: 12px; margin-bottom: 25px; max-height: 350px; overflow-y: auto; padding-right: 10px;">
+                <p style="text-align: center; color: #999; font-size: 0.8rem; padding: 20px;">Sincronizando métricas de rendimiento...</p>
+            </div>
+            
+            <div style="display: flex; gap: 12px;">
+                <button class="btn-primary" id="btn-breakdown-action" style="flex: 2; font-weight: 700; letter-spacing: 1px;">ACCEDER AL MÓDULO</button>
+                <button class="btn-secondary" onclick="document.getElementById('breakdown-overlay').classList.remove('active')" style="flex: 1; background: #eee; color: #666; border: none; border-radius: 12px; font-weight: 600; cursor: pointer;">CERRAR</button>
+            </div>
+        </div>
+    </div>
+
+</body>
+</html>

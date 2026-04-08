@@ -1,0 +1,19 @@
+{
+  "name": "dreams-platform",
+  "version": "1.4.0",
+  "description": "Ecosistema Digital Mi Empresa Crece",
+  "scripts": {
+    "build": "node generate-env.js"
+  },
+  "dependencies": {
+    "axios": "^1.14.0",
+    "firebase-admin": "^11.11.1",
+    "googleapis": "^171.4.0",
+    "nodemailer": "^6.9.13"
+  },
+  "author": "Jorge - Mi Empresa Crece",
+  "license": "ISC",
+  "devDependencies": {
+    "netlify-cli": "^24.9.0"
+  }
+}

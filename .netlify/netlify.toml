@@ -1,0 +1,46 @@
+functionsDirectory = "/Users/user/Desktop/APPS/DC/DC/dreams-platform/netlify/functions"
+functionsDirectoryOrigin = "config-v1"
+redirectsOrigin = "config"
+plugins = []
+headers = []
+
+[build]
+publish = "/Users/user/Desktop/APPS/DC/DC/dreams-platform/public"
+publishOrigin = "config"
+commandOrigin = "ui"
+command = "npm run build"
+functions = "/Users/user/Desktop/APPS/DC/DC/dreams-platform/netlify/functions"
+
+[build.environment]
+
+[build.processing]
+
+[build.processing.css]
+
+[build.processing.html]
+
+[build.processing.images]
+
+[build.processing.js]
+
+[build.services]
+
+[dev]
+port = 8888.0
+publish = "public"
+
+[functions]
+
+[functions."*"]
+
+[[redirects]]
+from = "/api/*"
+to = "/.netlify/functions/:splat"
+status = 200.0
+force = false
+
+[redirects.query]
+
+[redirects.conditions]
+
+[redirects.headers]

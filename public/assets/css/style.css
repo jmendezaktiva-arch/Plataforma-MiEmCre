@@ -1,0 +1,1601 @@
+/*public/assets/css/style.css
+/* ========================================================================== */
+/* DREAMS ACADEMIA | ESTILOS INSTITUCIONALES "MI EMPRESA CRECE" */
+/* ========================================================================== */
+
+:root {
+    /* TRACEABILIDAD: Se elimina la variable de ruta estática. 
+       La gestión de activos de marca ha sido migrada al motor dinámico en la nube 
+       para garantizar la integridad de la identidad visual en producción. */
+
+    /* --- DESIGN TOKENS: PRESTIGE (MARCA OFICIAL) --- */
+    --bg-base: #F5F5F0;           /* Marfil de Lino (Calidez sofisticada) */
+    --primary-midnight: #0F3460;  /* Azul Medianoche (Autoridad) */
+    --accent-gold: #957C3D;       /* Oro Bronceado (Exclusividad) */
+    
+    /* Mapeo de Identidad Blindado */
+    --primary-color: var(--primary-midnight);
+    --accent-color: var(--accent-gold);
+    --text-color: #1A1A1A;
+    --card-bg: #FFFFFF;
+
+    /* --- WORKBOOK UI TOKENS (HOMOLOGADOS PRESTIGE) --- */
+    --brand-blue: var(--primary-midnight); /* Sincronizado con Azul Medianoche [cite: 16] */
+    --brand-orange: var(--accent-gold);    /* Sincronizado con Oro Bronceado [cite: 17] */
+    --brand-blue-light: rgba(15, 52, 96, 0.05); /* Versión suave para fondos de cajas */
+    --brand-orange-light: rgba(149, 124, 61, 0.1); /* Versión suave para tips */
+
+    /* --- ESCALA DE LEGIBILIDAD DREAMS (ESTÁNDAR PRESTIGE) --- */
+    --font-size-h1: 2.125rem;     /* 34px: Autoridad Máxima */
+    --font-size-h2: 1.75rem;      /* 28px: Títulos de Sección */
+    --font-size-h3: 1.375rem;     /* 22px: Títulos de Módulo / Card */
+    --font-size-body: 1.063rem;   /* 17px: Cuerpo de texto (Lectura Premium) */
+    --font-size-label: 0.938rem;  /* 15px: Mínimo para etiquetas y micro-copy */
+    --font-size-button: 1rem;     /* 16px: Botones de acción */
+
+    /* --- SEMÁFORO INSTITUCIONAL (SINCRONIZACIÓN) --- */
+    --secondary-color: #2E7D32;   /* Verde para estados 'Live' y Éxito */
+
+    /* --- INFRAESTRUCTURA DE ESPACIADO (FASE 1) --- */
+    --container-max-width: 1400px; 
+    /* Padding Dinámico: escala suavemente de 1.5rem (p-6) a 3rem (p-12) según la pantalla */
+    --dynamic-padding: clamp(1.5rem, 5vw, 3rem); 
+    --content-gap: 1.5rem;
+
+    /* --- ARCHITECTURAL TOKENS: HEADER & SIDEBAR (GEOMETRÍA PRESTIGE) --- */
+    --navbar-height: 75px; /* Sincronizado con Standard Gold de Consultoría */
+    --navbar-bg: rgba(255, 255, 255, 0.90);
+    --navbar-button-gap: 25px;
+
+    /* TOKENS DE GEOMETRÍA DINÁMICA: La base de la simetría del ecosistema */
+    --sidebar-width-expanded: 260px;
+    --sidebar-width-collapsed: 8px;
+    
+    /* Esta es la variable maestra que usaremos en todos los contenedores 'main' */
+    --sidebar-width: var(--sidebar-width-expanded);
+}
+
+/* REGLA DE SINCRONIZACIÓN: Cambia el valor del token según el estado del body */
+body.sidebar-is-collapsed {
+    --sidebar-width: var(--sidebar-width-collapsed);
+}
+
+/* Expansión del Canvas de Trabajo y Normalización */
+.container {
+    width: 100%;
+    max-width: var(--container-max-width);
+    margin-left: auto;
+    margin-right: auto;
+    padding: 0 var(--content-gap);
+    box-sizing: border-box;
+}
+
+/* BLINDAJE DE SIMETRÍA: Asegura que el contenido principal siempre respete el Sidebar */
+.main-content, .workbook-container {
+    width: calc(100% - var(--sidebar-width)) !important;
+    margin-left: var(--sidebar-width) !important;
+    /* Sincronización milimétrica: 40px de respiro superior para evitar el encimado con la Navbar sticky */
+    margin-top: 40px !important; 
+    padding-bottom: 80px; /* Respiro inferior institucional */
+    transition: all 0.4s cubic-bezier(0.19, 1, 0.22, 1);
+}
+
+/* Corrección de Hiper-densidad: Se aplica el estándar dinámico p-6/p-12 */
+.section-content {
+    padding: var(--dynamic-padding) !important;
+    background-color: var(--card-bg);
+}
+
+/* Forzamos Montserrat en todos los elementos interactivos y definimos escala base */
+body, button, input, textarea, select {
+    font-family: 'Montserrat', sans-serif;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+}
+
+body {
+    font-size: var(--font-size-body); /* 17px: Sincronización con escala Prestige */
+    background-color: var(--bg-base);
+    color: var(--text-color);
+    margin: 0;
+    min-height: 100vh;
+    line-height: 1.6;
+    font-weight: 400;
+}
+
+/* Blindaje Global de Legibilidad para Etiquetas y Fragmentos */
+span {
+    font-size: var(--font-size-label); /* Suelo mínimo de 15px garantizado */
+}
+
+/* --- AJUSTE GLOBAL DE REVEAL PARA ACADEMIA --- */
+.reveal {
+    font-family: 'Montserrat', sans-serif !important;
+    font-size: 24px; 
+    color: var(--text-color);
+}
+
+/* --- JERARQUÍA TIPOGRÁFICA PRESTIGE (MONTSERRAT CORE) --- */
+/* --- JERARQUÍA TIPOGRÁFICA PRESTIGE (SINCRONIZADA) --- */
+h1, .reveal h1 {
+    font-family: 'Montserrat', sans-serif !important;
+    font-size: var(--font-size-h1) !important; /* 34px: Autoridad Máxima */
+    font-weight: 700 !important;
+    color: var(--primary-midnight) !important;
+    letter-spacing: -0.02em !important;
+    line-height: 1.2 !important;
+    margin-bottom: 1.5rem;
+}
+
+h2, .reveal h2 {
+    font-family: 'Montserrat', sans-serif !important;
+    font-size: var(--font-size-h2) !important; /* 28px: Títulos de Sección */
+    font-weight: 700 !important;
+    color: var(--primary-midnight) !important;
+    letter-spacing: -0.02em !important;
+    line-height: 1.3 !important;
+    margin-bottom: 1.5rem;
+}
+
+h3, .reveal h3 {
+    font-family: 'Montserrat', sans-serif !important;
+    font-size: var(--font-size-h3) !important; /* 22px: Títulos de Módulo */
+    font-weight: 700 !important;
+    color: var(--primary-midnight) !important;
+    letter-spacing: -0.01em !important;
+    margin-bottom: 1rem;
+}
+
+/* Cuerpo de Texto y Listas: Lujo Silencioso y Legibilidad Premium */
+p, li, .reveal p, .reveal li {
+    font-family: 'Montserrat', sans-serif !important;
+    font-weight: 400 !important;
+    font-size: var(--font-size-body) !important; /* Consistencia en 17px */
+    line-height: 1.8 !important; 
+    color: var(--text-color);
+    margin-bottom: 1.5rem;
+    letter-spacing: 0.01em;
+}
+
+/* Énfasis y Datos Críticos: Blindaje de Trazabilidad */
+strong, b, .calculation-label {
+    font-weight: 600 !important; /* Semi-bold para destacar sin saturar */
+    color: var(--primary-midnight);
+}
+
+/* --- ESTRUCTURA DE CONTENEDOR DE DIAPOSITIVA (Normalizado para Reveal) --- */
+.reveal .slides section {
+    /* Eliminamos display:flex y height:100% para que Reveal controle la visibilidad y el escalado */
+    padding: 40px 60px; 
+    box-sizing: border-box;
+    text-align: center;
+}
+
+/* Aplicamos el diseño flexible solo a la diapositiva que se está mostrando actualmente */
+.reveal .slides section.present {
+    display: flex !important;
+    flex-direction: column !important;
+    justify-content: center !important; 
+    height: 100% !important;
+}
+
+/* Asegura que los títulos tengan margen inferior consistente */
+.reveal .slides section h2 {
+    margin-top: 0;
+    margin-bottom: 30px;
+}
+
+/* Contenedor Principal */
+#app {
+    width: 100%;
+    margin: 0;
+    display: block; /* Restablece el flujo vertical para las pantallas internas */
+}
+
+/* --- HEADER AURA: ARQUITECTURA DE TRES ZONAS (PRESTIGE) --- */
+.navbar {
+    height: var(--navbar-height) !important;
+    padding: 0 40px;
+    background: rgba(255, 255, 255, 0.7) !important;
+    backdrop-filter: blur(20px) saturate(180%);
+    -webkit-backdrop-filter: blur(20px) saturate(180%);
+    border-bottom: 1px solid rgba(15, 52, 96, 0.08);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    position: sticky !important;
+    top: 0 !important;
+    z-index: 9000;
+    transition: all 0.4s ease;
+}
+
+/* --- COMPONENTES NAV-ACTIONS (ICON-ONLY PRESTIGE) --- */
+.nav-btn-minimal {
+    background: rgba(15, 52, 96, 0); /* Fondo inicial invisible */
+    border: none;
+    color: var(--primary-midnight);
+    width: 42px; /* Área de contacto optimizada */
+    height: 42px;
+    border-radius: 50%; /* Orbe perfecto */
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    opacity: 0.7;
+    position: relative;
+}
+
+.nav-btn-minimal:hover {
+    opacity: 1;
+    color: var(--accent-gold);
+    background: rgba(15, 52, 96, 0.04); /* Sutil rastro de cristal al pasar el cursor */
+    transform: scale(1.1); /* Micro-expansión elástica */
+}
+
+.nav-btn-minimal .icon {
+    font-size: 1.2rem; /* El icono ahora tiene el protagonismo total */
+    display: block;
+    line-height: 1;
+}
+
+.nav-btn-minimal:hover {
+    opacity: 1;
+    color: var(--accent-gold);
+    transform: translateY(-1px);
+}
+
+.nav-btn-minimal .icon {
+    font-size: 1.1rem; /* El icono es el guía, el texto es la confirmación */
+    margin-bottom: 2px;
+}
+
+/* BLINDAJE DE ALINEACIÓN: Regla de los Tres Tercios */
+.nav-left, .nav-right {
+    flex: 1 1 30%; /* Garantiza que los extremos tengan el mismo peso */
+}
+.nav-center {
+    flex: 1 1 40%; /* El centro tiene el espacio necesario para el título sin asfixiarse */
+}
+
+/* ESTÁNDAR PRESTIGE: Botones de Comando (Alta Visibilidad) */
+/* ESTÁNDAR PRESTIGE: Botones de Comando de Alta Visibilidad */
+.nav-btn-prestige {
+    background-color: #0F3460 !important; /* Azul Medianoche Sólido */
+    border: 2px solid #957C3D !important;   /* Borde Oro Grueso */
+    color: #957C3D !important;              /* Icono Oro */
+    width: 44px !important;
+    height: 44px !important;
+    border-radius: 10px !important;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    box-shadow: 0 4px 15px rgba(15, 52, 96, 0.4) !important;
+}
+
+.nav-btn-prestige:hover {
+    background-color: #164275 !important;
+    border-color: #FFFFFF !important;       /* Brillo Blanco */
+    transform: translateY(-3px) scale(1.05);
+    box-shadow: 0 10px 25px rgba(149, 124, 61, 0.5) !important;
+}
+
+.nav-btn-prestige .icon {
+    font-size: 1.25rem !important;
+    color: inherit;
+}
+
+.nav-btn-prestige:hover .icon {
+    color: #FFFFFF !important; /* El icono brilla en blanco */
+}
+
+/* Zonas de Control: Blindaje de Simetría y Escalabilidad */
+.nav-left, .nav-right {
+    display: flex;
+    align-items: center;
+    gap: var(--navbar-button-gap); /* 25px: Espacio para expansión futura */
+    flex: 1; /* Fuerza al centro a mantenerse en el eje real */
+}
+
+.nav-right { justify-content: flex-end; }
+
+.nav-center {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex: 0 0 auto; /* El eje de marca es prioritario e inamovible */
+}
+
+/* --- ESTILIZACIÓN DEL LOGO INSTITUCIONAL (IMPACTO PREMIUM) --- */
+.logo-header {
+    height: 70px; /* Altura optimizada para presencia visual sin desbordar el header */
+    width: auto;
+    object-fit: contain; /* Ignora bordes transparentes excesivos del archivo de imagen */
+    display: block;
+    transition: transform 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+}
+
+.logo-header:hover {
+    transform: scale(1.03); /* Micro-interacción sutil y elegante */
+}
+
+/* Contenedor flexible que garantiza el centrado y respiro del logo */
+.logo-container {
+    display: flex;
+    align-items: center;
+    padding: 8px 0;
+}
+
+.navbar a {
+    text-decoration: none;
+    color: var(--text-color);
+    font-size: 0.938rem; /* Elevado a 15px para nitidez en navegación */
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.05em; /* Tracking optimizado para mayúsculas */
+    transition: color 0.3s ease;
+}
+
+.navbar a:hover {
+    color: var(--primary-color);
+}
+
+/* --- AJUSTE 5: RESPONSIVIDAD DE INTERFAZ (HEADER Y ENTRADAS) --- */
+@media (max-width: 991px) {
+    /* Reducción de Header para maximizar el área de trabajo */
+    .navbar {
+        padding: 10px 20px !important;
+    }
+    .logo-header {
+        height: 45px !important; /* Escala proporcional para dispositivos móviles */
+    }
+    .navbar a {
+        font-size: 0.8rem; /* Evita que el menú se desborde horizontalmente */
+    }
+
+    /* Blindaje contra el Zoom Automático en Móviles */
+    input[type="text"], 
+    input[type="email"], 
+    input[type="password"], 
+    input[type="number"], 
+    input[type="date"], 
+    textarea,
+    select,
+    .autosave-input {
+        font-size: 16px !important; 
+        padding: 12px 15px !important; 
+        margin-bottom: 15px !important;
+    }
+
+    /* --- AJUSTE 7: MODALES Y CÁPSULAS DE VISIÓN (PRESTIGE MOBILE) --- */
+    .purpose-bubble, .help-bubble, .mindset-bubble {
+        padding: 30px 20px !important; /* Reducción de aire interno */
+        width: 95% !important;
+        max-height: 90vh; /* Evita que el modal sea más alto que la pantalla */
+        overflow-y: auto; /* Permite scroll si el texto es extenso */
+        border-radius: 24px !important;
+    }
+
+    .purpose-bubble h2 {
+        font-size: 1.5rem !important;
+        margin-bottom: 15px !important;
+    }
+
+    .purpose-bubble p {
+        font-size: 1rem !important;
+        line-height: 1.6 !important;
+    }
+
+    /* Mejora de zona táctil para el botón de cierre */
+    .close-bubble {
+        top: 15px !important;
+        right: 15px !important;
+        width: 40px !important;
+        height: 40px !important;
+        background: rgba(15, 52, 96, 0.1) !important;
+    }
+
+    /* --- AJUSTE 8: RESILIENCIA DE WORKBOOKS (IFRAMES MOBILE) --- */
+    #view-presentation, #view-workbook {
+        height: 82vh !important; /* Altura dinámica segura para evitar recortes por UI del navegador */
+        min-height: 500px;
+        -webkit-overflow-scrolling: touch; /* Scroll fluido y natural en iOS/Android */
+        overflow-y: auto;
+    }
+
+    #view-workbook iframe {
+        height: 100% !important;
+        border-radius: 0; /* Aprovechamos cada píxel en pantallas pequeñas */
+    }
+
+    /* Ajuste de contenedores para evitar desbordes en diapositivas */
+    .presentation-wrapper {
+        height: auto !important;
+        min-height: 450px;
+        margin-bottom: 20px;
+    }
+}
+
+/* --- BOTONES Y COMPONENTES (Normalizados) --- */
+/* --- ESTILIZACIÓN QUIRÚRGICA DEL BOTÓN DE ACCIÓN --- */
+/* --- BOTÓN PRIMARIO: PRESTIGE (AZUL & ORO) --- */
+.btn-primary {
+    background-color: var(--primary-midnight); /* [cite: 7, 64] */
+    color: #FFFFFF;
+    border: 1px solid var(--accent-gold); /* [cite: 73] Micro-destello en Oro */
+    padding: 18px 32px;
+    border-radius: 12px;
+    cursor: pointer;
+    font-family: 'Montserrat', sans-serif !important; /* [cite: 465] */
+    font-weight: 600; /* [cite: 85] */
+    font-size: 1rem; /* [cite: 85, 471] */
+    letter-spacing: 0.05em; /* [cite: 85] */
+    text-transform: uppercase; /* [cite: 85] */
+    transition: all 300ms ease-out; /* [cite: 26, 123] */
+    width: 100%;
+    /* Soft Depth Shadow teñida de Midnight */
+    box-shadow: 0 4px 6px rgba(15, 52, 96, 0.08), 0 1px 3px rgba(15, 52, 96, 0.04); /* [cite: 102] */
+    position: relative;
+    overflow: hidden;
+}
+
+.btn-primary:hover:not([disabled]) {
+    background-color: #164275; /* Variante sutil del azul para profundidad */
+    transform: translateY(-2px);
+    box-shadow: 0 10px 15px -3px rgba(15, 52, 96, 0.12); /* [cite: 103] */
+}
+
+.btn-primary:active:not([disabled]) {
+    transform: scale(0.98); /* [cite: 32, 125] Micro-escala de calidad */
+    box-shadow: 0 2px 4px rgba(15, 52, 96, 0.1);
+}
+
+.btn-primary[disabled] {
+    background-color: #e2e8f0;
+    color: #94a3b8;
+    cursor: not-allowed;
+    box-shadow: none;
+    transform: none;
+}
+
+/* AJUSTE QUIRÚRGICO: PROPORCIONALIDAD DE BOTONES EN ACADEMIA */
+.card-category-btn .btn-primary {
+    width: auto !important;
+    min-width: 110px !important;
+    padding: 8px 20px !important;
+    font-size: 0.75rem !important;
+    margin: 15px auto 0 auto !important;
+    border-radius: 10px !important;
+    display: inline-block !important;
+}
+
+/* Sincronización de Hover con Diseño Prestige */
+.card-category-btn:hover .btn-primary {
+    background-color: var(--accent-gold) !important;
+    border-color: #FFFFFF !important;
+    transform: scale(1.05);
+}
+
+.card {
+    background: var(--card-bg);
+    padding: 1.75rem; /* Reducción quirúrgica para un look más compacto y ágil */
+    border-radius: 16px; /* Ajuste proporcional a la nueva escala bento */
+    border: 1px solid rgba(15, 52, 96, 0.04);
+    display: flex;
+    flex-direction: column;
+    transition: all 0.5s cubic-bezier(0.165, 0.84, 0.44, 1);
+    /* Mantenemos la profundidad suave (Soft Depth) del Lujo Silencioso */
+    box-shadow: 
+        0 4px 6px rgba(15, 52, 96, 0.02),
+        0 15px 35px rgba(15, 52, 96, 0.05);
+}
+
+.card:hover {
+    transform: translateY(-8px); /* Elevación sutil al interactuar */
+    box-shadow: 
+        0 12px 20px rgba(15, 52, 96, 0.05),
+        0 30px 60px rgba(15, 52, 96, 0.08);
+}
+
+/* --- REPARACIÓN DE PORTAL: PRESTIGE LOGIN --- */
+.login-split-wrapper {
+    display: grid;
+    grid-template-columns: 1fr 1fr; /* Proporción 50/50 para estabilidad */
+    max-width: 900px;
+    width: 95%; /* Asegura visibilidad en pantallas medianas */
+    min-height: 500px;
+    background: var(--card-bg);
+    border-radius: 32px;
+    overflow: hidden;
+    margin: 8vh auto;
+    border: 1px solid rgba(15, 52, 96, 0.05);
+    box-shadow: 0 40px 100px rgba(15, 52, 96, 0.12);
+}
+
+.login-brand-side {
+    background-color: var(--primary-midnight);
+    padding: 60px; /* Aumentamos el aire para evitar el efecto 'amontonado' */
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #ffffff !important;
+}
+
+/* Blindaje de Contraste: Evita que el Midnight global oscurezca el texto sobre fondo azul */
+.login-brand-side h1, 
+.login-brand-side p {
+    color: #ffffff !important;
+}
+
+.brand-content {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    width: 100%;
+    gap: 20px; /* Alineación perfecta de Logo, H1 y P [cite: 161] */
+}
+
+.brand-content h1 {
+    margin: 0; /* Elimina la brecha vertical asimétrica [cite: 84] */
+    line-height: 1.2;
+}
+
+.login-brand-side p {
+    margin: 0; /* Elimina desplazamientos por herencia */
+    max-width: 280px; /* Estrecha el texto para mejorar el 'justificado' visual  */
+}
+
+/* RESTRICCIÓN CRÍTICA DEL LOGO (NORMALIZADA) */
+.login-hero-logo {
+    max-width: 160px; 
+    height: auto;
+    display: block;
+    filter: brightness(0) invert(1);
+    /* TRACEABILIDAD: Se eliminan los 'translateY' que eran parches para el logo antiguo. 
+       El centrado ahora es gestionado de forma nativa por Flexbox. */
+}
+
+.brand-content p {
+    margin: 0 auto;
+    max-width: 320px;
+    font-weight: 300;
+    line-height: 1.6;
+    opacity: 0.85;
+    text-wrap: balance;
+}
+
+.login-form-side {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 40px;
+    background: rgba(255, 255, 255, 0.5) !important; /* BLINDAJE: Mantiene la transparencia suave contra cambios externos */
+    backdrop-filter: blur(12px) saturate(160%) !important;
+    -webkit-backdrop-filter: blur(12px) saturate(160%) !important; /* PARIDAD: Activa el efecto de cristal en Safari e iOS */
+    border-left: 1px solid rgba(15, 52, 96, 0.05); /* Refuerzo de borde sutil */
+}
+
+#auth-card {
+    width: 100%;
+    max-width: 320px; /* Compacto para evitar desproporción */
+}
+
+#auth-card h2 {
+    font-weight: 700 !important;
+    font-size: 1.6rem !important;
+    letter-spacing: -0.02em;
+    color: var(--primary-midnight);
+    margin-bottom: 2rem;
+    text-align: center;
+}
+
+/* Ajuste Responsivo para Móviles */
+@media (max-width: 900px) {
+    .login-split-wrapper {
+        grid-template-columns: 1fr;
+        margin: 20px;
+    }
+    .login-brand-side {
+        display: flex; /* Restauramos la identidad visual en dispositivos móviles */
+        padding: 40px 24px;
+        background: rgba(15, 52, 96, 0.92); /* Transparencia Prestige sobre Azul Medianoche */
+        backdrop-filter: blur(10px); /* Efecto Liquid Glass para cohesión visual */
+        border-bottom: 1px solid rgba(149, 124, 61, 0.2); /* Línea capilar en Oro para separar del form */
+    }
+
+    .login-brand-side .brand-content p {
+        display: none; /* Ocultamos la descripción larga para priorizar el área de interacción */
+    }
+
+    .login-brand-side .brand-content h1 {
+        font-size: 1.25rem !important; /* Reducción de jerarquía para balancear el logotipo */
+        margin-top: 10px;
+    }
+
+    .login-hero-logo {
+        max-width: 120px; /* Escala optimizada para ergonomía en smartphones */
+    }
+}
+
+/* --- BOTÓN SECUNDARIO (Modalidad Live) --- */
+#btn-open-live {
+    background: var(--card-bg);
+    color: var(--secondary-color); /* Verde Original */
+    border: 2px solid var(--secondary-color);
+}
+
+#btn-open-live:hover {
+    background: var(--secondary-color);
+    color: #ffffff;
+}
+
+/* --- ENTRADAS DE CRISTAL LÍQUIDO: AISLAMIENTO QUIRÚRGICO (FASE 1) --- */
+/* Target exclusivo para campos de escritura, blindando botones y selectores */
+input[type="text"], 
+input[type="email"], 
+input[type="password"], 
+input[type="number"], 
+input[type="date"], 
+textarea,
+select {
+    width: 100%;
+    padding: 16px 20px;
+    margin: 8px 0 24px 0;
+    background: rgba(255, 255, 255, 0.5) !important; /* Opacidad Prestige inicial */
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    border: 1.5px solid rgba(15, 52, 96, 0.12); /* Definición aumentada */
+    border-radius: 12px;
+    box-sizing: border-box;
+    font-family: 'Montserrat', sans-serif;
+    font-size: 1rem;
+    font-weight: 400;
+    color: var(--text-color);
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    box-shadow: 
+        inset 0 1px 2px rgba(255, 255, 255, 0.8), 
+        0 2px 4px rgba(15, 52, 96, 0.02);
+}
+
+/* Mejora de Legibilidad del Placeholder (Contraste 4.5:1 para accesibilidad) */
+::placeholder {
+    color: rgba(26, 26, 26, 0.5) !important; /* Gris Midnight equilibrado */
+    font-weight: 300;
+}
+
+/* Estado de Enfoque: Claridad Absoluta en la Escritura */
+input[type="text"]:focus, 
+input[type="email"]:focus, 
+input[type="number"]:focus, 
+input[type="date"]:focus, 
+textarea:focus, 
+select:focus {
+    outline: none;
+    background: #FFFFFF !important; /* Fondo sólido al escribir para máxima legibilidad */
+    border-color: var(--accent-gold) !important;
+    transform: translateY(-1px);
+    box-shadow: 
+        0 8px 20px rgba(15, 52, 96, 0.06),
+        0 0 0 4px rgba(149, 124, 61, 0.15); /* Halo de Oro sutil */
+}
+
+/* ========================================================================== */
+/* ESTILOS DEL REPRODUCTOR DE PODCAST (CON TRANSICIONES SUAVES) */
+/* ========================================================================== */
+
+#podcast-player {
+    /* Efecto Liquid Glass (Cristalización) */
+    background: rgba(255, 255, 255, 0.65) !important; 
+    backdrop-filter: blur(20px) saturate(160%) !important;
+    -webkit-backdrop-filter: blur(20px) saturate(160%) !important;
+    
+    /* Refinamiento de Superficie Prestige */
+    border: 1px solid rgba(255, 255, 255, 0.4) !important;
+    border-top: 1px solid rgba(255, 255, 255, 0.8) !important; /* Reflejo de luz superior */
+    border-radius: 24px 24px 0 0 !important;
+    
+    /* Soft Depth Shadow teñida */
+    box-shadow: 0 -20px 40px rgba(15, 52, 96, 0.08) !important;
+    
+    /* Dinámica de Movimiento Fluido */
+    transition: all 0.6s cubic-bezier(0.19, 1, 0.22, 1) !important;
+    transform-origin: bottom right;
+}
+
+#podcast-name {
+    color: var(--primary-color) !important;
+    letter-spacing: 0.5px;
+    font-size: 0.7rem;
+}
+
+#btn-close-podcast {
+    color: #999 !important;
+    transition: color 0.3s ease;
+}
+
+#btn-close-podcast:hover {
+    color: var(--accent-color) !important;
+}
+
+/* --- ESTILOS PARA LA BURBUJA DE RECUPERACIÓN (FAB) --- */
+#btn-show-podcast {
+    /* Geometría y Fondo de Orbe Midnight */
+    background: radial-gradient(circle at 30% 30%, rgba(22, 66, 117, 0.9), var(--primary-midnight)) !important;
+    border: 1px solid var(--accent-gold) !important; /* Marco de Oro */
+    width: 60px;
+    height: 60px;
+    border-radius: 50%;
+    
+    /* Efecto Liquid Glass */
+    backdrop-filter: blur(8px) !important;
+    -webkit-backdrop-filter: blur(8px) !important;
+    
+    /* Soft Depth: Sombra de Orbe */
+    box-shadow: 
+        0 8px 16px rgba(15, 52, 96, 0.2),
+        inset 0 2px 4px rgba(255, 255, 255, 0.2) !important; /* Reflejo interno superior */
+    
+    /* Dinámica de Elevación */
+    transition: all 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275) !important;
+    cursor: pointer;
+}
+
+/* --- FOCUS MODE: AISLAMIENTO DE ORBES PRESTIGE --- */
+
+/* 1. Solo la burbuja bajo el cursor se expande */
+.bento-grid:has(.glass-card:hover) .glass-card:not(:hover),
+.welcome-container:has(.btn-show-podcast:hover) .btn-show-podcast:not(:hover),
+.grid-recursos:has(.card-recurso:hover) .card-recurso:not(:hover) {
+    filter: blur(4px) saturate(50%); /* El efecto de desenfoque que sugeriste */
+    opacity: 0.4;
+    transform: scale(0.95); /* Encogimiento sutil para dar paso a la principal */
+    pointer-events: none; /* Evita distracciones táctiles */
+}
+
+/* 2. Refinamiento de la Burbuja (Orbe) individual */
+#btn-show-podcast {
+    transition: all 0.6s cubic-bezier(0.19, 1, 0.22, 1) !important;
+}
+
+#btn-show-podcast:hover {
+    transform: scale(1.25) rotate(5deg); /* Expansión elástica más pronunciada */
+    border-color: #FFFFFF !important;
+    z-index: 100; /* Asegura que la activa esté siempre al frente */
+    box-shadow: 
+        0 25px 50px rgba(15, 52, 96, 0.4),
+        0 0 30px rgba(149, 124, 61, 0.6) !important;
+}
+
+/* --- CLASE DE CONTROL DE VISIBILIDAD (EL "ALMA" DE LA ANIMACIÓN) --- */
+.podcast-hidden {
+    opacity: 0 !important;
+    visibility: hidden !important;
+    pointer-events: none !important;
+    transform: translateY(30px) scale(0.5) !important;
+}
+
+/* Personalización del Audio Nativo (Básico) */
+audio {
+    filter: drop-shadow(0 2px 3px rgba(0,0,0,0.1));
+}
+
+audio::-webkit-media-controls-panel {
+    background-color: #f8f9fa;
+}
+
+audio::-webkit-media-controls-play-button {
+    background-color: var(--secondary-color);
+    border-radius: 50%;
+}
+
+/* ========================================================================== */
+/* INTEGRACIÓN Y CORRECCIÓN DE REVEAL.JS (SIN ENCIMADO) */
+/* ========================================================================== */
+
+/* Contenedor de la Presentación (Rescate de Estilo Original: Fondo Claro) */
+.presentation-wrapper {
+    position: relative;
+    width: 100%;
+    height: 70vh;
+    min-height: 500px;
+    background: #fff; /* Regresamos al blanco para resaltar la paleta azul/coral */
+    border-radius: 12px;
+    overflow: hidden;
+    margin-bottom: 30px;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+    border: 1px solid #eee;
+}
+
+/* Estilos base para Reveal con Marca de Agua "Liquid Glass" */
+#view-presentation .reveal {
+    font-family: 'Montserrat', sans-serif;
+    color: var(--text-color);
+    /* Patrón Geométrico Liquid Glass: Líneas diagonales ultra-sutiles */
+    background-image: repeating-linear-gradient(
+        -45deg,
+        rgba(15, 52, 96, 0.03) 0px,
+        rgba(15, 52, 96, 0.03) 1px,
+        transparent 1px,
+        transparent 40px
+    );
+    background-color: #FFFFFF; /* Fondo base sólido para contraste */
+}
+
+/* Títulos de Diapositivas (Azul Institucional Recuperado) */
+#view-presentation .reveal h2 {
+    color: var(--primary-color) !important; 
+    font-weight: 700;
+    text-transform: none;
+    margin-bottom: 20px;
+}
+
+/* Subtítulos y texto general (Jerarquía de Color) */
+#view-presentation .reveal p,
+#view-presentation .reveal li {
+    color: var(--text-color);
+    font-size: 1.2rem;
+    line-height: 1.6;
+}
+
+/* Imágenes en Diapositivas - CORREGIDO */
+#view-presentation .slide-image {
+    max-width: 90%;
+    max-height: 450px; /* Altura máxima para evitar desbordes */
+    object-fit: contain; /* Asegura que la imagen se vea completa */
+    margin: 30px auto;
+    display: block;
+    border-radius: 8px;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+}
+
+/* Botón dentro de la presentación (Link al Workbook) */
+#view-presentation .reveal .btn-primary {
+    display: inline-block;
+    width: auto;
+    margin-top: 30px;
+    padding: 16px 32px;
+    font-size: 0.9rem;
+    background-color: var(--primary-midnight); /* Azul Medianoche */
+    color: #FFFFFF;
+    border: 1px solid var(--accent-gold); /* Detalle en Oro */
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    font-weight: 600;
+    /* Soft Depth Shadow teñida de Midnight */
+    box-shadow: 0 10px 25px rgba(15, 52, 96, 0.15);
+    transition: all 0.4s cubic-bezier(0.165, 0.84, 0.44, 1);
+}
+
+#view-presentation .reveal .btn-primary:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 15px 35px rgba(15, 52, 96, 0.25);
+    border-color: #FFFFFF;
+}
+
+/* Estilos Específicos de la Sesión A (Rescatados) */
+
+/* --- RECUPERACIÓN DE LAYOUTS DE DOBLE COLUMNA --- */
+#view-presentation .content-wrapper,
+#view-presentation .layout-two-columns .content-wrapper {
+    display: grid;
+    grid-template-columns: 1.2fr 0.8fr; /* Prioridad ligera al texto */
+    gap: 50px;
+    align-items: center;
+    text-align: left;
+    width: 100%;
+}
+
+/* Control de imágenes dentro de columnas para evitar desbordes */
+#view-presentation .content-wrapper img {
+    max-width: 100%;
+    max-height: 380px; 
+    object-fit: contain;
+    border-radius: 12px;
+    box-shadow: 0 10px 25px rgba(0,0,0,0.2);
+}
+
+/* Adaptación para pantallas pequeñas (Responsivo) */
+@media (max-width: 768px) {
+    #view-presentation .content-wrapper {
+        grid-template-columns: 1fr;
+        text-align: center;
+    }
+}
+
+/* --- RESCATE DE VIÑETAS PERSONALIZADAS (Lámina 6) --- */
+#view-presentation .lista-objetivos {
+    list-style-type: none !important;
+    padding-left: 0;
+    text-align: left;
+    margin-top: 40px !important; /* Espacio entre el texto y la lista */
+    font-size: 1.1em; /* Texto ligeramente más grande para legibilidad */
+}
+
+#view-presentation .lista-objetivos li {
+    margin-bottom: 20px;
+    display: flex;
+    align-items: flex-start; /* Alinea el icono con la primera línea de texto */
+}
+
+#view-presentation .lista-objetivos li::before {
+    content: '';
+    display: inline-block;
+    /* TRACEABILIDAD: Se elimina referencia local huérfana que causaba Error 404.
+       Sustituido por un glifo de marca (✓) para mantener la estética sin dependencias de archivos.
+    */
+    content: "✓";
+    color: var(--accent-gold);
+    font-weight: 900;
+    font-size: 1.2rem;
+    margin-right: 15px;
+    flex-shrink: 0;
+}
+
+/* --- CITA DESTACADA PRESTIGE (AUTORIDAD & ELEGANCIA) --- */
+#view-presentation .highlight-quote {
+    background: rgba(15, 52, 96, 0.04); /* Sutil velo de Azul Medianoche */
+    padding: 35px 45px;
+    border-left: 6px solid var(--accent-gold); /* Borde de autoridad en Oro Prestige */
+    border-radius: 0 16px 16px 0;
+    margin-top: 50px;
+    font-style: italic;
+    box-shadow: 0 10px 30px rgba(15, 52, 96, 0.03); /* Sombra teñida de Midnight */
+}
+
+#view-presentation .highlight-quote p {
+    color: var(--primary-color) !important; /* Texto en Azul institucional */
+    margin: 0 !important;
+    font-size: 1.2rem !important;
+    line-height: 1.6 !important;
+}
+
+#view-presentation .highlight-quote strong {
+    color: var(--accent-color) !important; /* Palabras clave en Coral */
+    font-weight: 700;
+}
+
+/* --- REFINAMIENTO DE TARJETAS (CARDS) DE LA ACADEMIA --- */
+.card-content {
+    flex-grow: 1; /* Empuja los botones hacia abajo para mantener simetría */
+}
+
+.card h3 {
+    margin: 12px 0;
+    font-weight: 700; /* Más fuerza visual */
+    color: var(--primary-color);
+    font-size: 1.25rem; /* 20px: Estándar H3 */
+    line-height: 1.2;
+}
+
+.card p {
+    font-size: var(--font-size-body); /* 17px (1.063rem): Sincronización Prestige */
+    color: var(--text-color); /* #1A1A1A: Contraste optimizado para accesibilidad */
+    line-height: 1.7; /* Mayor interlineado para facilitar el escaneo visual */
+    font-weight: 400;
+}
+
+/* Clase para etiquetas de categoría dentro de las cards */
+.card-category {
+    font-size: 0.938rem !important; /* Elevado a 15px para jerarquía clara */
+    font-weight: 700 !important;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+}
+
+.btn-group {
+    display: flex;
+    gap: 12px;
+    margin-top: 20px;
+}
+
+/* --- ESTILOS DE LA BURBUJA DE PROPÓSITO (MODALES) --- */
+/* --- CÁPSULAS DE VISIÓN (MODALES PRESTIGE) --- */
+.purpose-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(15, 52, 96, 0.2); /* Tintura Midnight para inmersión */
+    backdrop-filter: blur(15px);        /* Enfoque selectivo profundo */
+    display: none;
+    justify-content: center;
+    align-items: center;
+    z-index: 2000;
+    padding: 20px;
+}
+
+.purpose-bubble {
+    background: rgba(255, 255, 255, 0.75) !important;
+    backdrop-filter: blur(30px) saturate(180%) !important;
+    -webkit-backdrop-filter: blur(30px) saturate(180%) !important;
+    max-width: 550px !important; /* BLINDAJE: Geometría fija */
+    width: 100% !important;
+    padding: 50px !important; /* BLINDAJE: Espaciado Prestige garantizado */
+    border-radius: 32px !important;
+    border: 1px solid rgba(255, 255, 255, 0.5) !important;
+    position: relative;
+    transform: scale(0.95) translateY(20px);
+    opacity: 0;
+    transition: all 0.6s cubic-bezier(0.19, 1, 0.22, 1);
+/* Soft Depth: Elevación de importancia estratégica */
+    box-shadow: 
+        0 40px 100px rgba(15, 52, 96, 0.15),
+        inset 0 0 20px rgba(255, 255, 255, 0.4) !important; /* BLINDAJE: Sombra Prestige garantizada */
+        
+    position: relative;
+    transform: scale(0.95) translateY(20px);
+    opacity: 0;
+    transition: all 0.6s cubic-bezier(0.19, 1, 0.22, 1);
+}
+
+.purpose-bubble h2 {
+    color: var(--primary-midnight) !important;
+    margin-bottom: 25px !important;
+    font-weight: 700 !important;
+    letter-spacing: -0.02em !important;
+}
+
+.purpose-bubble p {
+    font-weight: 400 !important; /* Peso Regular para estabilidad visual sobre el cristal */
+    color: var(--text-color) !important;
+    line-height: 1.8 !important;
+    font-size: 1.15rem !important; /* Incremento a ~18.5px para lectura inmersiva */
+}
+
+.purpose-overlay.active { display: flex; }
+.purpose-overlay.active .purpose-bubble {
+    transform: scale(1);
+    opacity: 1;
+}
+
+.close-bubble {
+    position: absolute;
+    top: 25px;
+    right: 25px;
+    background: #f5f5f5;
+    border: none;
+    width: 35px;
+    height: 35px;
+    border-radius: 50%;
+    font-size: 1.2rem;
+    color: #999;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.2s;
+}
+
+.close-bubble:hover { background: #fee2e2; color: #ef4444; }
+
+.btn-reveal-purpose {
+    background: none;
+    border: 1.5px solid var(--secondary-color);
+    color: var(--secondary-color);
+    padding: 14px 24px; /* Incremento de padding para equilibrar el nuevo tamaño */
+    border-radius: 12px;
+    font-size: var(--font-size-button); /* 16px (1rem): Estándar Prestige de Legibilidad */
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    cursor: pointer;
+    margin-top: 15px;
+    transition: all 0.3s;
+    width: fit-content;
+}
+
+.btn-reveal-purpose:hover {
+    background: var(--secondary-color);
+    color: white;
+    box-shadow: 0 5px 15px rgba(0, 155, 119, 0.2);
+}
+
+/* MARCA DE AGUA DINÁMICA: Sello de Calidad "Mi Empresa Crece" */
+.presentation-wrapper::after {
+    content: "";
+    position: absolute;
+    bottom: 30px;
+    left: 40px; /* Ajustado a la esquina inferior izquierda según tu preferencia */
+    width: 120px;
+    height: 50px;
+    /* TRACEABILIDAD: Usamos una variable dinámica que JS alimentará desde la nube */
+    background-image: var(--dynamic-logo-url); 
+    background-size: contain;
+    background-repeat: no-repeat;
+    background-position: left bottom;
+    opacity: 0.15; /* Sutil pero visible para proteger la trazabilidad pedagógica */
+    z-index: 20; 
+    pointer-events: none;
+    filter: grayscale(1) brightness(0.8); 
+    transition: opacity 0.5s ease;
+}
+
+/* ========================================================================== */
+/* REFINAMIENTO: CÁPSULA DE CONTACTO (FASE 3) */
+/* ========================================================================== */
+
+/* Personalización del Selector de Interés */
+#contact-form select {
+    appearance: none;
+    -webkit-appearance: none;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' fill='%230F3460' viewBox='0 0 16 16'%3E%3Cpath d='M7.247 11.14 2.451 5.658C1.885 5.013 2.345 4 3.204 4h9.592a1 1 0 0 1 .753 1.659l-4.796 5.48a1 1 0 0 1-1.506 0z'/%3E%3C/svg%3E");
+    background-repeat: no-repeat;
+    background-position: right 20px center;
+    cursor: pointer;
+}
+
+/* Ajuste fino para el área de mensaje */
+#contact-message {
+    resize: none;
+    min-height: 100px;
+}
+
+/* Estados de Envío (Visual Feedback) */
+.sending-state {
+    opacity: 0.6;
+    pointer-events: none;
+    filter: grayscale(0.5);
+}
+
+#contact-status {
+    font-weight: 600;
+    letter-spacing: 0.02em;
+    transition: all 0.3s ease;
+    min-height: 20px;
+}
+
+/* Animación de entrada para el formulario */
+#contact-overlay.active .purpose-bubble {
+    animation: capsuleAppear 0.5s cubic-bezier(0.19, 1, 0.22, 1) forwards;
+}
+
+@keyframes capsuleAppear {
+    from { 
+        opacity: 0; 
+        transform: scale(0.9) translateY(30px); 
+    }
+    to { 
+        opacity: 1; 
+        transform: scale(1) translateY(0); 
+    }
+}
+
+/* ========================================================================== */
+/* BOTÓN DE ASISTENCIA GLOBAL (HEADER PRESTIGE) */
+/* ========================================================================== */
+#btn-open-contact {
+    background: var(--primary-midnight);
+    color: white;
+    padding: 14px 24px; /* Ajuste milimétrico para albergar el nuevo tamaño de fuente */
+    border-radius: 12px;
+    font-size: var(--font-size-button); /* 16px (1rem): Homologación Prestige */
+    border: 1.5px solid var(--accent-gold);
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 10px; /* Mayor respiro entre el texto y el emoji/icono */
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    box-shadow: 0 4px 12px rgba(15, 52, 96, 0.12);
+}
+
+#btn-open-contact:hover {
+    transform: translateY(-2px);
+    background-color: #164275;
+    box-shadow: 0 8px 20px rgba(15, 52, 96, 0.2);
+    border-color: #FFFFFF; /* Brillo de contacto premium */
+}
+
+#btn-open-contact:active {
+    transform: scale(0.95);
+}
+
+/* --- MEJORAS DE NAVEGACIÓN HOMOLOGADA --- */
+.btn-nav-back:hover {
+    color: var(--accent-gold) !important;
+    transform: translateX(-4px);
+}
+
+.btn-contact-fab:hover {
+    transform: scale(1.1) rotate(5deg);
+    background: #164275 !important;
+    box-shadow: 0 6px 16px rgba(15, 52, 96, 0.25) !important;
+}
+
+/* BLOQUE ELIMINADO POR AUDITORÍA: La simetría y el padding (0 40px) ya están 
+   blindados en el CORE (Línea 203) para garantizar los 90px de altura real. */
+
+/* ========================================================================== */
+/* MODO CINEMA: EXPANSIÓN PARA MAXIMIZAR VIDEO Y WORKBOOK */
+/* ========================================================================== */
+
+/* Cuando el body tenga esta clase, la navbar desaparece con suavidad */
+body.cinema-mode .navbar {
+    display: none !important;
+}
+
+/* Forzamos al contenedor a ocupar todo el ancho disponible y subir al tope */
+body.cinema-mode .container {
+    max-width: 98vw !important; /* Aprovecha el 98% del ancho de la pantalla */
+    margin-top: 10px !important; /* Reduce el espacio superior */
+    padding: 0 10px !important;
+    transition: all 0.3s ease;
+}
+
+/* Ajuste de altura para que el video y workbook se vean más grandes */
+body.cinema-mode #view-presentation > div {
+    height: 92vh !important; /* Aumenta del 82vh original al 92vh */
+}
+
+body.cinema-mode #view-workbook {
+    height: 95vh !important; /* Casi toda la altura de la pantalla */
+}
+
+/* ========================================================================== */
+/* DREAMS WORKBOOK | INFRAESTRUCTURA DE INTERFAZ (CORE) */
+/* ========================================================================== */
+
+/* Sincronización de Clases de Marca (Heredadas de :root) */
+.brand-blue { color: var(--primary-color); }
+.brand-orange { color: var(--accent-color); }
+.bg-brand-blue { background-color: var(--primary-color); }
+.bg-brand-orange { background-color: var(--accent-color); }
+.border-brand-blue { border-color: var(--primary-color); }
+.border-brand-orange { border-color: var(--accent-color); }
+
+/* Transiciones de Secciones (Optimización "Sin Parpadeos") */
+.section-content { 
+    display: none; 
+    opacity: 0;
+}
+.section-content.active { 
+    display: block; 
+    animation: fadeInWorkbookSection 0.4s ease-out forwards; 
+}
+
+@keyframes fadeInWorkbookSection { 
+    from { opacity: 0; transform: translateY(10px); } 
+    to { opacity: 1; transform: translateY(0); } 
+}
+
+/* Navegación del Cuaderno */
+.nav-link.active { 
+    background-color: #eef2ff !important; 
+    color: var(--primary-midnight) !important; 
+    font-weight: 700 !important; 
+    border-right: 4px solid var(--accent-gold) !important; 
+}
+
+/* Inputs Dinámicos y Feedback Visual */
+.autosave-input:focus { 
+    outline: 2px solid var(--primary-midnight) !important; 
+    border-color: transparent !important; 
+}
+
+.semaforo-radio:checked + label {
+    transform: scale(1.05);
+    box-shadow: 0 0 0 3px var(--accent-gold);
+}
+
+/* Barra de Desplazamiento Personalizada Dreams (Estilo Prestige) */
+::-webkit-scrollbar { width: 8px; }
+::-webkit-scrollbar-track { background: #f1f1f1; }
+::-webkit-scrollbar-thumb { 
+    background: var(--primary-midnight); 
+    border-radius: 10px; 
+}
+::-webkit-scrollbar-thumb:hover { background: #164275; }
+
+/* Soporte para Exportación (PDF) */
+@media print {
+  .avoid-break { page-break-inside: avoid; }
+  .section-content { display: block !important; opacity: 1 !important; }
+}
+
+/* ========================================================================== */
+/* COMPONENTES DE AYUDA Y MODALES INFORMATIVOS (ESTILO PRESTIGE) */
+/* ========================================================================== */
+
+/* --- DISPARADOR DE AYUDA (ICONO "i") --- */
+.btn-help-trigger {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 20px;
+    height: 20px;
+    background: var(--primary-midnight);
+    color: white;
+    border-radius: 50%;
+    font-size: 12px;
+    font-weight: 700;
+    cursor: pointer;
+    margin-left: 8px;
+    transition: all 0.3s ease;
+    border: 1px solid var(--accent-gold);
+    vertical-align: middle;
+}
+
+.btn-help-trigger:hover {
+    transform: scale(1.2);
+    box-shadow: 0 0 10px rgba(149, 124, 61, 0.4);
+    background: var(--accent-gold);
+}
+
+/* --- CONTENEDOR DE MODAL GENÉRICO (LIQUID GLASS) --- */
+/* Reutilizamos la lógica de purpose-overlay para consistencia */
+.help-overlay {
+    position: fixed !important; /* BLINDAJE: Bloquea la capa sobre todo el viewport sin excepciones */
+    top: 0 !important;
+    left: 0 !important;
+    width: 100% !important;
+    height: 100% !important;
+    background: rgba(15, 52, 96, 0.25) !important; /* BLINDAJE: Tinte Midnight persistente para inmersión */
+    backdrop-filter: blur(15px) !important;
+    -webkit-backdrop-filter: blur(15px) !important; /* PARIDAD: Activa el efecto esmerilado en iOS/Safari */
+    display: none; 
+    justify-content: center;
+    align-items: center;
+    z-index: 3000 !important; /* BLINDAJE: Prioridad absoluta sobre el contenido dinámico del Workbook */
+    padding: 20px;
+    opacity: 0;
+    transition: opacity 0.4s ease;
+}
+
+.help-overlay.active {
+    display: flex;
+    opacity: 1;
+}
+
+.help-bubble {
+    background: rgba(255, 255, 255, 0.85) !important; 
+    backdrop-filter: blur(30px) saturate(180%) !important;
+    -webkit-backdrop-filter: blur(30px) saturate(180%) !important; /* PARIDAD: Consistencia del cristal en iOS/Safari */
+    max-width: 600px !important; /* BLINDAJE: Evita desbordes horizontales en layouts complejos */
+    width: 100% !important;
+    padding: 40px !important; /* BLINDAJE: Mantiene el "aire" institucional del Estándar Prestige */
+    border-radius: 28px !important;
+    border: 1px solid rgba(255, 255, 255, 0.5) !important;
+    box-shadow: 0 40px 100px rgba(15, 52, 96, 0.2) !important;
+    position: relative;
+    transform: translateY(20px);
+    transition: transform 0.4s cubic-bezier(0.19, 1, 0.22, 1);
+}
+
+.help-overlay.active .help-bubble {
+    transform: translateY(0);
+}
+
+/* --- CALL TO ACTION (CAT) DE ASESORÍA INTERMEDIA --- */
+.cat-advisory-box {
+    background: linear-gradient(135deg, rgba(15, 52, 96, 0.03), rgba(149, 124, 61, 0.05));
+    border: 1.5px dashed var(--accent-gold);
+    border-radius: 20px;
+    padding: 25px;
+    margin-top: 30px;
+    display: flex;
+    align-items: center;
+    gap: 20px;
+    animation: pulseBorder 3s infinite ease-in-out;
+}
+
+@keyframes pulseBorder {
+    0%, 100% { border-color: rgba(149, 124, 61, 0.3); }
+    50% { border-color: var(--accent-gold); }
+}
+
+/* ========================================================================== */
+/* COMPONENTE GLOBAL: MINDSET ESTRATÉGICO (PRESTIGE) */
+/* ========================================================================== */
+
+.mindset-container {
+    position: relative;
+    display: inline-block;
+    width: 100%;
+}
+
+.btn-mindset {
+    background: rgba(15, 52, 96, 0.05);
+    border: 1px solid rgba(15, 52, 96, 0.15);
+    color: var(--primary-midnight);
+    padding: 14px 28px; /* Padding incrementado para dar aire al nuevo tamaño */
+    border-radius: 12px;
+    font-size: var(--font-size-button); /* 16px (1rem): Estándar Prestige de Legibilidad */
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    transition: all 0.4s cubic-bezier(0.165, 0.84, 0.44, 1);
+}
+
+.btn-mindset:hover {
+    background: var(--primary-midnight);
+    color: white;
+    transform: translateY(-2px);
+    box-shadow: 0 5px 15px rgba(15, 52, 96, 0.2);
+}
+
+.mindset-bubble {
+    background: rgba(255, 255, 255, 0.9) !important;
+    backdrop-filter: blur(20px) saturate(160%) !important;
+    -webkit-backdrop-filter: blur(20px) saturate(160%) !important;
+    border: 1px solid rgba(255, 255, 255, 0.5) !important;
+    border-radius: 20px !important;
+    padding: 25px !important;
+    position: absolute;
+    z-index: 100 !important; /* BLINDAJE: Siempre por encima de elementos del Workbook */
+    box-shadow: 0 20px 40px rgba(15, 52, 96, 0.12);
+    
+    /* Estado Inicial (Oculto) */
+    opacity: 0;
+    visibility: hidden;
+    transform: translateY(-10px) scale(0.95);
+    transition: all 0.5s cubic-bezier(0.19, 1, 0.22, 1);
+    pointer-events: none;
+}
+
+.mindset-bubble.active {
+    opacity: 1;
+    visibility: visible;
+    transform: translateY(0) scale(1);
+    pointer-events: all;
+}
+
+/* Decoración Premium del Triángulo (Caret) */
+.mindset-bubble::before {
+    content: '';
+    position: absolute;
+    top: -8px;
+    left: 30px;
+    border-left: 8px solid transparent;
+    border-right: 8px solid transparent;
+    border-bottom: 8px solid rgba(255, 255, 255, 0.8);
+}
+
+/* ========================================================================== */
+/* SEMÁFOROS DINÁMICOS: EJERCICIO 3 (MATRIZ DE RESPALDO) */
+/* ========================================================================== */
+
+.score-select-red { 
+    background-color: #FEE2E2 !important; 
+    color: #991B1B !important; 
+    border-color: #F87171 !important; 
+}
+
+.score-select-yellow { 
+    background-color: #FEF3C7 !important; 
+    color: #92400E !important; 
+    border-color: #FBBF24 !important; 
+}
+
+.score-select-green { 
+    background-color: #DCFCE7 !important; 
+    color: #166534 !important; 
+    border-color: #4ADE80 !important; 
+}
+
+/* Contenedor de Totales en la Matriz */
+.score-total-box {
+    background-color: var(--primary-midnight);
+    color: white;
+    font-weight: 900;
+    text-align: center;
+    border-radius: 12px;
+    padding: 10px;
+    box-shadow: 0 4px 10px rgba(15, 52, 96, 0.15);
+}
+
+.matrix-table th {
+    background-color: var(--primary-midnight);
+    color: white;
+    font-size: var(--font-size-label); /* 15px (0.938rem): Suelo de Legibilidad Prestige */
+    font-weight: 700; /* Refuerzo de autoridad para encabezados */
+    text-transform: uppercase;
+    letter-spacing: 0.06em; /* Micro-ajuste para mejorar la lectura en mayúsculas */
+    padding: 18px 15px; /* Incremento de respiro vertical para equilibrar el tamaño */
+    text-align: center;
+}
+
+/* REPARACIÓN NAV-ACTIONS PRESTIGE */
+#header-aura-actions .nav-btn-prestige {
+    background-color: #0F3460 !important; /* Azul Medianoche Sólido */
+    border: 2px solid #957C3D !important;   /* Borde Oro Grueso */
+    color: #957C3D !important;              /* Icono Oro */
+    width: 44px !important;
+    height: 44px !important;
+    border-radius: 10px !important;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    box-shadow: 0 4px 15px rgba(15, 52, 96, 0.4) !important;
+    opacity: 1 !important;
+}
+
+#header-aura-actions .nav-btn-prestige:hover {
+    background-color: #164275 !important;
+    border-color: #FFFFFF !important;       /* Brillo Blanco */
+    transform: translateY(-3px) scale(1.05);
+}
+
+#header-aura-actions .nav-btn-prestige .icon {
+    font-size: 1.25rem !important;
+}
+
+/* ========================================================================== */
+/* ESPECIALIZACIÓN: MODAL DE SOPORTE COMPACTO (PRESTIGE ASSIST) */
+/* ========================================================================== */
+
+/* Overlay más sutil para no perder contexto de fondo */
+#contact-overlay {
+    background: rgba(15, 52, 96, 0.15) !important; 
+    backdrop-filter: blur(8px) !important;
+}
+
+/* Reducción de escala y balance de blancos */
+#contact-overlay .purpose-bubble {
+    max-width: 380px !important; 
+    padding: 30px 25px !important;
+    border: 1px solid rgba(149, 124, 61, 0.4) !important;
+    background: rgba(255, 255, 255, 0.95) !important;
+    box-shadow: 0 30px 60px rgba(15, 52, 96, 0.12) !important;
+}
+
+/* Blindaje de visibilidad del botón de cierre */
+#contact-overlay .close-bubble {
+    position: absolute !important;
+    top: -12px !important;
+    right: -12px !important;
+    background: var(--accent-gold) !important; 
+    color: white !important;
+    width: 34px !important;
+    height: 34px !important;
+    font-size: 1.2rem !important;
+    border-radius: 50% !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    cursor: pointer !important;
+    z-index: 10001 !important; /* Por encima de cualquier inyección */
+    border: 2px solid white !important;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.15) !important;
+    opacity: 1 !important;
+    visibility: visible !important;
+}
+
+#contact-overlay .close-bubble:hover {
+    background: var(--primary-midnight) !important;
+    transform: scale(1.1) rotate(90deg);
+}
+
+/* Compactación de Inputs y Tipografía */
+#contact-overlay .form-group input, 
+#contact-overlay .form-group select, 
+#contact-overlay .form-group textarea {
+    margin-bottom: 10px !important;
+    padding: 10px 14px !important;
+    font-size: 0.85rem !important;
+    border-radius: 8px !important;
+}
+
+#contact-overlay header h2 {
+    font-size: 1.15rem !important;
+    color: var(--primary-midnight) !important;
+    margin-bottom: 4px !important;
+}
+
+#contact-overlay header p {
+    font-size: 0.75rem !important;
+    line-height: 1.4 !important;
+    margin-bottom: 15px !important;
+}
