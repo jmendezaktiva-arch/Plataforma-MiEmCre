@@ -25,11 +25,14 @@ service cloud.firestore {
 
     // --- COLECCIÓN DE USUARIOS Y PROGRESO ---
     match /usuarios/{userId} {
-      // LECTURA: Prioridad al dueño para evitar recursividad en getRole()
-      allow read: if request.auth != null && (
-        request.auth.uid == userId || 
-        (request.auth.uid != userId && isAdmin())
+      // LECTURA (quirúrgica): separar get vs list.
+      // getDocs(collection("usuarios")) usa la operación LIST; sin allow list explícito,
+      // algunos despliegues fallan con "Missing or insufficient permissions" aunque el get individual funcione.
+      allow get: if request.auth != null && (
+        request.auth.uid == userId ||
+        isAdmin()
       );
+      allow list: if request.auth != null && isAdmin();
       
       // Gestión de perfiles: El dueño puede actualizar su propia info básica; Admin total.
       allow write: if request.auth != null && (

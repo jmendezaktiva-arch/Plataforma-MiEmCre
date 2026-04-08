@@ -424,8 +424,8 @@ document.addEventListener('DOMContentLoaded', async () => {
             const userData = userSnap.data() || {};
             
             // TRACEABILIDAD: Normalización de Rol Resiliente (v2.0)
-            // Permite variantes como 'Admin', 'admin' o 'Administrador'
-            const userRol = (userData.rol || "").toLowerCase();
+            // Permite variantes como 'Admin', 'admin' o 'Administrador' (incl. espacios accidentales)
+            const userRol = String(userData.rol || "").trim().toLowerCase();
             const isAdmin = userRol === 'admin' || userRol === 'administrador';
 
             if (!userSnap.exists() || !isAdmin) {

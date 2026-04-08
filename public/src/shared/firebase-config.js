@@ -61,9 +61,17 @@ export const checkAccess = async (itemType, itemId) => {
 
 export { doc, getDoc, setDoc, collection, getDocs, query, orderBy, where };
 
-// ANCLAJE QUIRÚRGICO PARA DEBUGGING (Solo en desarrollo)
-if (location.hostname === "localhost" || location.hostname === "127.0.0.1") {
+// ANCLAJE QUIRÚRGICO PARA DEBUGGING (localhost + panel Admin en producción)
+// Nota: auth/db ya están en el bundle; esto solo facilita pruebas en consola (p. ej. getDoc del rol).
+const isAdminPage =
+    typeof location !== "undefined" &&
+    (location.pathname.endsWith("/admin.html") || location.pathname.endsWith("admin.html"));
+if (location.hostname === "localhost" || location.hostname === "127.0.0.1" || isAdminPage) {
     window.auth = auth;
     window.db = db;
-    console.log("🛠️ DREAMS DEBUG: Núcleo expuesto en window (auth, db).");
+    if (isAdminPage && location.hostname !== "localhost" && location.hostname !== "127.0.0.1") {
+        console.log("🛠️ DREAMS DEBUG (Admin): window.auth y window.db disponibles para consola.");
+    } else {
+        console.log("🛠️ DREAMS DEBUG: Núcleo expuesto en window (auth, db).");
+    }
 }
