@@ -59,13 +59,13 @@
                 <div class="shelf-content-wrapper" id="shelf-content">
                     <div class="split-operative-panel">
                         <div class="operative-column">
-                            <h5 class="column-sticky-title">Mis activos</h5>
-                            <p class="operative-column-hint">Programas, herramientas y consultoría que ya forman parte de tu expediente.</p>
+                            <h5 class="column-sticky-title" style="text-align: center; width: 100%;">Mis activos</h5>
+                            <p class="operative-column-hint">Programas, apps y consultoría que ya forman parte de tu desarrollo y crecimiento.</p>
                             <div class="monitor-list" id="operative-owned-list" aria-live="polite"></div>
                         </div>
 
                         <div class="operative-column ai-insights-zone">
-                            <h5 class="column-sticky-title ai-glow-text">Explorar oferta</h5>
+                            <h5 class="column-sticky-title ai-glow-text" style="text-align: center; width: 100%;">Explorar oferta</h5>
                             <p class="operative-column-hint operative-hint-muted">Propuesta Mi Empresa Crece: descubre qué más puedes sumar, sin salir del panel.</p>
                             <div class="ai-recommendation-feed" id="operative-suggest-list" aria-live="polite"></div>
                         </div>
@@ -74,45 +74,52 @@
             </section>
             
             <div class="dashboard-section">
-                <h3 style="color: var(--primary-midnight); font-weight: 700; margin-bottom: 30px; text-align: center; letter-spacing: 1px; text-transform: uppercase; font-size: 0.9rem;">Centro de Resultados Estratégicos</h3>
+                <h3 style="color: var(--primary-midnight); font-weight: 700; margin-bottom: 12px; text-align: center; letter-spacing: 1px; text-transform: uppercase; font-size: 0.9rem;">Centro de Resultados Estratégicos</h3>
+                <p id="hub-executive-summary" class="hub-executive-summary" aria-live="polite"></p>
                 
                 <div class="dreams-axis-hub">
-                    <div class="axis-node" data-axis="academia" onclick="window.location.href='academia.html'">
+                    <div class="axis-node" data-axis="academia" data-chart-pct="0">
                         <div class="node-icon">🎓</div>
                         <div class="node-content">
                             <span class="node-label">Academia</span>
                             <div class="node-chart-container">
                                 <canvas id="chart-academia"></canvas>
                             </div>
-                            <div class="node-kpi" id="kpi-val-academia">0%</div>
+                            <div class="node-kpi" id="kpi-val-academia">—</div>
+                            <div class="node-kpi-sub" id="kpi-sub-academia"></div>
                         </div>
                     </div>
 
-                    <div class="axis-node" data-axis="apps" onclick="window.location.href='apps.html'">
+                    <div class="axis-node" data-axis="apps" data-chart-pct="0">
                         <div class="node-icon">🛠️</div>
                         <div class="node-content">
                             <span class="node-label">Operativa</span>
                             <div class="node-chart-container">
                                 <canvas id="chart-apps"></canvas>
                             </div>
-                            <div class="node-kpi" id="kpi-val-apps">--</div>
+                            <div class="node-kpi" id="kpi-val-apps">—</div>
+                            <div class="node-kpi-sub" id="kpi-sub-apps"></div>
                         </div>
                     </div>
 
-                    <div class="axis-node" data-axis="consultoria" onclick="window.location.href='consultoria.html'">
+                    <div class="axis-node" data-axis="consultoria" data-chart-pct="0">
                         <div class="node-icon">🤝</div>
                         <div class="node-content">
                             <span class="node-label">Consultoría</span>
                             <div class="node-chart-container">
                                 <canvas id="chart-consultoria"></canvas>
                             </div>
-                            <div class="node-kpi" id="kpi-val-consultoria">Fase 1</div>
+                            <div class="node-kpi" id="kpi-val-consultoria">—</div>
+                            <div class="node-kpi-sub" id="kpi-sub-consultoria"></div>
                         </div>
                     </div>
                 </div>
             </div>
         </main>
     </div>
+
+    <div id="academia-drill-popover" class="academia-drill-popover" role="tooltip" aria-hidden="true"></div>
+
     <script>
     (function() {
         var mainScript = document.createElement('script');

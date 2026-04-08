@@ -3,6 +3,145 @@
 /* DREAMS | EJES DE RESULTADOS ESTRATÉGICOS (PRESTIGE HUB) */
 /* ========================================================================== */
 
+/* --- Drill-down Academia (dashboard): hover + modal --- */
+.academia-drill-popover {
+    display: none;
+    width: 320px;
+    max-width: calc(100vw - 24px);
+    max-height: min(320px, 70vh);
+    overflow-y: auto;
+    pointer-events: auto;
+    background: rgba(255, 255, 255, 0.97);
+    backdrop-filter: blur(16px);
+    -webkit-backdrop-filter: blur(16px);
+    border: 1px solid rgba(149, 124, 61, 0.28);
+    border-radius: 20px;
+    box-shadow: 0 24px 48px rgba(15, 52, 96, 0.14);
+    padding: 0;
+    font-family: 'Montserrat', sans-serif;
+}
+
+.academia-drill-popover.active {
+    display: block;
+}
+
+.academia-drill-popover-inner {
+    padding: 14px 16px 12px;
+}
+
+.academia-drill-popover-title {
+    display: block;
+    font-size: 0.58rem;
+    font-weight: 800;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    color: var(--accent-gold);
+    margin-bottom: 10px;
+}
+
+.academia-drill-popover-hint {
+    display: block;
+    font-size: 0.6rem;
+    font-weight: 600;
+    color: rgba(15, 52, 96, 0.45);
+    margin-top: 10px;
+    text-align: center;
+    letter-spacing: 0.04em;
+}
+
+.academia-drill-row {
+    margin-bottom: 10px;
+}
+
+.academia-drill-row.is-compact {
+    margin-bottom: 8px;
+}
+
+.academia-drill-row-head {
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+    gap: 8px;
+    margin-bottom: 4px;
+}
+
+.academia-drill-name {
+    font-size: 0.72rem;
+    font-weight: 700;
+    color: var(--primary-midnight);
+    line-height: 1.25;
+    flex: 1;
+    min-width: 0;
+}
+
+.academia-drill-pct {
+    font-size: 0.85rem;
+    font-weight: 800;
+    color: var(--accent-gold);
+    flex-shrink: 0;
+}
+
+.academia-drill-bar-track {
+    height: 6px;
+    border-radius: 6px;
+    background: rgba(15, 52, 96, 0.08);
+    overflow: hidden;
+}
+
+.academia-drill-bar-fill {
+    height: 100%;
+    border-radius: 6px;
+    background: linear-gradient(90deg, var(--primary-midnight), var(--accent-gold));
+    transition: width 0.35s ease;
+}
+
+.academia-drill-meta {
+    display: block;
+    font-size: 0.55rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    color: rgba(15, 52, 96, 0.4);
+    margin-top: 4px;
+}
+
+.academia-drill-section-label {
+    font-size: 0.58rem;
+    font-weight: 800;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: var(--primary-midnight);
+    margin: 18px 0 10px;
+    padding-top: 12px;
+    border-top: 1px solid rgba(15, 52, 96, 0.08);
+}
+
+.hub-executive-summary {
+    text-align: center;
+    font-size: 0.78rem;
+    font-weight: 600;
+    color: rgba(15, 52, 96, 0.72);
+    line-height: 1.45;
+    max-width: 640px;
+    margin: 0 auto 8px;
+    letter-spacing: 0.02em;
+}
+
+.node-kpi-sub {
+    font-size: 0.62rem;
+    font-weight: 700;
+    color: rgba(15, 52, 96, 0.45);
+    text-transform: uppercase;
+    letter-spacing: 0.12em;
+    margin-top: 6px;
+    line-height: 1.35;
+    max-width: 100%;
+}
+
+.axis-node:hover .node-kpi-sub {
+    color: rgba(149, 124, 61, 0.85);
+}
+
 .dreams-axis-hub {
     display: flex;
     justify-content: center;

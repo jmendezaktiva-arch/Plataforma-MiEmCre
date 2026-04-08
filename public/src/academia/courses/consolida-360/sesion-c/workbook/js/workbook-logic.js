@@ -1645,7 +1645,7 @@ document.addEventListener('DOMContentLoaded', function() {
     };
 
     // --- 4. GESTOR DE VISIBILIDAD (MOTOR DE INYECCIÓN) ---
-    // --- GESTOR DE VISIBILIDAD CON REHIDRATACIÓN (SOLUCIONA PÉRDIDA DE DATOS) [cite: 364] ---
+    // --- GESTOR DE VISIBILIDAD CON REHIDRATACIÓN (SOLUCIONA PÉRDIDA DE DATOS)  ---
     window.showSection = (sectionId) => {
         // TRACEABILIDAD QUIRÚRGICA: Apuntamos al contenedor de ejercicios, NO al 'main'.
         // Esto evita que el .innerHTML borre el div #reporte y el Header al cambiar de pestaña.

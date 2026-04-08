@@ -99,15 +99,15 @@ service cloud.firestore {
       allow write: if request.auth != null && isAdmin();
     }
 
-    // --- COLECCIÓN DE CONSULTORÍA (Servicios y Precios) --- [cite: 212, 213]
+    // --- COLECCIÓN DE CONSULTORÍA (Servicios y Precios) --- 
     match /config_consultoria/{documentId} {
       // Cualquier usuario autenticado puede leer el catálogo de servicios 
       allow read: if request.auth != null;
-      // Solo el Admin Jorge puede modificar servicios, precios o destacar la IA [cite: 29, 85]
+      // Solo el Admin Jorge puede modificar servicios, precios o destacar la IA 
       allow write: if request.auth != null && isAdmin();
     }
 
-    // --- COLECCIÓN DE SOPORTE (Formulario de Contacto) --- [cite: 94, 102]
+    // --- COLECCIÓN DE SOPORTE (Formulario de Contacto) --- 
     match /solicitudes_contacto/{solicitudId} {
       // Los usuarios pueden crear solicitudes; el Admin puede leerlas todas
       allow create: if request.auth != null;

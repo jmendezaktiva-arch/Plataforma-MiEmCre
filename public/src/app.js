@@ -3,6 +3,29 @@
 import { login, logout, redirectByUserRole, resetPassword } from './auth/auth.js';
 import { db, auth, doc, setDoc, getDoc, checkAccess, collection, getDocs } from './shared/firebase-config.js';
 
+/** Último snapshot de drill-down Academia (curso → %) para hover/click en dashboard */
+let academiaDrilldownSnapshot = [];
+let academiaDrillPopoverTimer = null;
+
+function escapeHtml(s) {
+    return String(s ?? '')
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;')
+        .replace(/"/g, '&quot;');
+}
+
+/** Aplana workbook + respuestas para KPIs de catálogo sin mutar persistencia */
+function mergeWorkbookDocIntoStore(store, raw) {
+    const d = raw || {};
+    const merged = { ...d };
+    if (d.respuestas && typeof d.respuestas === 'object') {
+        Object.assign(merged, d.respuestas);
+    }
+    delete merged.respuestas;
+    return { ...store, ...merged };
+}
+
 /**
  * MOTOR DE AGREGACIÓN DREAMS (DASHBOARD v2.0)
  * Busca y suma resultados de KPIs configurados en el catálogo.
@@ -24,7 +47,7 @@ const aggregateAxisResults = async (uid, accessIds, catalogCollection) => {
     let userDataStore = {};
     if (catalogCollection === 'config_ecosistema') {
         const wSnap = await getDocs(collection(db, "usuarios", uid, "progreso_workbooks"));
-        wSnap.forEach(doc => { userDataStore = { ...userDataStore, ...doc.data() }; });
+        wSnap.forEach((w) => { userDataStore = mergeWorkbookDocIntoStore(userDataStore, w.data()); });
     } else {
         const uSnap = await getDoc(doc(db, "usuarios", uid));
         userDataStore = uSnap.exists() ? { ...uSnap.data(), ...uSnap.data().expediente?.finanzas } : {};
@@ -72,7 +95,7 @@ const getGranularKPIData = async (uid, accessIds, catalogCollection) => {
     let userDataStore = {};
     if (catalogCollection === 'config_ecosistema') {
         const wSnap = await getDocs(collection(db, "usuarios", uid, "progreso_workbooks"));
-        wSnap.forEach(doc => { userDataStore = { ...userDataStore, ...doc.data() }; });
+        wSnap.forEach((w) => { userDataStore = mergeWorkbookDocIntoStore(userDataStore, w.data()); });
     } else {
         const uSnap = await getDoc(doc(db, "usuarios", uid));
         userDataStore = uSnap.exists() ? { ...uSnap.data(), ...uSnap.data().expediente?.finanzas } : {};
@@ -92,11 +115,436 @@ const getGranularKPIData = async (uid, accessIds, catalogCollection) => {
                 label: kpi.label || 'Indicador',
                 value: val,
                 unit: kpi.unit || '',
-                productTitle: product.title
+                productTitle: product.title || product.nombre || productId
             });
         });
     }
     return details;
+};
+
+const WB_META_KEYS = new Set([
+    'lastUpdate', 'lastSync', 'updatedAt', 'createdAt', 'ultimaModificacion',
+    'courseID', 'courseId', 'workbookId', 'status', 'porcentaje', 'respuestas',
+]);
+
+function countWorkbookContentFields(data) {
+    const d = data || {};
+    if (d.respuestas && typeof d.respuestas === 'object') {
+        return Object.keys(d.respuestas).length;
+    }
+    return Object.keys(d).filter((k) => !WB_META_KEYS.has(k)).length;
+}
+
+/** Progreso 0–100 por documento de workbook (nuevo esquema + legado) */
+function docProgressPercent(data) {
+    const d = data || {};
+    const p = d.porcentaje;
+    if (p != null && p !== '') {
+        const n = typeof p === 'number' ? p : parseFloat(p);
+        if (!Number.isNaN(n)) {
+            return Math.min(100, Math.max(0, n));
+        }
+    }
+    const st = String(d.status || '').toLowerCase();
+    if (st === 'completed') return 100;
+    if (st === 'in_progress') {
+        const r = d.respuestas && typeof d.respuestas === 'object' ? Object.keys(d.respuestas).length : 0;
+        return r > 0 ? Math.min(95, 30 + r * 10) : 20;
+    }
+    const n = countWorkbookContentFields(d);
+    if (n >= 2) return Math.min(100, 25 + n * 12);
+    if (n === 1) return 12;
+    return 0;
+}
+
+function groupWorkbooksByCourse(wSnap) {
+    const groups = {};
+    wSnap.forEach((docSnap) => {
+        const data = docSnap.data();
+        const keyRaw = (data.courseId || data.courseID || '').trim();
+        const k = keyRaw || '__legacy__';
+        if (!groups[k]) groups[k] = { docs: [] };
+        groups[k].docs.push({ id: docSnap.id, data });
+    });
+    return groups;
+}
+
+function buildEcoMapFromSnap(ecoSnap) {
+    const map = {};
+    ecoSnap.forEach((d) => {
+        map[d.id] = d.data();
+    });
+    return map;
+}
+
+/**
+ * Filas de drill-down por courseId; fusiona legado en un solo curso contratado si aplica.
+ */
+function buildAcademiaCourseRows(cursos, groups, ecoById) {
+    const g = { ...groups };
+    if (g.__legacy__?.docs?.length && cursos.length === 1) {
+        const only = cursos[0];
+        if (!g[only]) g[only] = { docs: [] };
+        g[only] = { docs: [...(g[only].docs || []), ...g.__legacy__.docs] };
+        delete g.__legacy__;
+    }
+
+    const rows = [];
+    const seen = new Set();
+
+    for (const courseId of cursos) {
+        seen.add(courseId);
+        const cat = ecoById[courseId] || {};
+        const totalW = Number(cat.total_workbooks) > 0 ? Number(cat.total_workbooks) : 3;
+        const bucket = g[courseId];
+        const docs = bucket ? bucket.docs : [];
+        const sumP = docs.reduce((s, x) => s + docProgressPercent(x.data), 0);
+        const pct = Math.min(100, Math.round(sumP / Math.max(totalW, 1)));
+        rows.push({
+            courseId,
+            nombre: cat.nombre || cat.title || courseId,
+            pct,
+            workbookCount: docs.length,
+            expected: totalW,
+        });
+    }
+
+    if (g.__legacy__?.docs?.length && cursos.length !== 1) {
+        const docs = g.__legacy__.docs;
+        const sumP = docs.reduce((s, x) => s + docProgressPercent(x.data), 0);
+        const pct = Math.min(100, Math.round(sumP / Math.max(docs.length, 1)));
+        rows.push({
+            courseId: '__legacy__',
+            nombre: 'Progreso sin curso vinculado',
+            pct,
+            workbookCount: docs.length,
+            expected: docs.length,
+        });
+    }
+
+    for (const courseId of Object.keys(g)) {
+        if (courseId === '__legacy__' || seen.has(courseId)) continue;
+        const cat = ecoById[courseId] || {};
+        const totalW = Number(cat.total_workbooks) > 0 ? Number(cat.total_workbooks) : 3;
+        const docs = g[courseId].docs;
+        const sumP = docs.reduce((s, x) => s + docProgressPercent(x.data), 0);
+        const pct = Math.min(100, Math.round(sumP / Math.max(totalW, 1)));
+        rows.push({
+            courseId,
+            nombre: cat.nombre || cat.title || courseId,
+            pct,
+            workbookCount: docs.length,
+            expected: totalW,
+        });
+    }
+
+    return rows;
+}
+
+function renderAcademiaCourseDrillRowsHtml(courseRows, { compact }) {
+    return courseRows.map((r) => {
+        const sub = compact
+            ? `${r.workbookCount}/${r.expected} wb`
+            : `${r.workbookCount} workbook(s) · meta ${r.expected}`;
+        return `
+        <div class="academia-drill-row ${compact ? 'is-compact' : ''}">
+            <div class="academia-drill-row-head">
+                <span class="academia-drill-name">${escapeHtml(r.nombre)}</span>
+                <span class="academia-drill-pct">${r.pct}%</span>
+            </div>
+            <div class="academia-drill-bar-track" role="progressbar" aria-valuenow="${r.pct}" aria-valuemin="0" aria-valuemax="100">
+                <div class="academia-drill-bar-fill" style="width:${r.pct}%;"></div>
+            </div>
+            <span class="academia-drill-meta">${escapeHtml(sub)}</span>
+        </div>`;
+    }).join('');
+}
+
+function renderKpiDetailRowHtml(k) {
+    return `
+        <div class="academia-kpi-detail-row" style="display: flex; justify-content: space-between; align-items: center; padding: 15px; background: #fafafa; border-radius: 12px; border-left: 4px solid var(--accent-gold);">
+            <div>
+                <span style="display: block; font-size: 0.6rem; color: #999; font-weight: 800; text-transform: uppercase;">${escapeHtml(k.productTitle)}</span>
+                <span style="font-size: 0.85rem; font-weight: 600; color: var(--primary-midnight);">${escapeHtml(k.label)}</span>
+            </div>
+            <div style="text-align: right;">
+                <span style="font-size: 1.1rem; font-weight: 800; color: var(--primary-midnight);">${escapeHtml(String(k.value))}${escapeHtml(k.unit || '')}</span>
+            </div>
+        </div>`;
+}
+
+function renderAcademiaCourseBreakdown(courseRows, targetUrl, granularDetails = null) {
+    hideAcademiaDrillPopover();
+    const overlay = document.getElementById('breakdown-overlay');
+    const list = document.getElementById('breakdown-list');
+    const titleEl = document.getElementById('breakdown-title');
+    const iconEl = document.getElementById('breakdown-icon');
+    const actionBtn = document.getElementById('btn-breakdown-action');
+    const subEl = document.getElementById('breakdown-subtitle');
+
+    if (!overlay || !list) return;
+
+    titleEl.innerText = 'Avance por programa';
+    iconEl.innerText = '🎓';
+    if (subEl) {
+        subEl.textContent = 'Agrupación por courseId; cada workbook sigue en su documento en progreso_workbooks (sin reescritura).';
+    }
+    let listHtml = courseRows.length
+        ? renderAcademiaCourseDrillRowsHtml(courseRows, { compact: false })
+        : '<p style="text-align: center; color: #999; padding: 20px;">No hay progreso registrado por curso todavía.</p>';
+
+    if (granularDetails && granularDetails.length) {
+        listHtml += `
+            <p class="academia-drill-section-label">Indicadores del catálogo (KPI)</p>
+            ${granularDetails.map((k) => renderKpiDetailRowHtml(k)).join('')}`;
+    }
+
+    list.innerHTML = listHtml;
+
+    actionBtn.onclick = () => { window.location.href = targetUrl; };
+    actionBtn.innerText = 'IR A ACADEMIA';
+    overlay.classList.add('active');
+}
+
+function positionAcademiaDrillPopover(anchorEl, popEl) {
+    if (!anchorEl || !popEl) return;
+    const r = anchorEl.getBoundingClientRect();
+    const margin = 8;
+    popEl.style.position = 'fixed';
+    popEl.style.zIndex = '10001';
+    let left = r.left + r.width / 2 - 160;
+    left = Math.max(margin, Math.min(left, window.innerWidth - 320 - margin));
+    let top = r.bottom + margin;
+    if (top + 220 > window.innerHeight) {
+        top = Math.max(margin, r.top - 220 - margin);
+    }
+    popEl.style.left = `${left}px`;
+    popEl.style.top = `${top}px`;
+}
+
+function hideAcademiaDrillPopover() {
+    const pop = document.getElementById('academia-drill-popover');
+    if (!pop) return;
+    pop.classList.remove('active');
+    pop.setAttribute('aria-hidden', 'true');
+    pop.innerHTML = '';
+}
+
+function showAcademiaDrillPopover(anchorEl, courseRows) {
+    const pop = document.getElementById('academia-drill-popover');
+    if (!pop || !anchorEl) return;
+    if (!courseRows.length) {
+        hideAcademiaDrillPopover();
+        return;
+    }
+    pop.innerHTML = `
+        <div class="academia-drill-popover-inner">
+            <span class="academia-drill-popover-title">Avance por curso</span>
+            ${renderAcademiaCourseDrillRowsHtml(courseRows, { compact: true })}
+            <span class="academia-drill-popover-hint">Clic para detalle completo</span>
+        </div>`;
+    positionAcademiaDrillPopover(anchorEl, pop);
+    pop.classList.add('active');
+    pop.setAttribute('aria-hidden', 'false');
+}
+
+function bindAcademiaDrillInteractions(academiaNode) {
+    if (!academiaNode || academiaNode.dataset.prestigeAcademiaDrill === '1') return;
+    academiaNode.dataset.prestigeAcademiaDrill = '1';
+
+    const scheduleHide = () => {
+        if (academiaDrillPopoverTimer) clearTimeout(academiaDrillPopoverTimer);
+        academiaDrillPopoverTimer = setTimeout(hideAcademiaDrillPopover, 240);
+    };
+
+    const cancelHide = () => {
+        if (academiaDrillPopoverTimer) clearTimeout(academiaDrillPopoverTimer);
+    };
+
+    academiaNode.addEventListener('mouseenter', () => {
+        if (!window.matchMedia('(hover: hover)').matches) return;
+        cancelHide();
+        showAcademiaDrillPopover(academiaNode, academiaDrilldownSnapshot);
+    });
+    academiaNode.addEventListener('mouseleave', scheduleHide);
+
+    const pop = document.getElementById('academia-drill-popover');
+    if (pop) {
+        pop.addEventListener('mouseenter', cancelHide);
+        pop.addEventListener('mouseleave', scheduleHide);
+    }
+}
+
+function ensureStrategicMiniChart(axisKey, percent) {
+    const canvas = document.getElementById(`chart-${axisKey}`);
+    if (!canvas || typeof Chart === 'undefined') return;
+    const clamped = Math.max(0, Math.min(100, Number(percent) || 0));
+    const existing = typeof Chart.getChart === 'function' ? Chart.getChart(canvas) : null;
+    if (existing) return;
+    const ctx = canvas.getContext('2d');
+    new Chart(ctx, {
+        type: 'doughnut',
+        data: {
+            datasets: [{
+                data: [clamped, Math.max(0, 100 - clamped)],
+                backgroundColor: ['rgba(201, 169, 98, 0.95)', 'rgba(15, 76, 129, 0.08)'],
+                borderWidth: 0,
+            }],
+        },
+        options: {
+            cutout: '72%',
+            plugins: { legend: { display: false }, tooltip: { enabled: false } },
+            animation: { duration: 400 },
+            responsive: true,
+            maintainAspectRatio: false,
+        },
+    });
+}
+
+/**
+ * Hub ejecutivo: una sola fuente de verdad por eje (sin carrera con aggregate posterior).
+ */
+const hydrateStrategicHub = async (user, userData) => {
+    const uid = user.uid;
+    const accesos = userData?.accesos || {};
+    const cursos = accesos.cursos || [];
+    const appsList = accesos.apps || [];
+    const consult = accesos.consultor || [];
+
+    const [wSnap, ecoSnap, consSnap, appSnap] = await Promise.all([
+        getDocs(collection(db, 'usuarios', uid, 'progreso_workbooks')),
+        getDocs(collection(db, 'config_ecosistema')),
+        getDocs(collection(db, 'config_consultoria')),
+        (async () => {
+            try {
+                return await getDocs(collection(db, 'config_apps'));
+            } catch {
+                return null;
+            }
+        })(),
+    ]);
+
+    let appCatalogCount = OPERATIVE_APP_DEFS.length;
+    if (appSnap && typeof appSnap.size === 'number' && appSnap.size > 0) {
+        appCatalogCount = appSnap.size;
+    }
+
+    const groups = groupWorkbooksByCourse(wSnap);
+    const ecoById = buildEcoMapFromSnap(ecoSnap);
+    const courseRows = buildAcademiaCourseRows(cursos, groups, ecoById);
+    academiaDrilldownSnapshot = courseRows;
+
+    let sessionsWithData = 0;
+    let totalUserFields = 0;
+    wSnap.forEach((d) => {
+        const raw = d.data();
+        totalUserFields += countWorkbookContentFields(raw);
+        if (docProgressPercent(raw) >= 12 || String(raw.status || '').toLowerCase() === 'completed') {
+            sessionsWithData++;
+        }
+    });
+    const totalWb = wSnap.size;
+    const cursosN = cursos.length;
+
+    let formativoPct;
+    let expectedSlots;
+    if (courseRows.length > 0) {
+        formativoPct = Math.min(
+            100,
+            Math.round(courseRows.reduce((s, r) => s + r.pct, 0) / courseRows.length),
+        );
+        expectedSlots = Math.max(1, courseRows.reduce((s, r) => s + r.expected, 0));
+    } else {
+        expectedSlots = Math.max(cursosN * 3, totalWb || cursosN || 1, 1);
+        formativoPct = Math.min(100, Math.round((sessionsWithData / expectedSlots) * 100));
+    }
+
+    const academiaSub = courseRows.length
+        ? `${courseRows.filter((r) => r.pct > 0).length}/${courseRows.length} programas con avance · ${totalWb} workbook(s)`
+        : `${sessionsWithData}/${expectedSlots} bloques con avance · ${cursosN} curso(s)`;
+
+    const appsCoveragePct = Math.min(100, Math.round((appsList.length / Math.max(appCatalogCount, 1)) * 100));
+    let appsAgg = null;
+    if (appsList.length) {
+        appsAgg = await aggregateAxisResults(uid, appsList, 'config_apps');
+    }
+    let appsMain;
+    let appsSub;
+    let appsChartPct;
+    if (appsAgg && appsAgg.count > 0) {
+        appsMain = `${Math.round(appsAgg.avg)}%`;
+        appsSub = 'KPI en herramientas contratadas';
+        appsChartPct = Math.round(appsAgg.avg);
+    } else {
+        appsMain = `${appsList.length}/${appCatalogCount}`;
+        appsSub = 'Herramientas activas vs catálogo';
+        appsChartPct = appsCoveragePct;
+    }
+
+    let consAgg = null;
+    if (consult.length) {
+        consAgg = await aggregateAxisResults(uid, consult, 'config_consultoria');
+    }
+    let consMain;
+    let consSub;
+    let consChartPct;
+    if (consAgg && consAgg.count > 0) {
+        consMain = `${Math.round(consAgg.avg)}%`;
+        consSub = 'Indicadores de consultoría';
+        consChartPct = Math.round(consAgg.avg);
+    } else if (consult.length) {
+        consMain = String(consult.length);
+        consSub = consult.length === 1 ? 'Servicio en expediente' : 'Servicios en expediente';
+        consChartPct = Math.min(100, consult.length * 30);
+    } else {
+        consMain = '—';
+        consSub = 'Sin consultoría activa';
+        consChartPct = 0;
+    }
+
+    const ecoN = Math.max(ecoSnap.size, 1);
+    const consN = Math.max(consSnap.size, 1);
+    const denom = ecoN + appCatalogCount + consN;
+    const ownedCount = cursosN + appsList.length + consult.length;
+    const coberturaCat = Math.min(100, Math.round((ownedCount / denom) * 100));
+    const fieldIntensity = Math.min(100, Math.round(totalUserFields * 6));
+    const usoPlataforma = Math.min(100, Math.round(
+        formativoPct * 0.42
+        + fieldIntensity * 0.28
+        + appsCoveragePct * 0.22
+        + (consult.length ? 8 : 0),
+    ));
+
+    const summaryEl = document.getElementById('hub-executive-summary');
+    if (summaryEl) {
+        summaryEl.textContent = `Uso de plataforma ~${usoPlataforma}% · Valor incorporado vs oferta ${coberturaCat}% · ${ownedCount} activo(s) en expediente`;
+    }
+
+    const setAxis = (axis, mainText, subText, chartPct) => {
+        const mainEl = document.getElementById(`kpi-val-${axis}`);
+        const subEl = document.getElementById(`kpi-sub-${axis}`);
+        const node = document.querySelector(`[data-axis="${axis}"]`);
+        if (mainEl) mainEl.textContent = mainText;
+        if (subEl) subEl.textContent = subText;
+        if (node) node.setAttribute('data-chart-pct', String(chartPct));
+    };
+
+    setAxis('academia', `${formativoPct}%`, academiaSub, formativoPct);
+    setAxis('apps', appsMain, appsSub, appsChartPct);
+    setAxis('consultoria', consMain, consSub, consChartPct);
+
+    ['academia', 'apps', 'consultoria'].forEach((axis) => {
+        const node = document.querySelector(`[data-axis="${axis}"]`);
+        if (!node) return;
+        const onEnter = () => {
+            node.removeEventListener('mouseenter', onEnter);
+            const pct = parseFloat(node.getAttribute('data-chart-pct') || '0', 10);
+            ensureStrategicMiniChart(axis, pct);
+        };
+        node.addEventListener('mouseenter', onEnter);
+    });
+
+    bindAcademiaDrillInteractions(document.querySelector('[data-axis="academia"]'));
 };
 
 /**
@@ -338,62 +786,7 @@ const hydrateDashboardMetrics = async (user, userData) => {
         elBalance.innerText = formatCurrency(puntoEquilibrio);
     }
 
-    /**
-     * MOTOR DE RESULTADOS ESTRATÉGICOS v2.0 (Dual Logic)
-     * Procesa KPIs de Rendimiento (Negocio) y KPIs de Uso (Engagement)
-     */
-    const processStrategicKPIs = async () => {
-        const uid = user.uid;
-        const accesos = userData?.accesos || {};
-
-        // 1. EJE ACADEMIA (Resultados de Cursos)
-        let totalPerformanceAcademia = 0;
-        let countCursosConKPI = 0;
-        const cursosContratados = accesos.cursos || [];
-
-        for (const courseId of cursosContratados) {
-            const courseSnap = await getDoc(doc(db, "config_ecosistema", courseId));
-            const config = courseSnap.data()?.kpi_config;
-
-            if (config && config.field_source) {
-                // Buscamos el valor en todos los workbooks del usuario (Búsqueda Transversal)
-                const workbooksRef = collection(db, "usuarios", uid, "progreso_workbooks");
-                const wSnap = await getDocs(workbooksRef);
-                
-                wSnap.forEach(wDoc => {
-                    const val = parseFloat(wDoc.data()[config.field_source]);
-                    if (!isNaN(val)) {
-                        totalPerformanceAcademia += val;
-                        countCursosConKPI++;
-                    }
-                });
-            }
-        }
-
-        // Renderizado en Burbuja Academia
-        const elValAcademia = document.getElementById('kpi-val-academia');
-        if (elValAcademia) {
-            const result = countCursosConKPI > 0 ? (totalPerformanceAcademia / countCursosConKPI).toFixed(1) : "0";
-            elValAcademia.innerText = `${result}${countCursosConKPI > 0 ? (cursosContratados[0]?.unit || '%') : '%'}`;
-        }
-
-        // 2. EJE CONSULTORÍA (Resultados de Intervención)
-        const elValConsultoria = document.getElementById('kpi-val-consultoria');
-        if (elValConsultoria) {
-            const consultoriaKPI = userData?.expediente?.finanzas?.margenUtilidad || 0;
-            elValConsultoria.innerText = `${consultoriaKPI}% ROE`;
-        }
-
-        // 3. EJE OPERATIVA / APPS (Engagement y Uso)
-        const elValApps = document.getElementById('kpi-val-apps');
-        if (elValApps) {
-            const appsActivas = accesos.apps?.length || 0;
-            const recomendaciones = userData?.metricas?.recomendaciones || 0;
-            elValApps.innerText = `${appsActivas} Activos | ${recomendaciones} ✨`;
-        }
-    };
-
-    await processStrategicKPIs();
+    await hydrateStrategicHub(user, userData);
 
     await hydrateOperativeShelf(user, userData);
 
@@ -416,7 +809,7 @@ const hydrateDashboardMetrics = async (user, userData) => {
         apps: { 
             node: document.querySelector('[data-axis="apps"]'), 
             kpiEl: document.getElementById('kpi-val-apps'),
-            catalog: null, // Las apps operativas se manejan por estatus individual
+            catalog: 'config_apps',
             type: 'apps'
         },
         consultoria: { 
@@ -430,19 +823,7 @@ const hydrateDashboardMetrics = async (user, userData) => {
     for (const [key, config] of Object.entries(axes)) {
         if (!config.node) continue;
 
-        // A. HIDRATACIÓN DE KPIs REALES
-        if (config.catalog && userData?.accesos?.[config.type]) {
-            aggregateAxisResults(user.uid, userData.accesos[config.type], config.catalog)
-                .then(result => {
-                    if (result && config.kpiEl) {
-                        // Buscamos la unidad del primer producto para consistencia visual
-                        const unit = "%"; // Fallback o podrías traerlo del catálogo
-                        config.kpiEl.innerText = `${Math.round(result.avg)}${unit}`;
-                    }
-                });
-        }
-
-        // B. PROTOCOLO DE NAVEGACIÓN MULTIDIMENSIONAL (KPI BREAKDOWN + SENTINEL)
+        // PROTOCOLO DE NAVEGACIÓN MULTIDIMENSIONAL (KPI BREAKDOWN + SENTINEL)
         config.node.onclick = async (e) => {
             e.preventDefault();
             e.stopPropagation();
@@ -464,12 +845,24 @@ const hydrateDashboardMetrics = async (user, userData) => {
                 return;
             }
 
-            // 3. Disparo de Desglose Granular
-            if (config.catalog && userData?.accesos?.[config.type]) {
+            if (key === 'academia' && academiaDrilldownSnapshot.length > 0) {
+                let granular = [];
+                if (userData?.accesos?.cursos?.length) {
+                    granular = await getGranularKPIData(user.uid, userData.accesos.cursos, 'config_ecosistema');
+                }
+                renderAcademiaCourseBreakdown(academiaDrilldownSnapshot, targetUrl, granular);
+                return;
+            }
+
+            // Desglose granular (KPIs de catálogo) o salto al módulo
+            if (config.catalog && userData?.accesos?.[config.type]?.length) {
                 const details = await getGranularKPIData(user.uid, userData.accesos[config.type], config.catalog);
-                renderKPIDetails(labels[key], icons[key], details, targetUrl);
+                if (details.length) {
+                    renderKPIDetails(labels[key], icons[key], details, targetUrl);
+                } else {
+                    window.location.href = targetUrl;
+                }
             } else {
-                // Si el eje no tiene catálogo (Apps), navegamos directo
                 window.location.href = targetUrl;
             }
         };

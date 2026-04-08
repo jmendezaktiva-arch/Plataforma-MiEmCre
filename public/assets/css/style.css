@@ -20,8 +20,8 @@
     --card-bg: #FFFFFF;
 
     /* --- WORKBOOK UI TOKENS (HOMOLOGADOS PRESTIGE) --- */
-    --brand-blue: var(--primary-midnight); /* Sincronizado con Azul Medianoche [cite: 16] */
-    --brand-orange: var(--accent-gold);    /* Sincronizado con Oro Bronceado [cite: 17] */
+    --brand-blue: var(--primary-midnight); /* Sincronizado con Azul Medianoche */
+    --brand-orange: var(--accent-gold);    /* Sincronizado con Oro Bronceado [ */
     --brand-blue-light: rgba(15, 52, 96, 0.05); /* Versión suave para fondos de cajas */
     --brand-orange-light: rgba(149, 124, 61, 0.1); /* Versión suave para tips */
 
@@ -422,21 +422,21 @@ strong, b, .calculation-label {
 /* --- ESTILIZACIÓN QUIRÚRGICA DEL BOTÓN DE ACCIÓN --- */
 /* --- BOTÓN PRIMARIO: PRESTIGE (AZUL & ORO) --- */
 .btn-primary {
-    background-color: var(--primary-midnight); /* [cite: 7, 64] */
+    background-color: var(--primary-midnight); /*  */
     color: #FFFFFF;
-    border: 1px solid var(--accent-gold); /* [cite: 73] Micro-destello en Oro */
+    border: 1px solid var(--accent-gold); /*  Micro-destello en Oro */
     padding: 18px 32px;
     border-radius: 12px;
     cursor: pointer;
-    font-family: 'Montserrat', sans-serif !important; /* [cite: 465] */
-    font-weight: 600; /* [cite: 85] */
-    font-size: 1rem; /* [cite: 85, 471] */
-    letter-spacing: 0.05em; /* [cite: 85] */
-    text-transform: uppercase; /* [cite: 85] */
-    transition: all 300ms ease-out; /* [cite: 26, 123] */
+    font-family: 'Montserrat', sans-serif !important; /*  */
+    font-weight: 600; /*  */
+    font-size: 1rem; /*  */
+    letter-spacing: 0.05em; /*  */
+    text-transform: uppercase; /*  */
+    transition: all 300ms ease-out; /*  */
     width: 100%;
     /* Soft Depth Shadow teñida de Midnight */
-    box-shadow: 0 4px 6px rgba(15, 52, 96, 0.08), 0 1px 3px rgba(15, 52, 96, 0.04); /* [cite: 102] */
+    box-shadow: 0 4px 6px rgba(15, 52, 96, 0.08), 0 1px 3px rgba(15, 52, 96, 0.04); /*  */
     position: relative;
     overflow: hidden;
 }
@@ -444,11 +444,11 @@ strong, b, .calculation-label {
 .btn-primary:hover:not([disabled]) {
     background-color: #164275; /* Variante sutil del azul para profundidad */
     transform: translateY(-2px);
-    box-shadow: 0 10px 15px -3px rgba(15, 52, 96, 0.12); /* [cite: 103] */
+    box-shadow: 0 10px 15px -3px rgba(15, 52, 96, 0.12); /*  */
 }
 
 .btn-primary:active:not([disabled]) {
-    transform: scale(0.98); /* [cite: 32, 125] Micro-escala de calidad */
+    transform: scale(0.98); /*  Micro-escala de calidad */
     box-shadow: 0 2px 4px rgba(15, 52, 96, 0.1);
 }
 
@@ -536,11 +536,11 @@ strong, b, .calculation-label {
     justify-content: center;
     text-align: center;
     width: 100%;
-    gap: 20px; /* Alineación perfecta de Logo, H1 y P [cite: 161] */
+    gap: 20px; /* Alineación perfecta de Logo, H1 y P  */
 }
 
 .brand-content h1 {
-    margin: 0; /* Elimina la brecha vertical asimétrica [cite: 84] */
+    margin: 0; /* Elimina la brecha vertical asimétrica  */
     line-height: 1.2;
 }
 
