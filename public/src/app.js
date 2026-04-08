@@ -140,6 +140,186 @@ const renderKPIDetails = (title, icon, details, targetUrl) => {
  * CONTROLADOR QUIRÚRGICO DE BOTONES INTELIGENTES
  * Gestiona la mutación de los botones del Dashboard según el acceso real.
  */
+/** Catálogo fijo de apps operativas (alineado con admin / sidebar) */
+const OPERATIVE_APP_DEFS = [
+    { id: 'app-crm', title: 'CRM Ventas', icon: '📊' },
+    { id: 'app-erp', title: 'ERP Finanzas', icon: '💰' },
+    { id: 'app-process', title: 'Process Designer', icon: '⚙️' },
+];
+
+/**
+ * Panel operativo: activos reales del expediente + oferta dinámica (catálogo Firestore).
+ * Listado compacto; CTAs hacia módulos o contacto (sin invadir el hub de resultados).
+ */
+const hydrateOperativeShelf = async (user, userData) => {
+    const ownedEl = document.querySelector('.monitor-list');
+    const suggestEl = document.querySelector('.ai-recommendation-feed');
+    if (!ownedEl || !suggestEl) return;
+
+    ownedEl.innerHTML = '';
+    suggestEl.innerHTML = '';
+
+    const accesos = userData?.accesos || {};
+    const cursosIds = new Set(accesos.cursos || []);
+    const appsIds = new Set(accesos.apps || []);
+    const consultIds = new Set(accesos.consultor || []);
+
+    let coursesById = {};
+    let servicesById = {};
+    try {
+        const [ecoSnap, consSnap] = await Promise.all([
+            getDocs(collection(db, 'config_ecosistema')),
+            getDocs(collection(db, 'config_consultoria')),
+        ]);
+        ecoSnap.forEach((d) => { coursesById[d.id] = { id: d.id, ...d.data() }; });
+        consSnap.forEach((d) => { servicesById[d.id] = { id: d.id, ...d.data() }; });
+    } catch (e) {
+        console.warn('🚨 Dreams Operative: No se pudo sincronizar catálogo.', e);
+        const err = document.createElement('p');
+        err.className = 'operative-empty-hint';
+        err.style.cssText = 'font-size:0.75rem;color:#b45309;margin:0;padding:8px 0;';
+        err.textContent = 'No se pudo cargar la oferta. Revisa tu conexión e intenta de nuevo.';
+        suggestEl.appendChild(err);
+        return;
+    }
+
+    const appendRow = (container, { icon, title, badge, badgeColor, suggest, onClick }) => {
+        const row = document.createElement('button');
+        row.type = 'button';
+        row.className = 'glass-card operative-shelf-row' + (suggest ? ' ai-suggestion-card' : '');
+        row.setAttribute('aria-label', `${title}: ${badge}`);
+        row.innerHTML = `
+            <span class="app-icon-mini">${icon}</span>
+            <div class="glass-card-info">
+                <span>${title}</span>
+                <span class="status-label" style="color:${badgeColor}">${badge}</span>
+            </div>
+        `;
+        row.onclick = (e) => {
+            e.preventDefault();
+            onClick();
+        };
+        container.appendChild(row);
+    };
+
+    let ownedCount = 0;
+    for (const id of cursosIds) {
+        const c = coursesById[id];
+        const title = c?.title || id;
+        appendRow(ownedEl, {
+            icon: '🎓',
+            title,
+            badge: 'ACTIVO',
+            badgeColor: 'var(--secondary-color)',
+            suggest: false,
+            onClick: () => { window.location.href = 'academia.html'; },
+        });
+        ownedCount++;
+    }
+    for (const id of appsIds) {
+        const def = OPERATIVE_APP_DEFS.find((a) => a.id === id);
+        const title = def?.title || id;
+        const icon = def?.icon || '🛠️';
+        appendRow(ownedEl, {
+            icon,
+            title,
+            badge: 'ACTIVO',
+            badgeColor: 'var(--secondary-color)',
+            suggest: false,
+            onClick: () => { window.location.href = 'apps.html'; },
+        });
+        ownedCount++;
+    }
+    for (const id of consultIds) {
+        const s = servicesById[id];
+        const title = s?.title || id;
+        appendRow(ownedEl, {
+            icon: '🤝',
+            title,
+            badge: 'ACTIVO',
+            badgeColor: 'var(--secondary-color)',
+            suggest: false,
+            onClick: () => { window.location.href = 'consultoria.html'; },
+        });
+        ownedCount++;
+    }
+
+    if (ownedCount === 0) {
+        const p = document.createElement('p');
+        p.className = 'operative-empty-hint';
+        p.style.cssText = 'font-size:0.75rem;color:#999;margin:0;padding:8px 0;font-style:italic;';
+        p.textContent = 'Aún no hay activos en tu expediente. Revisa la columna "Explorar oferta" o entra por Academia, Apps o Consultoría.';
+        ownedEl.appendChild(p);
+    }
+
+    const courseRows = Object.values(coursesById)
+        .filter((c) => c.id && !cursosIds.has(c.id) && c.title && !c.isComingSoon)
+        .sort((a, b) => (a.orden ?? 99) - (b.orden ?? 99));
+
+    const serviceRows = Object.values(servicesById)
+        .filter((s) => s.id && !consultIds.has(s.id) && s.title && s.isActive !== false)
+        .sort((a, b) => (b.isHighlighted ? 1 : 0) - (a.isHighlighted ? 1 : 0));
+
+    const appRowsSuggested = OPERATIVE_APP_DEFS.filter((a) => !appsIds.has(a.id));
+
+    const maxSuggest = 6;
+    let suggestCount = 0;
+
+    for (const c of courseRows) {
+        if (suggestCount >= maxSuggest) break;
+        appendRow(suggestEl, {
+            icon: '🎓',
+            title: c.title,
+            badge: 'VER',
+            badgeColor: 'var(--accent-gold)',
+            suggest: true,
+            onClick: () => { window.location.href = 'academia.html'; },
+        });
+        suggestCount++;
+    }
+    for (const s of serviceRows) {
+        if (suggestCount >= maxSuggest) break;
+        appendRow(suggestEl, {
+            icon: '🤝',
+            title: s.title,
+            badge: 'VER',
+            badgeColor: 'var(--accent-gold)',
+            suggest: true,
+            onClick: () => { window.location.href = 'consultoria.html'; },
+        });
+        suggestCount++;
+    }
+    for (const a of appRowsSuggested) {
+        if (suggestCount >= maxSuggest) break;
+        appendRow(suggestEl, {
+            icon: a.icon,
+            title: a.title,
+            badge: 'EXPLORAR',
+            badgeColor: 'var(--accent-gold)',
+            suggest: true,
+            onClick: () => {
+                window.postMessage({
+                    type: 'OPEN_CONTACT_MODAL',
+                    data: {
+                        subject: 'Adquisición de Activo',
+                        context: `operative_suggest_${a.id}`,
+                        productTitle: a.title,
+                    },
+                }, '*');
+            },
+        });
+        suggestCount++;
+    }
+
+    if (suggestCount === 0) {
+        const p = document.createElement('p');
+        p.className = 'operative-empty-hint';
+        p.style.cssText = 'font-size:0.75rem;color:#999;margin:0;padding:8px 0;font-style:italic;';
+        p.textContent = 'Has incorporado los elementos visibles del catálogo. Tu consultor puede ampliar tu expediente cuando lo necesites.';
+        suggestEl.appendChild(p);
+    }
+};
+
 /**
  * MOTOR DE HIDRATACIÓN PRESTIGE (FASE 3)
  * Centraliza la carga de métricas y la seguridad del Carrusel.
@@ -215,45 +395,7 @@ const hydrateDashboardMetrics = async (user, userData) => {
 
     await processStrategicKPIs();
 
-    // 2. MOTOR DE DISTRIBUCIÓN OPERATIVA (ESTABILIZADO)
-    const allCards = document.querySelectorAll('.split-operative-panel .glass-card');
-    const monitorList = document.querySelector('.monitor-list');
-    const aiFeed = document.querySelector('.ai-recommendation-feed');
-
-    allCards.forEach(async (card) => {
-        const productId = card.dataset.product;
-        const type = productId.startsWith('app-') ? 'apps' : 'cursos';
-        const statusLabel = card.querySelector('.status-label');
-        
-        const hasAccess = await checkAccess(type, productId);
-        
-        if (hasAccess) {
-            // PROTOCOLO ACTIVO
-            if (monitorList) monitorList.appendChild(card);
-            if (statusLabel) {
-                statusLabel.innerText = "ACTIVO";
-                statusLabel.style.color = "var(--secondary-color)";
-            }
-            card.classList.remove('ai-suggestion-card');
-            card.onclick = () => window.location.href = `${type}.html?id=${productId}`;
-        } else {
-            // PROTOCOLO SUGERENCIA IA
-            if (aiFeed) aiFeed.appendChild(card);
-            if (statusLabel) {
-                statusLabel.innerText = "RECOMENDADO";
-                statusLabel.style.color = "var(--accent-gold)";
-            }
-            card.classList.add('ai-suggestion-card');
-            card.onclick = () => window.postMessage({ 
-                type: 'OPEN_CONTACT_MODAL', 
-                data: { subject: 'Adquisición de Activo', context: `ia_suggestion_${productId}` } 
-            }, '*');
-        }
-        
-        // Revelación elegante tras sincronización total
-        card.style.display = 'flex';
-        card.style.opacity = '1';
-    });
+    await hydrateOperativeShelf(user, userData);
 
     // 3. ACTUALIZACIÓN DE PÍLDORA DE AUTORIDAD (AURA)
     const pill = document.getElementById('authority-pill');
@@ -649,11 +791,14 @@ document.addEventListener('DOMContentLoaded', () => {
             const interestSelect = document.getElementById('contact-interest');
             const messageArea = document.getElementById('contact-message');
 
-            // ESCENARIO 1: INTERÉS EN APPS (Sidebar o Dashboard)
+            // ESCENARIO 1: INTERÉS EN APPS / ACTIVOS (Sidebar, Dashboard operativo, etc.)
             if (data?.subject === 'Adquisición de Apps' || data?.subject === 'Adquisición de Activo') {
-                if (interestSelect) interestSelect.value = 'Otro'; 
+                if (interestSelect) interestSelect.value = 'Otro';
                 if (messageArea) {
-                    messageArea.value = `[SOLICITUD DE ACTIVACIÓN] Estimado Staff de Mi Empresa Crece: Deseo integrar el Ecosistema de Apps a mi operativa estratégica. Quedo a la espera del enlace de Zoom para coordinar la implementación técnica en mi PyME.`;
+                    const productLine = data?.productTitle
+                        ? ` Me interesa: ${data.productTitle}.`
+                        : '';
+                    messageArea.value = `[SOLICITUD DE ACTIVACIÓN] Estimado Staff de Mi Empresa Crece:${productLine} Deseo integrar o ampliar soluciones en mi operativa y conocer la inversión y siguiente paso recomendado para mi PyME.`;
                 }
             }
             

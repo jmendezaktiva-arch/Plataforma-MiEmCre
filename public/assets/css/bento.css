@@ -631,6 +631,27 @@
     flex-direction: column;
 }
 
+/* Panel operativo dashboard: microcopy sin competir con el hub de ejes */
+.operative-column-hint {
+    font-size: 0.65rem;
+    color: rgba(15, 52, 96, 0.55);
+    font-weight: 500;
+    line-height: 1.35;
+    margin: 0 0 10px 0;
+    max-width: 420px;
+}
+.operative-hint-muted {
+    color: rgba(149, 124, 61, 0.75);
+}
+.operative-column .glass-card.operative-shelf-row {
+    cursor: pointer;
+    border: none;
+    width: 100%;
+    font-family: inherit;
+    text-align: left;
+    -webkit-tap-highlight-color: transparent;
+}
+
 /* --- REDISEÑO QUIRÚRGICO: LISTADO MINIMALISTA (EX-BURBUJAS) --- */
 
 /* 1. Transformación de Contenedores a Listas Verticales */

@@ -49,7 +49,7 @@
                 <div class="shelf-control-header">
                     <div class="shelf-header-titles">
                         <h4 class="shelf-title">Panel Operativo</h4>
-                        <span class="shelf-subtitle">Activos y Estrategia IA</span>
+                        <span class="shelf-subtitle">Tu expediente y la oferta de crecimiento</span>
                     </div>
                     <button id="btn-toggle-shelf" class="btn-minimal-toggle" title="Minimizar/Expandir">
                         <span id="toggle-icon">▼</span>
@@ -58,40 +58,17 @@
 
                 <div class="shelf-content-wrapper" id="shelf-content">
                     <div class="split-operative-panel">
-                        
                         <div class="operative-column">
-                            <h5 class="column-sticky-title">Mis Activos</h5>
-                            <div class="monitor-list">
-                                <div class="glass-card" data-product="app-crm" style="display: none;">
-                                    <span class="app-icon-mini">📊</span>
-                                    <div class="glass-card-info">
-                                        <span>CRM Ventas</span>
-                                        <span class="status-label">...</span>
-                                    </div>
-                                </div>
-                                <div class="glass-card" data-product="app-erp" style="display: none;">
-                                    <span class="app-icon-mini">💰</span>
-                                    <div class="glass-card-info">
-                                        <span>ERP Finanzas</span>
-                                        <span class="status-label">...</span>
-                                    </div>
-                                </div>
-                            </div>
+                            <h5 class="column-sticky-title">Mis activos</h5>
+                            <p class="operative-column-hint">Programas, herramientas y consultoría que ya forman parte de tu expediente.</p>
+                            <div class="monitor-list" id="operative-owned-list" aria-live="polite"></div>
                         </div>
 
                         <div class="operative-column ai-insights-zone">
-                            <h5 class="column-sticky-title ai-glow-text">Sugerencias IA</h5>
-                            <div class="ai-recommendation-feed">
-                                <div class="glass-card" data-product="app-process" style="display: none;">
-                                    <span class="app-icon-mini">⚙️</span>
-                                    <div class="glass-card-info">
-                                        <span>Process Designer</span>
-                                        <span class="status-label">...</span>
-                                    </div>
-                                </div>
-                            </div>
+                            <h5 class="column-sticky-title ai-glow-text">Explorar oferta</h5>
+                            <p class="operative-column-hint operative-hint-muted">Propuesta Mi Empresa Crece: descubre qué más puedes sumar, sin salir del panel.</p>
+                            <div class="ai-recommendation-feed" id="operative-suggest-list" aria-live="polite"></div>
                         </div>
-
                     </div>
                 </div>
             </section>
