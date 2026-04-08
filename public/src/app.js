@@ -938,7 +938,7 @@ onAuthStateChanged(auth, async (user) => {
                 const displayElement = document.getElementById('user-display-name');
                 if (displayElement) {
                     const name = userData?.nombre || user.displayName || 'Socio';
-                    displayElement.innerText = `Hola, ${name}. Bienvenido a tu espacio de trabajo estratégico.`;
+                    displayElement.innerText = `Hola, ${name}.`;
                     displayElement.style.opacity = "1";
                 }
 
@@ -1137,6 +1137,20 @@ document.addEventListener('DOMContentLoaded', () => {
         e.preventDefault();
 
         const btnId = auraBtn.id;
+
+        // 0. ACCESO RÁPIDO A MÓDULOS (navbar Prestige)
+        if (btnId === 'btn-nav-academia') {
+            window.location.href = 'academia.html';
+            return;
+        }
+        if (btnId === 'btn-nav-apps') {
+            window.location.href = 'apps.html';
+            return;
+        }
+        if (btnId === 'btn-nav-consultoria') {
+            window.location.href = 'consultoria.html';
+            return;
+        }
 
         // 1. DISPARADOR IA (✨) - EJECUCIÓN GLOBAL NO-INTERRUPTIVA
         if (btnId === 'btn-nav-ia' || btnId === 'btn-ia-consultant') {

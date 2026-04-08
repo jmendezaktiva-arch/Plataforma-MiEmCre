@@ -1505,6 +1505,43 @@ body.cinema-mode #view-workbook {
     text-align: center;
 }
 
+/* Agrupación: módulos (Academia / Apps / Consultoría) + herramientas (IA / búsqueda / soporte) */
+#header-aura-actions.nav-right {
+    flex-wrap: wrap;
+    justify-content: flex-end;
+    row-gap: 10px;
+    column-gap: var(--navbar-button-gap, 12px);
+}
+
+.nav-aura-group {
+    display: flex;
+    align-items: center;
+    gap: var(--navbar-button-gap, 12px);
+}
+
+.nav-aura-sep {
+    width: 1px;
+    height: 28px;
+    align-self: center;
+    background: rgba(149, 124, 61, 0.35);
+    flex-shrink: 0;
+}
+
+@media (max-width: 520px) {
+    #header-aura-actions.nav-right {
+        max-width: min(100%, 340px);
+        margin-left: auto;
+    }
+
+    .nav-aura-sep {
+        display: none;
+    }
+
+    #header-aura-actions .nav-aura-group {
+        gap: 8px;
+    }
+}
+
 /* REPARACIÓN NAV-ACTIONS PRESTIGE */
 #header-aura-actions .nav-btn-prestige {
     background-color: #0F3460 !important; /* Azul Medianoche Sólido */
@@ -1530,6 +1567,50 @@ body.cinema-mode #view-workbook {
 
 #header-aura-actions .nav-btn-prestige .icon {
     font-size: 1.25rem !important;
+}
+
+/* Leyendas rápidas (reemplazan el retardo largo del atributo title del navegador) */
+#header-aura-actions .nav-btn-prestige[data-nav-tip] {
+    position: relative;
+}
+
+#header-aura-actions .nav-btn-prestige[data-nav-tip]::after {
+    content: attr(data-nav-tip);
+    position: absolute;
+    left: 50%;
+    top: calc(100% + 8px);
+    transform: translateX(-50%);
+    padding: 7px 12px;
+    background: rgba(15, 52, 96, 0.96);
+    color: #fff;
+    font-family: 'Montserrat', sans-serif;
+    font-size: 0.65rem;
+    font-weight: 600;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    white-space: nowrap;
+    border-radius: 8px;
+    box-shadow: 0 6px 18px rgba(15, 52, 96, 0.35);
+    opacity: 0;
+    visibility: hidden;
+    pointer-events: none;
+    z-index: 10002;
+    transition: opacity 0.14s ease, visibility 0.14s ease;
+    transition-delay: 0s, 0s;
+}
+
+#header-aura-actions .nav-btn-prestige[data-nav-tip]:hover::after,
+#header-aura-actions .nav-btn-prestige[data-nav-tip]:focus-visible::after {
+    opacity: 1;
+    visibility: visible;
+    transition-delay: 0s, 0s;
+}
+
+@media (max-width: 768px) {
+    #header-aura-actions .nav-btn-prestige[data-nav-tip]::after {
+        font-size: 0.6rem;
+        padding: 6px 10px;
+    }
 }
 
 /* ========================================================================== */

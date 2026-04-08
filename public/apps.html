@@ -56,16 +56,29 @@
         </div>
 
         <div id="header-aura-actions" class="nav-right">
-            
-            <button id="btn-nav-ia" class="nav-btn-prestige" title="Consultoría IA">
-                <span class="icon">✨</span>
-            </button>
-            <button id="btn-nav-search" class="nav-btn-prestige" title="Buscador">
-                <span class="icon">🔍</span>
-            </button>
-            <button id="btn-nav-support" class="nav-btn-prestige" title="Soporte Técnico">
-                <span class="icon">✉️</span>
-            </button>
+            <div class="nav-aura-group" role="group" aria-label="Acceso a módulos">
+                <button id="btn-nav-academia" type="button" class="nav-btn-prestige" data-nav-tip="Academia" aria-label="Ir a Academia de estrategia">
+                    <span class="icon">🎓</span>
+                </button>
+                <button id="btn-nav-apps" type="button" class="nav-btn-prestige" data-nav-tip="Apps" aria-label="Ir a ecosistema de aplicaciones">
+                    <span class="icon">🛠️</span>
+                </button>
+                <button id="btn-nav-consultoria" type="button" class="nav-btn-prestige" data-nav-tip="Consultoría" aria-label="Ir a consultoría estratégica">
+                    <span class="icon">🤝</span>
+                </button>
+            </div>
+            <span class="nav-aura-sep" aria-hidden="true"></span>
+            <div class="nav-aura-group" role="group" aria-label="Herramientas del panel">
+                <button id="btn-nav-ia" type="button" class="nav-btn-prestige" data-nav-tip="Consultoría IA" aria-label="Consultoría IA">
+                    <span class="icon">✨</span>
+                </button>
+                <button id="btn-nav-search" type="button" class="nav-btn-prestige" data-nav-tip="Buscador" aria-label="Buscador">
+                    <span class="icon">🔍</span>
+                </button>
+                <button id="btn-nav-support" type="button" class="nav-btn-prestige" data-nav-tip="Soporte técnico" aria-label="Soporte técnico">
+                    <span class="icon">✉️</span>
+                </button>
+            </div>
         </div>
     </header>
 

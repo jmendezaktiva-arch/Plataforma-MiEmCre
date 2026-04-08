@@ -639,9 +639,39 @@
 /* DREAMS DASHBOARD | LAYOUT ESPECÍFICO (PRESTIGE) */
 /* ========================================================================== */
 
-.user-identity-header { margin-bottom: 35px; animation: fadeInSlide 0.8s ease-out; }
-#user-display-name { font-weight: 700; color: var(--primary-midnight); font-size: 2.2rem; letter-spacing: -0.02em; display: block; }
-.identity-subtitle { font-size: 0.95rem; color: #666; margin-top: 6px; font-weight: 300; }
+.user-identity-header {
+    margin-bottom: 35px;
+    animation: fadeInSlide 0.8s ease-out;
+    text-align: center;
+}
+
+#user-display-name {
+    font-family: 'Montserrat', sans-serif;
+    font-weight: 700;
+    color: var(--primary-midnight);
+    font-size: 2.2rem;
+    letter-spacing: -0.02em;
+    display: block;
+}
+
+.identity-subtitle {
+    font-family: 'Montserrat', sans-serif;
+    font-size: 0.95rem;
+    color: #666;
+    font-weight: 300;
+    line-height: 1.5;
+    max-width: 38rem;
+    margin-left: auto;
+    margin-right: auto;
+}
+
+.user-identity-header .identity-subtitle {
+    margin-top: 10px;
+}
+
+.user-identity-header .identity-subtitle + .identity-subtitle {
+    margin-top: 8px;
+}
 
 /* --- Dashboard: títulos de bloque unificados (bienvenida, panel operativo, hub) --- */
 .dashboard-block-title {
@@ -656,8 +686,10 @@
 }
 
 #welcome-section .dashboard-block-title {
-    text-align: left;
-    max-width: 42rem;
+    text-align: center;
+    max-width: 48rem;
+    margin-left: auto;
+    margin-right: auto;
 }
 
 .dashboard-block-title--shelf,
@@ -677,13 +709,6 @@
     max-width: 36rem;
     margin-left: auto;
     margin-right: auto;
-}
-
-@media (max-width: 600px) {
-    #welcome-section .dashboard-block-title {
-        text-align: center;
-        max-width: none;
-    }
 }
 
 /* --- ZONA OPERATIVA: CONTROLES Y COLAPSO --- */
