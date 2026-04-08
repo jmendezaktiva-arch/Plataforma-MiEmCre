@@ -403,7 +403,7 @@ onAuthStateChanged(auth, async (user) => {
                 const displayElement = document.getElementById('user-display-name');
                 if (displayElement) {
                     const name = userData?.nombre || user.displayName || 'Socio';
-                    displayElement.innerText = `Bienvenido de nuevo, ${name}`;
+                    displayElement.innerText = `Hola, ${name}. Bienvenido a tu espacio de trabajo estratégico.`;
                     displayElement.style.opacity = "1";
                 }
 
