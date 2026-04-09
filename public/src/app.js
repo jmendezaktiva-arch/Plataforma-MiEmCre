@@ -1139,6 +1139,10 @@ document.addEventListener('DOMContentLoaded', () => {
         const btnId = auraBtn.id;
 
         // 0. ACCESO RÁPIDO A MÓDULOS (navbar Prestige)
+        if (btnId === 'btn-nav-dashboard') {
+            window.location.href = 'dashboard.html';
+            return;
+        }
         if (btnId === 'btn-nav-academia') {
             window.location.href = 'academia.html';
             return;

@@ -1521,7 +1521,7 @@ body.cinema-mode #view-workbook {
 
 .nav-aura-sep {
     width: 1px;
-    height: 28px;
+    height: 24px;
     align-self: center;
     background: rgba(149, 124, 61, 0.35);
     flex-shrink: 0;
@@ -1529,7 +1529,7 @@ body.cinema-mode #view-workbook {
 
 @media (max-width: 520px) {
     #header-aura-actions.nav-right {
-        max-width: min(100%, 340px);
+        max-width: min(100%, 380px);
         margin-left: auto;
     }
 
@@ -1542,31 +1542,32 @@ body.cinema-mode #view-workbook {
     }
 }
 
-/* REPARACIÓN NAV-ACTIONS PRESTIGE */
+/* REPARACIÓN NAV-ACTIONS PRESTIGE (compacto: 7 accesos en cabecera) */
 #header-aura-actions .nav-btn-prestige {
     background-color: #0F3460 !important; /* Azul Medianoche Sólido */
     border: 2px solid #957C3D !important;   /* Borde Oro Grueso */
     color: #957C3D !important;              /* Icono Oro */
-    width: 44px !important;
-    height: 44px !important;
-    border-radius: 10px !important;
+    width: 36px !important;
+    height: 36px !important;
+    border-radius: 8px !important;
     cursor: pointer;
     display: flex;
     align-items: center;
     justify-content: center;
     transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-    box-shadow: 0 4px 15px rgba(15, 52, 96, 0.4) !important;
+    box-shadow: 0 3px 10px rgba(15, 52, 96, 0.32) !important;
     opacity: 1 !important;
 }
 
 #header-aura-actions .nav-btn-prestige:hover {
     background-color: #164275 !important;
     border-color: #FFFFFF !important;       /* Brillo Blanco */
-    transform: translateY(-3px) scale(1.05);
+    transform: translateY(-2px) scale(1.04);
 }
 
 #header-aura-actions .nav-btn-prestige .icon {
-    font-size: 1.25rem !important;
+    font-size: 1.05rem !important;
+    line-height: 1;
 }
 
 /* Leyendas rápidas (reemplazan el retardo largo del atributo title del navegador) */
