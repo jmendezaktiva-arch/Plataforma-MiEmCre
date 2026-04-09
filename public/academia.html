@@ -321,19 +321,22 @@
             <button class="close-bubble" id="btn-close-cart">&times;</button>
             
             <div style="font-size: 3rem; margin-bottom: 15px;">🛒</div>
-            <h2 id="cart-course-title" style="color: var(--primary-midnight); font-weight: 700; margin-bottom: 10px;">Nombre del Programa</h2>
-            <p style="font-size: 0.9rem; color: #666; margin-bottom: 25px;">Estás a un paso de potenciar tu crecimiento empresarial. Al confirmar, serás redirigido a nuestra pasarela de pago segura.</p>
+            <h2 id="cart-course-title" style="color: var(--primary-midnight); font-weight: 700; margin-bottom: 8px;">Nombre del Programa</h2>
+            <p id="cart-course-tagline" style="display: none; font-size: 0.78rem; font-weight: 700; color: var(--accent-gold); text-transform: uppercase; letter-spacing: 0.06em; margin: 0 0 12px 0; line-height: 1.35;"></p>
+            <div id="cart-course-lead" style="font-size: 0.88rem; color: #555; margin-bottom: 18px; line-height: 1.55; text-align: left;"></div>
+            <ul id="cart-checkout-bullets" style="display: none; list-style: none; padding: 0; margin: 0 0 20px 0; text-align: left;"></ul>
             
-            <div id="cart-details" style="background: #f9f9f9; padding: 15px; border-radius: 12px; margin-bottom: 25px; border-left: 4px solid var(--accent-gold);">
-                <span style="display: block; font-size: 0.7rem; text-transform: uppercase; color: #999;">Inversión Única</span>
-                <span id="cart-course-price" style="font-size: 1.5rem; font-weight: 700; color: var(--primary-midnight);">$ --.--</span>
+            <div id="cart-details" style="background: #f9f9f9; padding: 15px; border-radius: 12px; margin-bottom: 20px; border-left: 4px solid var(--accent-gold);">
+                <span style="display: block; font-size: 0.7rem; text-transform: uppercase; color: #999;">Inversión única</span>
+                <span id="cart-course-price" style="font-size: 1.5rem; font-weight: 700; color: var(--primary-midnight); display: block; margin-top: 4px;">$ --.--</span>
+                <span id="cart-price-hint" style="display: none; font-size: 0.68rem; color: #888; line-height: 1.35; margin-top: 10px;"></span>
             </div>
 
-            <button id="btn-proceed-to-payment" class="btn-primary" style="width: 100%; padding: 15px;">
-                CONFIRMAR Y PAGAR
+            <button type="button" id="btn-proceed-to-payment" class="btn-primary" style="width: 100%; padding: 15px;">
+                Activar mi acceso y pagar
             </button>
             
-            <p style="font-size: 0.7rem; color: #999; margin-top: 15px;">💳 Pago seguro procesado por Mi Empresa Crece Platform</p>
+            <p style="font-size: 0.7rem; color: #999; margin-top: 15px; line-height: 1.4;">💳 Pago seguro encriptado · <strong>Mi Empresa Crece Platform</strong> · ¿Duda al pagar? Usa el ícono de soporte (✉️) en la cabecera.</p>
         </div>
     </div>
 

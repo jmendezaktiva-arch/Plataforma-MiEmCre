@@ -13,6 +13,150 @@ import { auth, db, collection, getDocs, query, orderBy, doc, getDoc, setDoc, che
 let autosaveTimer; 
 let COURSES_CONFIG = []; 
 
+function escapeHtmlCart(s) {
+    return String(s ?? '')
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;')
+        .replace(/"/g, '&quot;');
+}
+
+function formatPlainLeadParagraphs(text) {
+    const t = String(text ?? '').trim();
+    if (!t) return '';
+    return t.split(/\n+/).map((para) => `<p style="margin:0 0 10px 0;">${escapeHtmlCart(para)}</p>`).join('');
+}
+
+function isConsolidaCourse(course) {
+    const t = (course?.title || '').toLowerCase();
+    return t.includes('consolida');
+}
+
+/**
+ * Copy del carrito: 1) Firestore checkout* si existen · 2) plantilla Consolida 360 (alineada a inventario + sesiones) · 3) plantilla genérica desde ficha del curso.
+ * Campos opcionales en config_ecosistema: checkoutTagline, checkoutLead (texto, saltos de línea = párrafos), checkoutBullets (array), checkoutCtaLabel, checkoutPriceHint.
+ */
+function buildCheckoutCopy(course) {
+    const title = course?.title || 'Programa';
+    const modality = String(course?.modality || 'ONLINE').toUpperCase();
+    const category = course?.category || '';
+    const desc = (course?.description || '').trim();
+    const purpose = (course?.purposeTitle || '').trim();
+
+    const fromFirestore = course?.checkoutTagline || course?.checkoutLead
+        || (Array.isArray(course?.checkoutBullets) && course.checkoutBullets.length);
+    if (fromFirestore) {
+        const bullets = Array.isArray(course.checkoutBullets)
+            ? course.checkoutBullets.map((b) => String(b).trim()).filter(Boolean)
+            : [];
+        return {
+            tagline: (course.checkoutTagline || '').trim(),
+            leadHtml: formatPlainLeadParagraphs(course.checkoutLead || ''),
+            bullets,
+            priceHint: (course.checkoutPriceHint || '').trim(),
+            ctaLabel: (course.checkoutCtaLabel || '').trim() || 'Activar mi acceso y pagar',
+        };
+    }
+
+    if (isConsolidaCourse(course)) {
+        const isLive = modality === 'LIVE';
+        return {
+            tagline: isLive
+                ? 'Mentoría en vivo + ruta 360°: dirección, operación y crecimiento'
+                : 'Programa integral online · PyME exitosa y sostenible',
+            leadHtml: isLive
+                ? `<p style="margin:0 0 10px 0;">Siguiente paso: activar tu lugar en <strong>Consolida 360°</strong> con acompañamiento en vivo. Continuarás a un <strong>pago encriptado</strong>; al confirmar, coordinamos tu acceso al aula y al ecosistema digital del programa.</p>`
+                : `<p style="margin:0 0 10px 0;">Siguiente paso: <strong>activar tu acceso</strong> a <strong>Consolida 360° — Online</strong>. Pasarás a un <strong>pago encriptado</strong>; al confirmar, entras al campus con el recorrido por sesión: visión ejecutiva, mapa metodológico, plan de acción en workbook y material en audio — la misma brújula que en el aula: <em>transformar tu PyME en una empresa exitosa y sostenible</em>.</p>`,
+            bullets: isLive
+                ? [
+                    'Metodología Mi Empresa Crece: misión centrada en tu transformación.',
+                    'Bloques de trabajo en vivo + acceso a presentación, workbook y soporte en plataforma.',
+                    'Enfoque en equipo proactivo, resultados medibles y orden operativo.',
+                ]
+                : [
+                    'Sesión 1 — Equipo proactivo, empresa exitosa: de tareas a resultados.',
+                    'Sesión 2 — Impulsa tu PyME: ecosistema digital de ventas.',
+                    'Sesión 3 — Gasto inteligente, inversiones efectivas: blindaje financiero.',
+                    'Workbooks interactivos con tu expediente, presentaciones y audio para implementar a tu ritmo.',
+                ],
+            priceHint: 'Inversión única · Activación del programa en Mi Empresa Crece Platform según modalidad (Online / Mentoría).',
+            ctaLabel: isLive ? 'Activar mi lugar y pagar' : 'Activar mi acceso y pagar',
+        };
+    }
+
+    const modalityLabel = modality === 'LIVE' ? 'Experiencia en vivo' : 'Programa online';
+    const tagline = purpose || [category, modalityLabel].filter(Boolean).join(' · ');
+
+    let leadHtml;
+    if (desc && desc !== 'En desarrollo') {
+        leadHtml = `<p style="margin:0 0 10px 0;">${escapeHtmlCart(desc)}</p><p style="margin:0;">Al continuar, pasas a un <strong>pago encriptado</strong>. Al confirmar, <strong>activas tu acceso</strong> a <strong>${escapeHtmlCart(title)}</strong> en la plataforma.</p>`;
+    } else {
+        leadHtml = `<p style="margin:0;">Al continuar, activas tu acceso a <strong>${escapeHtmlCart(title)}</strong> y pasas a un <strong>pago encriptado</strong> seguro. Tras confirmar, recibes la confirmación y comienzas en el campus.</p>`;
+    }
+
+    const bullets = modality === 'LIVE'
+        ? [
+            'Modalidad y entregables según la ficha del programa en el catálogo.',
+            'Materiales y seguimiento en tu expediente dentro de la plataforma.',
+            'Confirmación por correo tras completar el pago.',
+        ]
+        : [
+            'Acceso al contenido digital del programa en la plataforma.',
+            'Materiales y herramientas según la ficha publicada en Academia.',
+            'Confirmación inmediata al finalizar el pago.',
+        ];
+
+    return {
+        tagline,
+        leadHtml,
+        bullets,
+        priceHint: 'Inversión única · Activación en Mi Empresa Crece Platform.',
+        ctaLabel: 'Activar mi acceso y pagar',
+    };
+}
+
+function applyCheckoutCopyToDom(copy) {
+    const tagEl = document.getElementById('cart-course-tagline');
+    const leadEl = document.getElementById('cart-course-lead');
+    const bulletsEl = document.getElementById('cart-checkout-bullets');
+    const hintEl = document.getElementById('cart-price-hint');
+    const btnPay = document.getElementById('btn-proceed-to-payment');
+
+    if (tagEl) {
+        if (copy.tagline) {
+            tagEl.textContent = copy.tagline;
+            tagEl.style.display = 'block';
+        } else {
+            tagEl.textContent = '';
+            tagEl.style.display = 'none';
+        }
+    }
+    if (leadEl) leadEl.innerHTML = copy.leadHtml || '';
+    if (bulletsEl) {
+        if (copy.bullets && copy.bullets.length) {
+            bulletsEl.style.display = 'block';
+            bulletsEl.innerHTML = copy.bullets.map((b) => `
+                <li style="position:relative;padding-left:18px;margin-bottom:8px;font-size:0.8rem;color:#444;line-height:1.45;">
+                    <span style="position:absolute;left:0;color:var(--accent-gold);font-weight:800;">·</span>
+                    ${escapeHtmlCart(b)}
+                </li>`).join('');
+        } else {
+            bulletsEl.style.display = 'none';
+            bulletsEl.innerHTML = '';
+        }
+    }
+    if (hintEl) {
+        if (copy.priceHint) {
+            hintEl.textContent = copy.priceHint;
+            hintEl.style.display = 'block';
+        } else {
+            hintEl.textContent = '';
+            hintEl.style.display = 'none';
+        }
+    }
+    if (btnPay) btnPay.textContent = copy.ctaLabel;
+}
+
 document.addEventListener('DOMContentLoaded', () => {
     // 1. SELECTORES DE NAVEGACIÓN (JERARQUÍA SMART STAGE)
     const viewLobby = document.getElementById('view-lobby');
@@ -574,12 +718,13 @@ document.addEventListener('DOMContentLoaded', () => {
                 }
 
                 // 2. INTERFAZ: Activación de la pasarela visual (Dinamizada con Precio Firestore)
-                window.dispatchEvent(new CustomEvent('OPEN_SHOPPING_CART', { 
-                    detail: { 
+                window.dispatchEvent(new CustomEvent('OPEN_SHOPPING_CART', {
+                    detail: {
                         courseId: id,
                         courseTitle: course?.title || 'Programa de Crecimiento',
-                        coursePrice: course?.price || 0 // Trazabilidad de Inversión
-                    } 
+                        coursePrice: course?.price || 0,
+                        course: course || null,
+                    },
                 }));
             }
         });
@@ -1075,22 +1220,29 @@ document.addEventListener('DOMContentLoaded', () => {
  * Escucha el evento de compra y prepara la pasarela.
  */
 window.addEventListener('OPEN_SHOPPING_CART', (e) => {
-    const { courseId, courseTitle, coursePrice } = e.detail;
+    const { courseId, courseTitle, coursePrice, course: courseFromEvent } = e.detail;
     const overlay = document.getElementById('cart-overlay');
     const titleEl = document.getElementById('cart-course-title');
-    const priceEl = document.getElementById('cart-course-price'); // Nueva vinculación
+    const priceEl = document.getElementById('cart-course-price');
     const btnPay = document.getElementById('btn-proceed-to-payment');
+
+    const course = courseFromEvent || COURSES_CONFIG.find((c) => c.id === courseId) || {
+        id: courseId,
+        title: courseTitle,
+        price: coursePrice,
+    };
 
     if (overlay && titleEl) {
         titleEl.innerText = courseTitle;
-        if (priceEl) priceEl.innerText = `$${coursePrice.toLocaleString('es-MX', {minimumFractionDigits: 2})} MXN`;
-        
+        if (priceEl) priceEl.innerText = `$${Number(coursePrice).toLocaleString('es-MX', { minimumFractionDigits: 2 })} MXN`;
+
+        applyCheckoutCopyToDom(buildCheckoutCopy(course));
+
         overlay.style.display = 'flex';
         overlay.classList.add('active');
 
-        // Vinculación Quirúrgica: Evitamos múltiples listeners al abrir/cerrar el carrito
-        btnPay.onclick = async (e) => {
-            e.preventDefault();
+        btnPay.onclick = async (ev) => {
+            ev.preventDefault();
             console.log(`🚀 Dreams Sales: Iniciando protocolo de pago para ${courseId}`);
             await ejecutarProcesoDePago(courseId);
         };
