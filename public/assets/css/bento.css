@@ -1079,3 +1079,113 @@
         transform: translateY(0) scale(1);
     }
 }
+
+/* ========================================================================== */
+/* ACADEMIA | VISTA DE PILARES (#view-categories) — copy orientado al usuario */
+/* ========================================================================== */
+
+.academia-pillars-header {
+    margin-bottom: 50px;
+    text-align: center;
+}
+
+.academia-pillars-title {
+    text-transform: uppercase;
+    font-family: 'Montserrat', sans-serif;
+    font-weight: 800;
+    font-size: clamp(1.15rem, 2vw, 1.5rem);
+    letter-spacing: 0.08em;
+    color: var(--primary-midnight);
+    margin: 0 0 8px;
+}
+
+.academia-pillars-intro {
+    max-width: 820px;
+    margin: 0 auto;
+    text-align: left;
+}
+
+.academia-pillars-lead,
+.academia-pillars-reflection,
+.academia-pillars-cta {
+    font-family: 'Montserrat', sans-serif;
+    font-size: 0.92rem;
+    font-weight: 400;
+    line-height: 1.65;
+    color: #4a5568;
+    margin: 0 0 1rem;
+}
+
+.academia-pillars-lead {
+    margin-top: 18px;
+}
+
+.academia-pillars-lead strong,
+.academia-pillars-reflection strong,
+.academia-pillars-cta strong {
+    color: var(--primary-midnight);
+    font-weight: 700;
+}
+
+.academia-pillars-subhead {
+    font-family: 'Montserrat', sans-serif;
+    font-size: 0.72rem;
+    font-weight: 800;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: var(--accent-gold);
+    margin: 1.35rem 0 0.75rem;
+    text-align: center;
+}
+
+.academia-pillars-list {
+    list-style: none;
+    padding: 0;
+    margin: 0 0 1.15rem;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+
+.academia-pillars-list li {
+    font-family: 'Montserrat', sans-serif;
+    font-size: 0.88rem;
+    line-height: 1.55;
+    color: #4a5568;
+    padding: 14px 16px;
+    background: rgba(15, 52, 96, 0.04);
+    border-radius: 14px;
+    border-left: 4px solid var(--accent-gold);
+    text-align: left;
+}
+
+.academia-pillars-list li strong {
+    color: var(--primary-midnight);
+    font-weight: 700;
+}
+
+.academia-pillars-reflection {
+    margin-top: 1.1rem;
+    padding-top: 1rem;
+    border-top: 1px solid rgba(15, 52, 96, 0.08);
+}
+
+.academia-pillars-cta {
+    margin-bottom: 0;
+    padding: 14px 18px;
+    background: rgba(149, 124, 61, 0.08);
+    border-radius: 14px;
+    border: 1px solid rgba(149, 124, 61, 0.22);
+    text-align: center;
+}
+
+@media (max-width: 600px) {
+    .academia-pillars-intro {
+        padding: 0 6px;
+    }
+
+    .academia-pillars-list li {
+        font-size: 0.84rem;
+        padding: 12px 14px;
+    }
+}

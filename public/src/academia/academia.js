@@ -1,6 +1,13 @@
 //public/src/academia/academia.js
 import { auth, db, collection, getDocs, query, orderBy, doc, getDoc, setDoc, checkAccess } from '../shared/firebase-config.js';
 
+/**
+ * Vista de pilares (#view-categories): el copy orientativo para el usuario vive en
+ * public/academia.html (.academia-pillars-intro). Los valores data-category de
+ * .card-category-btn deben coincidir con course.category en Firestore y con
+ * filterCategory en renderLobby (Dirección, Productividad, Liderazgo, Comercial, Generales).
+ */
+
 // --- ESTADO GLOBAL DE SESIÓN ---
 let autosaveTimer; 
 let COURSES_CONFIG = []; 
