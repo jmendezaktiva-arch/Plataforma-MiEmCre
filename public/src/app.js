@@ -595,6 +595,26 @@ const OPERATIVE_APP_DEFS = [
     { id: 'app-process', title: 'Process Designer', icon: '⚙️' },
 ];
 
+function resolveCatalogCourseTitle(c) {
+    if (!c) return 'Programa (catálogo no disponible)';
+    const t = c.title || c.nombre || c.purposeTitle;
+    return (t && String(t).trim()) || 'Programa (sin nombre en catálogo)';
+}
+
+function resolveCatalogServiceTitle(s) {
+    if (!s) return 'Servicio (catálogo no disponible)';
+    const t = s.title || s.nombre;
+    return (t && String(t).trim()) || 'Servicio (sin nombre en catálogo)';
+}
+
+function appendOperativeDivisionHeading(container, labelText) {
+    const el = document.createElement('div');
+    el.className = 'operative-division-label';
+    el.setAttribute('role', 'presentation');
+    el.textContent = labelText;
+    container.appendChild(el);
+}
+
 /**
  * Panel operativo: activos reales del expediente + oferta dinámica (catálogo Firestore).
  * Listado compacto; CTAs hacia módulos o contacto (sin invadir el hub de resultados).
@@ -651,45 +671,52 @@ const hydrateOperativeShelf = async (user, userData) => {
     };
 
     let ownedCount = 0;
-    for (const id of cursosIds) {
-        const c = coursesById[id];
-        const title = c?.title || id;
-        appendRow(ownedEl, {
-            icon: '🎓',
-            title,
-            badge: 'ACTIVO',
-            badgeColor: 'var(--secondary-color)',
-            suggest: false,
-            onClick: () => { window.location.href = 'academia.html'; },
-        });
-        ownedCount++;
+    if (cursosIds.size > 0) {
+        appendOperativeDivisionHeading(ownedEl, 'Capacitación');
+        for (const id of cursosIds) {
+            const c = coursesById[id];
+            appendRow(ownedEl, {
+                icon: '🎓',
+                title: resolveCatalogCourseTitle(c),
+                badge: 'ACTIVO',
+                badgeColor: 'var(--secondary-color)',
+                suggest: false,
+                onClick: () => { window.location.href = 'academia.html'; },
+            });
+            ownedCount++;
+        }
     }
-    for (const id of appsIds) {
-        const def = OPERATIVE_APP_DEFS.find((a) => a.id === id);
-        const title = def?.title || id;
-        const icon = def?.icon || '🛠️';
-        appendRow(ownedEl, {
-            icon,
-            title,
-            badge: 'ACTIVO',
-            badgeColor: 'var(--secondary-color)',
-            suggest: false,
-            onClick: () => { window.location.href = 'apps.html'; },
-        });
-        ownedCount++;
+    if (appsIds.size > 0) {
+        appendOperativeDivisionHeading(ownedEl, 'Tecnología');
+        for (const id of appsIds) {
+            const def = OPERATIVE_APP_DEFS.find((a) => a.id === id);
+            const title = def?.title || 'Herramienta operativa';
+            const icon = def?.icon || '🛠️';
+            appendRow(ownedEl, {
+                icon,
+                title,
+                badge: 'ACTIVO',
+                badgeColor: 'var(--secondary-color)',
+                suggest: false,
+                onClick: () => { window.location.href = 'apps.html'; },
+            });
+            ownedCount++;
+        }
     }
-    for (const id of consultIds) {
-        const s = servicesById[id];
-        const title = s?.title || id;
-        appendRow(ownedEl, {
-            icon: '🤝',
-            title,
-            badge: 'ACTIVO',
-            badgeColor: 'var(--secondary-color)',
-            suggest: false,
-            onClick: () => { window.location.href = 'consultoria.html'; },
-        });
-        ownedCount++;
+    if (consultIds.size > 0) {
+        appendOperativeDivisionHeading(ownedEl, 'Consultoría');
+        for (const id of consultIds) {
+            const s = servicesById[id];
+            appendRow(ownedEl, {
+                icon: '🤝',
+                title: resolveCatalogServiceTitle(s),
+                badge: 'ACTIVO',
+                badgeColor: 'var(--secondary-color)',
+                suggest: false,
+                onClick: () => { window.location.href = 'consultoria.html'; },
+            });
+            ownedCount++;
+        }
     }
 
     if (ownedCount === 0) {

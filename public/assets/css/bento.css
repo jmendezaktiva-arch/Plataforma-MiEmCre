@@ -919,6 +919,22 @@
 .operative-hint-muted {
     color: rgba(149, 124, 61, 0.75);
 }
+
+.operative-division-label {
+    font-family: 'Montserrat', sans-serif;
+    font-size: 0.58rem;
+    font-weight: 800;
+    letter-spacing: 0.16em;
+    text-transform: uppercase;
+    color: rgba(15, 52, 96, 0.45);
+    margin: 14px 0 6px 0;
+    padding: 0 2px;
+}
+
+.operative-column .monitor-list > .operative-division-label:first-child {
+    margin-top: 0;
+}
+
 .operative-column .glass-card.operative-shelf-row {
     cursor: pointer;
     border: none;
