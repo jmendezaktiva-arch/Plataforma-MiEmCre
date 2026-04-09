@@ -1396,16 +1396,15 @@ const SearchManager = {
         if (document.getElementById('search-overlay')) return;
         
         const html = `
-            <div id="search-overlay" class="purpose-overlay" style="z-index: 15000;">
-                <div class="purpose-bubble" style="max-width: 600px; padding: 40px;">
-                    <button class="close-bubble" id="btn-close-search">&times;</button>
-                    <header style="margin-bottom: 25px; text-align: center;">
-                        <h2 style="color: var(--primary-midnight); font-weight: 700; margin-bottom: 5px; font-size: 1.4rem;">BUSCADOR</h2>
-                        <p style="font-size: 0.8rem; color: #666;">Localiza activos, cursos o herramientas de gestión.</p>
+            <div id="search-overlay" class="purpose-overlay">
+                <div class="purpose-bubble">
+                    <button type="button" class="close-bubble" id="btn-close-search" aria-label="Cerrar buscador">&times;</button>
+                    <header style="margin-bottom: 20px; text-align: center;">
+                        <h2>BUSCADOR</h2>
+                        <p>Localiza activos, cursos o herramientas de gestión.</p>
                     </header>
-                    <input type="text" id="search-input" placeholder="¿Qué estás buscando hoy?" 
-                           style="width: 100%; padding: 18px; border-radius: 15px; border: 2px solid var(--accent-gold); font-family: 'Montserrat'; font-size: 1.1rem; outline: none; margin-bottom: 20px;">
-                    <div id="search-results" style="max-height: 300px; overflow-y: auto; display: flex; flex-direction: column; gap: 10px; padding-right: 5px;">
+                    <input type="text" id="search-input" placeholder="¿Qué estás buscando hoy?">
+                    <div id="search-results" style="display: flex; flex-direction: column; gap: 10px; padding-right: 4px;">
                         </div>
                 </div>
             </div>

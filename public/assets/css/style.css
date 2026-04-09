@@ -1150,7 +1150,9 @@ audio::-webkit-media-controls-play-button {
 }
 
 /* Animación de entrada para el formulario */
-#contact-overlay.active .purpose-bubble {
+#contact-overlay.active .purpose-bubble,
+#search-overlay.active .purpose-bubble,
+#ai-chat-container.active .purpose-bubble {
     animation: capsuleAppear 0.5s cubic-bezier(0.19, 1, 0.22, 1) forwards;
 }
 
@@ -1618,27 +1620,51 @@ body.cinema-mode #view-workbook {
 /* ESPECIALIZACIÓN: MODAL DE SOPORTE COMPACTO (PRESTIGE ASSIST) */
 /* ========================================================================== */
 
-/* Overlay más sutil para no perder contexto de fondo */
-#contact-overlay {
-    background: rgba(15, 52, 96, 0.15) !important; 
+/* Overlay y burbuja compacta: paridad visual con Soporte (también Buscador + Consultor IA) */
+#contact-overlay,
+#search-overlay,
+#ai-chat-container.purpose-overlay {
+    background: rgba(15, 52, 96, 0.15) !important;
     backdrop-filter: blur(8px) !important;
 }
 
-/* Reducción de escala y balance de blancos */
-#contact-overlay .purpose-bubble {
-    max-width: 380px !important; 
+#search-overlay.purpose-overlay {
+    z-index: 15000 !important;
+}
+
+#ai-chat-container.purpose-overlay {
+    z-index: 10000 !important;
+}
+
+#contact-overlay .purpose-bubble,
+#search-overlay .purpose-bubble,
+#ai-chat-container .purpose-bubble {
+    max-width: 380px !important;
     padding: 30px 25px !important;
     border: 1px solid rgba(149, 124, 61, 0.4) !important;
     background: rgba(255, 255, 255, 0.95) !important;
     box-shadow: 0 30px 60px rgba(15, 52, 96, 0.12) !important;
 }
 
-/* Blindaje de visibilidad del botón de cierre */
-#contact-overlay .close-bubble {
+#search-overlay .purpose-bubble {
+    max-height: 85vh !important;
+    overflow-y: auto !important;
+}
+
+#ai-chat-container .purpose-bubble.ai-consultant-bubble {
+    display: flex !important;
+    flex-direction: column !important;
+    max-height: min(85vh, 640px) !important;
+    overflow: hidden !important;
+}
+
+#contact-overlay .close-bubble,
+#search-overlay .close-bubble,
+#ai-chat-container .close-bubble {
     position: absolute !important;
     top: -12px !important;
     right: -12px !important;
-    background: var(--accent-gold) !important; 
+    background: var(--accent-gold) !important;
     color: white !important;
     width: 34px !important;
     height: 34px !important;
@@ -1648,16 +1674,120 @@ body.cinema-mode #view-workbook {
     align-items: center !important;
     justify-content: center !important;
     cursor: pointer !important;
-    z-index: 10001 !important; /* Por encima de cualquier inyección */
+    z-index: 10001 !important;
     border: 2px solid white !important;
-    box-shadow: 0 4px 12px rgba(0,0,0,0.15) !important;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15) !important;
     opacity: 1 !important;
     visibility: visible !important;
 }
 
-#contact-overlay .close-bubble:hover {
+#contact-overlay .close-bubble:hover,
+#search-overlay .close-bubble:hover,
+#ai-chat-container .close-bubble:hover {
     background: var(--primary-midnight) !important;
     transform: scale(1.1) rotate(90deg);
+}
+
+#search-overlay header h2 {
+    font-size: 1.15rem !important;
+    color: var(--primary-midnight) !important;
+    font-weight: 700 !important;
+    margin: 0 0 4px 0 !important;
+}
+
+#search-overlay header p {
+    font-size: 0.75rem !important;
+    line-height: 1.4 !important;
+    color: #666 !important;
+    margin: 0 !important;
+}
+
+#ai-chat-container .ai-consultant-bubble__head {
+    padding-bottom: 12px;
+    margin-bottom: 12px;
+    border-bottom: 1px solid rgba(15, 52, 96, 0.08);
+}
+
+#ai-chat-container .ai-consultant-bubble__head h2 {
+    margin: 0 !important;
+    font-size: 1.15rem !important;
+    color: var(--primary-midnight) !important;
+    font-weight: 700 !important;
+    letter-spacing: 0.02em !important;
+}
+
+#ai-chat-container .ai-consultant-bubble__sub {
+    display: block;
+    margin: 6px 0 0 0 !important;
+    font-size: 0.65rem !important;
+    color: var(--accent-gold) !important;
+    font-weight: 700 !important;
+    text-transform: uppercase !important;
+    letter-spacing: 0.06em !important;
+}
+
+#ai-chat-container .ai-consultant-bubble__messages {
+    flex: 1 1 auto;
+    min-height: 120px;
+    overflow-y: auto;
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+    padding: 4px 2px 12px 0;
+    font-family: 'Montserrat', sans-serif;
+    font-weight: 400;
+    font-size: 0.85rem;
+    line-height: 1.55;
+}
+
+#ai-chat-container .ai-consultant-bubble__foot {
+    padding-top: 12px;
+    margin-top: auto;
+    border-top: 1px solid rgba(15, 52, 96, 0.08);
+}
+
+#ai-chat-container .ai-consultant-bubble__form {
+    display: flex;
+    gap: 10px;
+    align-items: center;
+}
+
+#ai-chat-container #ai-user-input {
+    flex: 1;
+    padding: 12px 16px !important;
+    border-radius: 12px !important;
+    border: 1.5px solid rgba(15, 52, 96, 0.12) !important;
+    font-family: 'Montserrat', sans-serif !important;
+    font-size: 0.85rem !important;
+    outline: none !important;
+    background: #fafafa !important;
+    margin: 0 !important;
+    box-sizing: border-box !important;
+}
+
+#ai-chat-container .ai-consultant-bubble__form button[type="submit"] {
+    background: var(--primary-midnight) !important;
+    color: white !important;
+    border: none !important;
+    width: 42px !important;
+    height: 42px !important;
+    min-width: 42px !important;
+    border-radius: 50% !important;
+    cursor: pointer !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    flex-shrink: 0 !important;
+    padding: 0 !important;
+}
+
+#ai-chat-container .ai-send-glyph {
+    display: block;
+    transform: rotate(-45deg);
+    margin-left: 3px;
+    margin-top: -2px;
+    font-size: 1rem;
+    line-height: 1;
 }
 
 /* Compactación de Inputs y Tipografía */
@@ -1668,6 +1798,19 @@ body.cinema-mode #view-workbook {
     padding: 10px 14px !important;
     font-size: 0.85rem !important;
     border-radius: 8px !important;
+}
+
+#search-overlay #search-input {
+    width: 100% !important;
+    box-sizing: border-box !important;
+    margin-bottom: 10px !important;
+    padding: 10px 14px !important;
+    font-size: 0.85rem !important;
+    border-radius: 8px !important;
+    border: 1.5px solid rgba(15, 52, 96, 0.12) !important;
+    font-family: 'Montserrat', sans-serif !important;
+    background: #fafafa !important;
+    outline: none !important;
 }
 
 #contact-overlay header h2 {

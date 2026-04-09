@@ -254,21 +254,19 @@ const SidebarPrestige = {
     injectAIChatHTML() {
         if (document.getElementById('ai-chat-container')) return;
         const chatHTML = `
-            <div id="ai-chat-container" class="modal-overlay" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(15, 52, 96, 0.4); backdrop-filter: blur(15px); z-index:10000; align-items:center; justify-content:center;">
-                <div style="background: rgba(255, 255, 255, 0.7); width: 90%; max-width: 500px; height: 80vh; border-radius: 24px; border: 0.5px solid rgba(149, 124, 61, 0.4); box-shadow: 0 20px 60px rgba(0,0,0,0.15); display: flex; flex-direction: column; overflow: hidden; position: relative;">
-                    <header style="padding: 25px; background: rgba(15, 52, 96, 0.05); border-bottom: 0.5px solid rgba(15, 52, 96, 0.1); display: flex; justify-content: space-between; align-items: center;">
-                        <div>
-                            <h3 style="margin:0; color: var(--primary-midnight); font-weight: 700; font-size: 1.1rem; letter-spacing: 0.5px;">CONSULTOR ESTRATÉGICO IA</h3>
-                            <span style="font-size: 0.65rem; color: var(--accent-gold); font-weight: 700; text-transform: uppercase;">Powered by Dreams Intelligence</span>
-                        </div>
-                        <button onclick="document.getElementById('ai-chat-container').style.display='none'" style="background:none; border:none; font-size: 1.5rem; cursor:pointer; color: var(--primary-midnight); opacity: 0.5;">&times;</button>
+            <div id="ai-chat-container" class="purpose-overlay" style="display: none;">
+                <div class="purpose-bubble ai-consultant-bubble">
+                    <button type="button" class="close-bubble" id="btn-close-ai-chat" aria-label="Cerrar consultor IA">&times;</button>
+                    <header class="ai-consultant-bubble__head">
+                        <h2>CONSULTOR ESTRATÉGICO IA</h2>
+                        <span class="ai-consultant-bubble__sub">Powered by Dreams Intelligence</span>
                     </header>
-                    <div id="ai-chat-messages" style="flex: 1; overflow-y: auto; padding: 25px; display: flex; flex-direction: column; gap: 20px; font-family: 'Montserrat'; font-weight: 300; font-size: 0.9rem; line-height: 1.6;"></div>
-                    <footer style="padding: 20px; background: white; border-top: 0.5px solid rgba(0,0,0,0.05);">
-                        <form id="ai-chat-form" style="display: flex; gap: 10px;">
-                            <input type="text" id="ai-user-input" placeholder="Escribe tu consulta estratégica..." autocomplete="off" style="flex: 1; padding: 15px 20px; border-radius: 30px; border: 1px solid rgba(15, 52, 96, 0.1); font-family: 'Montserrat'; font-size: 0.85rem; outline: none; background: #f9f9f9;">
-                            <button type="submit" style="background: var(--primary-midnight); color: white; border: none; width: 45px; height: 45px; border-radius: 50%; cursor: pointer; display: flex; align-items: center; justify-content: center;">
-                                <span style="transform: rotate(-45deg); margin-left: 4px; margin-top: -2px;">🚀</span>
+                    <div id="ai-chat-messages" class="ai-consultant-bubble__messages"></div>
+                    <footer class="ai-consultant-bubble__foot">
+                        <form id="ai-chat-form" class="ai-consultant-bubble__form">
+                            <input type="text" id="ai-user-input" placeholder="Escribe tu consulta estratégica..." autocomplete="off">
+                            <button type="submit" aria-label="Enviar mensaje">
+                                <span class="ai-send-glyph" aria-hidden="true">🚀</span>
                             </button>
                         </form>
                     </footer>
@@ -281,7 +279,8 @@ const SidebarPrestige = {
         const chatContainer = document.getElementById('ai-chat-container');
         const chatMessages = document.getElementById('ai-chat-messages');
         chatContainer.style.display = 'flex';
-        if (chatMessages.innerHTML !== "") return; // No re-cargar si ya hay chat
+        setTimeout(() => chatContainer.classList.add('active'), 10);
+        if (chatMessages.innerHTML.trim() !== '') return;
 
         try {
             chatMessages.innerHTML = `<div id="ai-loading-dna" style="font-size: 0.7rem; color: var(--accent-gold); font-style: italic;">Sincronizando expediente estratégico...</div>`;
@@ -330,6 +329,18 @@ const SidebarPrestige = {
     },
 
     setupAIChatListeners() {
+        const chatContainer = document.getElementById('ai-chat-container');
+        const btnCloseAi = document.getElementById('btn-close-ai-chat');
+        if (btnCloseAi && chatContainer && btnCloseAi.dataset.prestigeCloseBound !== '1') {
+            btnCloseAi.dataset.prestigeCloseBound = '1';
+            btnCloseAi.addEventListener('click', () => {
+                chatContainer.classList.remove('active');
+                setTimeout(() => {
+                    chatContainer.style.display = 'none';
+                }, 400);
+            });
+        }
+
         const form = document.getElementById('ai-chat-form');
         form.onsubmit = async (e) => {
             e.preventDefault();
