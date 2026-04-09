@@ -3,9 +3,11 @@ import { auth, db, collection, getDocs, query, orderBy, doc, getDoc, setDoc, che
 
 /**
  * Vista de pilares (#view-categories): el copy orientativo para el usuario vive en
- * public/academia.html (.academia-pillars-intro). Los valores data-category de
- * .card-category-btn deben coincidir con course.category en Firestore y con
- * filterCategory en renderLobby (Dirección, Productividad, Liderazgo, Comercial, Generales).
+ * public/academia.html (.academia-pillars-intro). La simetría y el texto justificado
+ * de los cinco recuadros (.academia-pillars-list li) se controlan en bento.css.
+ * Los valores data-category de .card-category-btn deben coincidir con course.category
+ * en Firestore y con filterCategory en renderLobby (Dirección, Productividad,
+ * Liderazgo, Comercial, Generales).
  */
 
 // --- ESTADO GLOBAL DE SESIÓN ---

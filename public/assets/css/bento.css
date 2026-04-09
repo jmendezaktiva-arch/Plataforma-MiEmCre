@@ -1150,13 +1150,23 @@
 .academia-pillars-list li {
     font-family: 'Montserrat', sans-serif;
     font-size: 0.88rem;
-    line-height: 1.55;
+    line-height: 1.6;
     color: #4a5568;
-    padding: 14px 16px;
+    box-sizing: border-box;
+    /* Altura mínima común: simetría entre ejes; crece si el texto lo requiere */
+    min-height: clamp(10.25rem, 28vw, 11.75rem);
+    padding: 1.35rem 1.45rem 1.45rem 1.3rem;
     background: rgba(15, 52, 96, 0.04);
     border-radius: 14px;
     border-left: 4px solid var(--accent-gold);
-    text-align: left;
+    text-align: justify;
+    text-justify: inter-word;
+    hyphens: auto;
+    -webkit-hyphens: auto;
+    overflow-wrap: break-word;
+    word-break: normal;
+    display: grid;
+    align-content: center;
 }
 
 .academia-pillars-list li strong {
@@ -1186,6 +1196,8 @@
 
     .academia-pillars-list li {
         font-size: 0.84rem;
-        padding: 12px 14px;
+        line-height: 1.62;
+        min-height: clamp(11.5rem, 52vw, 14rem);
+        padding: 1.25rem 1.15rem 1.35rem 1.1rem;
     }
 }
