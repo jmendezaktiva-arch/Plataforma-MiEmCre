@@ -2,12 +2,11 @@
 import { auth, db, collection, getDocs, query, orderBy, doc, getDoc, setDoc, checkAccess } from '../shared/firebase-config.js';
 
 /**
- * Vista de pilares (#view-categories): el copy orientativo para el usuario vive en
- * public/academia.html (.academia-pillars-intro). La simetría y el texto justificado
- * de los cinco recuadros (.academia-pillars-list li) se controlan en bento.css.
- * Los valores data-category de .card-category-btn deben coincidir con course.category
- * en Firestore y con filterCategory en renderLobby (Dirección, Productividad,
- * Liderazgo, Comercial, Generales).
+ * Vista de pilares (#view-categories): copy y botones INGRESAR por eje en
+ * public/academia.html (.academia-pillars-list li.card-category-btn). Estilos en bento.css.
+ * Cada <li class="card-category-btn"> en .academia-pillars-list debe llevar data-category
+ * alineado con course.category en Firestore y con filterCategory en renderLobby
+ * (Dirección, Productividad, Liderazgo, Comercial, Generales).
  */
 
 // --- ESTADO GLOBAL DE SESIÓN ---
@@ -165,12 +164,11 @@ document.addEventListener('DOMContentLoaded', () => {
         }, 50);
     };
 
-    // 2. MOTOR DE INTERACCIÓN DE PILARES (ESTILO BENTO FOCUS - HOMOLOGADO CON APPS)
-    const categoryGrid = document.getElementById('category-grid');
-    if (categoryGrid) {
-        const cards = categoryGrid.querySelectorAll('.card-category-btn');
-        
-        // A. Entrada Escalonada: Evita el despliegue simultáneo (Efecto Prestige)
+    // 2. MOTOR DE INTERACCIÓN DE PILARES (lista única con INGRESAR en cada recuadro)
+    const pillarsList = document.querySelector('#view-categories .academia-pillars-list');
+    if (pillarsList) {
+        const cards = pillarsList.querySelectorAll('li.card-category-btn');
+
         cards.forEach((card, i) => {
             card.style.opacity = '0';
             card.style.transform = 'translateY(20px)';
@@ -183,29 +181,27 @@ document.addEventListener('DOMContentLoaded', () => {
             });
         });
 
-        // B. Lógica de Foco Replicada: Solo la burbuja activa se mantiene nítida
-        categoryGrid.addEventListener('mouseover', (e) => {
-            const hoveredCard = e.target.closest('.card-category-btn');
-            if (!hoveredCard) return;
+        pillarsList.addEventListener('mouseover', (e) => {
+            const hoveredCard = e.target.closest('li.card-category-btn');
+            if (!hoveredCard || !pillarsList.contains(hoveredCard)) return;
 
-            cards.forEach(card => {
+            cards.forEach((card) => {
                 card.style.transition = 'all 0.4s ease';
                 if (card !== hoveredCard) {
-                    card.style.filter = 'blur(6px) grayscale(0.3)';
-                    card.style.opacity = '0.4';
-                    card.style.transform = 'scale(0.96)';
+                    card.style.filter = 'blur(4px) grayscale(0.25)';
+                    card.style.opacity = '0.45';
+                    card.style.transform = 'scale(0.99)';
                 } else {
                     card.style.filter = 'none';
                     card.style.opacity = '1';
-                    card.style.transform = 'scale(1.03)';
-                    card.style.zIndex = '10';
+                    card.style.transform = 'scale(1.01)';
+                    card.style.zIndex = '2';
                 }
             });
         });
 
-        // C. Restauración de Nitidez al salir del grid
-        categoryGrid.addEventListener('mouseleave', () => {
-            cards.forEach(card => {
+        pillarsList.addEventListener('mouseleave', () => {
+            cards.forEach((card) => {
                 card.style.filter = 'none';
                 card.style.opacity = '1';
                 card.style.transform = 'scale(1)';
