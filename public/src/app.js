@@ -968,25 +968,29 @@ document.addEventListener('DOMContentLoaded', () => {
     const toggleIcon = document.getElementById('toggle-icon');
 
     if (toggleBtn && shelf) {
+        const toggleLabel = toggleBtn.querySelector('.shelf-toggle-label');
+
+        const syncShelfToggleUI = (collapsed) => {
+            toggleBtn.setAttribute('aria-expanded', collapsed ? 'false' : 'true');
+            if (toggleIcon) toggleIcon.textContent = collapsed ? '▶' : '▼';
+            if (toggleLabel) toggleLabel.textContent = collapsed ? 'Mostrar' : 'Ocultar';
+        };
+
         // 1. Recuperar estado previo del usuario (Persistencia Prestige)
         const isStoredCollapsed = localStorage.getItem('dreams_dashboard_shelf_collapsed') === 'true';
-        
+
         if (isStoredCollapsed) {
             shelf.classList.add('is-collapsed');
-            if (toggleIcon) toggleIcon.innerText = '▶'; // Cambiamos el glifo para indicar expansión
         }
+        syncShelfToggleUI(isStoredCollapsed);
 
         // 2. Listener de interacción quirúrgica
         toggleBtn.onclick = (e) => {
             e.preventDefault();
             const isNowCollapsed = shelf.classList.toggle('is-collapsed');
-            
-            // Actualización de estado visual y persistencia
-            if (toggleIcon) {
-                toggleIcon.innerText = isNowCollapsed ? '▶' : '▼';
-            }
+            syncShelfToggleUI(isNowCollapsed);
             localStorage.setItem('dreams_dashboard_shelf_collapsed', isNowCollapsed);
-            
+
             console.log(`🖥️ Dreams UI: Panel operativo ${isNowCollapsed ? 'colapsado' : 'expandido'}.`);
         };
     }
