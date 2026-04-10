@@ -15,11 +15,47 @@
             margin: 0 auto;
         }
         .bento-consultoria {
+            /* Tokens locales: control quirúrgico de geometría del grid */
+            --consultoria-grid-gap: 20px;
+            /*
+              Altura base de cada celda (reposo). Está calibrada para:
+              - Homologar dimensiones entre servicios (evita "mega-bloques")
+              - Mantener legibilidad del título + inversión
+              - Preservar el efecto de expansión existente (card-expanded)
+            */
+            --consultoria-row-height: 190px;
+
             display: grid;
             grid-template-columns: repeat(3, 1fr);
-            grid-auto-rows: auto; /* Liberación del Suelo de Legibilidad */
-            gap: 20px;
+            grid-auto-rows: var(--consultoria-row-height); /* Suelo uniforme: todas las burbujas mismo tamaño */
+            gap: var(--consultoria-grid-gap);
             margin-top: 30px;
+            align-items: stretch;
+        }
+
+        /* Homologación: cualquier tarjeta dentro del grid llena su celda */
+        .bento-consultoria > * {
+            height: 100%;
+        }
+
+        /*
+          Servicios dinámicos (Planeación, Seguimiento, etc.)
+          - En reposo: misma altura (por celda)
+          - En hover/expandido: el motor existente (card-expanded) puede crecer sin romper la base
+        */
+        .bento-consultoria .card-lobby-item {
+            height: 100%;
+            min-height: 0; /* neutraliza min-height global para que mande el grid */
+        }
+
+        /* Blindaje: evitamos que .glass-card:hover infle la altura (regla global en bento.css) */
+        .bento-consultoria .glass-card:hover {
+            min-height: 100%;
+        }
+
+        /* Las tarjetas que ocupan 2 filas deben medir exactamente 2 celdas + 1 gap */
+        .bento-consultoria .card-ia {
+            height: calc((var(--consultoria-row-height) * 2) + var(--consultoria-grid-gap));
         }
 
         /* SINCRONIZACIÓN PRESTIGE: Columna Única Vertical (Móvil) */
@@ -27,11 +63,19 @@
             .bento-consultoria {
                 grid-template-columns: 1fr; /* Paridad con el módulo de Academia */
                 gap: 25px;
+                grid-auto-rows: auto; /* En móvil priorizamos flujo natural y legibilidad */
             }
             .card-ia, .card-recurso {
                 grid-column: span 1 !important;
                 grid-row: auto !important; /* Reset de jerarquía para flujo vertical */
                 min-height: 480px; /* Asegura el suelo de legibilidad sin amontonar texto */
+                height: auto; /* Evita recortes por alturas fijas */
+            }
+
+            /* Servicios dinámicos: misma dimensión base en stack (sin depender del contenido) */
+            .bento-consultoria .card-lobby-item {
+                min-height: 200px;
+                height: auto;
             }
         }
 
