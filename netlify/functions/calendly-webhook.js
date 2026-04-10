@@ -1,4 +1,5 @@
 //netlify/functions/calendly-webhook.js
+// Actualiza solicitudes cuando el cliente agenda desde agendar.html (iframe Calendly enlazado también desde Apps y correos intervencion-notificacion).
 const admin = require('firebase-admin');
 
 if (!admin.apps.length) {

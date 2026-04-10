@@ -19,6 +19,82 @@ const APPS_SCHEDULE_PAGE = 'agendar.html';
 
 const APPS_CONTACT_PENDING_MSG = 'Estamos actualizando este canal. Mientras tanto escribe a contacto@miempresacrece.com.mx o usa Videollamada para agendar en Calendly.';
 
+/**
+ * Plantillas personalizables (placeholders: {{nombre}}, {{empresa}}, {{email}}, {{appNombre}}, {{appId}}).
+ * Tras hacer clic en Correo o WhatsApp se abre el cliente con este texto y, en paralelo, se envía
+ * un correo de respaldo vía netlify/functions/intervencion-notificacion.js (tipo CONTACTO_APPS_CANAL).
+ */
+const APPS_MESSAGE_TEMPLATES = {
+    emailSubject: 'Consulta desde la plataforma — {{appNombre}}',
+    emailBody: `Hola equipo Mi Empresa Crece,
+
+Soy {{nombre}} ({{email}}), de {{empresa}}.
+
+Escribo desde el módulo de Aplicaciones de la plataforma Dreams por la herramienta «{{appNombre}}» (referencia: {{appId}}).
+
+Me gustaría recibir información y/o agendar para conocer más del producto.
+
+[Describe aquí tu necesidad o disponibilidad]
+
+
+Saludos cordiales,
+{{nombre}}`,
+    whatsapp: 'Hola, soy *{{nombre}}* ({{email}}). Empresa: *{{empresa}}*. Escribo desde ME Crece Platform por la app *{{appNombre}}*. Me gustaría información y agendar para conocer más. ¡Gracias!',
+};
+
+const appsContactPayloadCache = new Map();
+
+function fillAppsTemplate(template, vars) {
+    return String(template).replace(/\{\{(\w+)\}\}/g, (_, key) => {
+        const v = vars[key];
+        return v != null && v !== '' ? String(v) : '';
+    });
+}
+
+function buildAppsTemplateVars(profile, app) {
+    const email = profile.email || '';
+    const nombre = profile.nombre || (email ? email.split('@')[0] : 'Cliente');
+    const empresa = profile.empresa && String(profile.empresa).trim()
+        ? profile.empresa
+        : '(indica el nombre de tu empresa)';
+    return {
+        nombre,
+        empresa,
+        email,
+        appNombre: app.name || app.id,
+        appId: app.id,
+    };
+}
+
+function notifyAppsContactChannel(canal, appId) {
+    const user = auth.currentUser;
+    const payload = appsContactPayloadCache.get(appId);
+    if (!user || !payload) return;
+
+    const cuerpoTexto = canal === 'email' ? payload.emailBody : payload.whatsappText;
+    const body = {
+        tipo: 'CONTACTO_APPS_CANAL',
+        canal,
+        destinatario: user.email,
+        cliente: {
+            uid: user.uid,
+            email: user.email,
+            nombre: payload.profile.nombre,
+            empresa: payload.profile.empresa || '',
+        },
+        servicio: { id: payload.app.id, titulo: payload.app.name },
+        cuerpoTexto,
+        asuntoPlantilla: payload.emailSubject,
+        omitirRegistroFirestore: false,
+    };
+
+    fetch('/.netlify/functions/intervencion-notificacion', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(body),
+    }).catch(() => {});
+}
+
 function escapeHtml(s) {
     return String(s ?? '')
         .replace(/&/g, '&amp;')
@@ -90,8 +166,6 @@ function digitsOnly(s) {
 
 function buildAppContactActionsHtml(app, tieneAcceso, routeEscaped) {
     const appNamePlain = app.name || app.id;
-    const subject = encodeURIComponent(`Consulta: ${appNamePlain} — Ecosistema de aplicaciones ME Crece`);
-    const mailto = `mailto:${APPS_CONTACT.email}?subject=${subject}`;
 
     const phoneDigits = digitsOnly(APPS_CONTACT.phoneE164);
     const phoneOk = phoneDigits.length >= 10;
@@ -100,8 +174,7 @@ function buildAppContactActionsHtml(app, tieneAcceso, routeEscaped) {
 
     const waDigits = digitsOnly(APPS_CONTACT.whatsappDigits);
     const waOk = waDigits.length >= 10;
-    const waHref = waOk ? `https://wa.me/${waDigits}` : '#';
-    const waClass = waOk ? 'apps-contact-btn' : 'apps-contact-btn apps-contact-btn--pending';
+    const waClass = waOk ? 'apps-contact-btn apps-contact-wa' : 'apps-contact-btn apps-contact-wa apps-contact-btn--pending';
 
     const scheduleHref = `${APPS_SCHEDULE_PAGE}?service=${encodeURIComponent(app.id)}`;
     const openAppBlock = tieneAcceso && routeEscaped
@@ -114,8 +187,8 @@ function buildAppContactActionsHtml(app, tieneAcceso, routeEscaped) {
     return `
         <div class="apps-pillar-actions" role="group" aria-label="Contacto y agenda">
             <a href="${phoneHref}" class="${phoneClass}" title="${phoneOk ? 'Llamada telefónica' : 'Número por configurar'}">📞 Llamada</a>
-            <a href="${waHref}" class="${waClass}" rel="noopener noreferrer" target="_blank" title="${waOk ? 'WhatsApp' : 'Número por configurar'}">💬 WhatsApp</a>
-            <a href="${mailto}" class="apps-contact-btn" title="Correo ${APPS_CONTACT.email}">✉️ Correo</a>
+            <a href="#" class="${waClass}" data-app-id="${escapeAttr(app.id)}" rel="noopener noreferrer" title="${waOk ? 'WhatsApp con mensaje sugerido' : 'Número por configurar'}">💬 WhatsApp</a>
+            <a href="#" class="apps-contact-btn apps-contact-email" data-app-id="${escapeAttr(app.id)}" title="Correo a ${escapeAttr(APPS_CONTACT.email)} con plantilla">✉️ Correo</a>
             <a href="${scheduleHref}" class="apps-contact-btn apps-contact-btn--schedule" title="Agenda sesión estratégica (videollamada vía Zoom según tu cita)">📹 Videollamada</a>
         </div>
         ${openAppBlock}
@@ -190,6 +263,31 @@ function bindPillarsActionsOnce(pillarsList) {
             alert(APPS_CONTACT_PENDING_MSG);
             return;
         }
+
+        const mailBtn = e.target.closest('.apps-contact-email');
+        if (mailBtn && pillarsList.contains(mailBtn)) {
+            e.preventDefault();
+            const id = mailBtn.dataset.appId;
+            const p = id ? appsContactPayloadCache.get(id) : null;
+            if (p?.mailtoUrl) {
+                notifyAppsContactChannel('email', id);
+                window.location.href = p.mailtoUrl;
+            }
+            return;
+        }
+
+        const waBtn = e.target.closest('.apps-contact-wa');
+        if (waBtn && pillarsList.contains(waBtn)) {
+            e.preventDefault();
+            const id = waBtn.dataset.appId;
+            const p = id ? appsContactPayloadCache.get(id) : null;
+            if (p?.waUrl && p.waUrl !== '#') {
+                notifyAppsContactChannel('whatsapp', id);
+                window.open(p.waUrl, '_blank', 'noopener,noreferrer');
+            }
+            return;
+        }
+
         const req = e.target.closest('.apps-request-access-btn');
         if (req && pillarsList.contains(req)) {
             e.preventDefault();
@@ -222,6 +320,14 @@ async function renderApps() {
         const userData = userDoc.data();
         const appsContratadas = userData?.servicios?.apps || {};
 
+        const profileSnap = await getDoc(doc(db, "usuarios", user.uid));
+        const profileData = profileSnap.exists() ? profileSnap.data() : {};
+        const profile = {
+            nombre: profileData.nombre || user.email?.split('@')[0] || 'Cliente',
+            empresa: profileData.empresa || '',
+            email: user.email || '',
+        };
+
         const querySnapshot = await getDocs(collection(db, "config_apps"));
         const items = [];
         querySnapshot.forEach((d) => {
@@ -240,6 +346,8 @@ async function renderApps() {
             return;
         }
 
+        appsContactPayloadCache.clear();
+
         const hoy = new Date();
         let html = '';
         items.forEach((app, index) => {
@@ -255,6 +363,26 @@ async function renderApps() {
             const desc = escapeHtml(app.description || '');
             const route = escapeAttr(app.route || '');
             const ariaName = escapeAttr(app.name || app.id);
+
+            const vars = buildAppsTemplateVars(profile, app);
+            const emailSubject = fillAppsTemplate(APPS_MESSAGE_TEMPLATES.emailSubject, vars);
+            const emailBody = fillAppsTemplate(APPS_MESSAGE_TEMPLATES.emailBody, vars);
+            const whatsappText = fillAppsTemplate(APPS_MESSAGE_TEMPLATES.whatsapp, vars);
+            const mailtoUrl = `mailto:${APPS_CONTACT.email}?subject=${encodeURIComponent(emailSubject)}&body=${encodeURIComponent(emailBody)}`;
+            const waDigits = digitsOnly(APPS_CONTACT.whatsappDigits);
+            const waOk = waDigits.length >= 10;
+            const waUrl = waOk ? `https://wa.me/${waDigits}?text=${encodeURIComponent(whatsappText)}` : '#';
+
+            appsContactPayloadCache.set(app.id, {
+                emailSubject,
+                emailBody,
+                whatsappText,
+                mailtoUrl,
+                waUrl,
+                profile,
+                app: { id: app.id, name: app.name || app.id },
+            });
+
             const actionsHtml = buildAppContactActionsHtml(app, tieneAcceso, route);
 
             html += `

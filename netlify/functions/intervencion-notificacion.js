@@ -30,7 +30,17 @@ exports.handler = async (event) => {
     }
 
     try {
-        const { destinatario, cliente, servicio } = JSON.parse(event.body);
+        const payload = JSON.parse(event.body);
+        const {
+            destinatario,
+            cliente,
+            servicio,
+            omitirRegistroFirestore = false,
+            tipo,
+            canal,
+            cuerpoTexto,
+            asuntoPlantilla,
+        } = payload;
 
         // Validación de Integridad: Asegurar que existan los datos mínimos para la trazabilidad
         if (!destinatario || !cliente?.email || !servicio?.id) {
@@ -39,23 +49,29 @@ exports.handler = async (event) => {
         }
 
         // 1. REGISTRO INTELIGENTE (Prevención de Duplicados y Alineación de Esquema)
-        const { omitirRegistroFirestore } = JSON.parse(event.body);
         let solicitudId = "email_only";
 
         if (!omitirRegistroFirestore) {
             const solicitudRef = db.collection('solicitudes_contacto').doc();
             solicitudId = solicitudRef.id;
-            
-            // TRACEABILIDAD: Alineamos los campos exactamente con lo que el Admin Panel espera leer
+
+            const esContactoApps = tipo === 'CONTACTO_APPS_CANAL';
+            const canalValor = esContactoApps && canal
+                ? `Módulo Apps (${String(canal)})`
+                : 'Netlify Function (Fallback)';
+            const interesValor = esContactoApps && canal
+                ? `Contacto vía ${String(canal)}: ${servicio.titulo}`
+                : servicio.titulo;
+
             await solicitudRef.set({
                 usuarioId: cliente.uid,
                 email: cliente.email,
                 nombre: cliente.nombre,
-                interes: servicio.titulo,
+                interes: interesValor,
                 servicioId: servicio.id,
-                estado: "pendiente",
+                estado: 'pendiente',
                 fechaEnvio: new Date().toISOString(),
-                canal: "Netlify Function (Fallback)"
+                canal: canalValor,
             });
             console.log(`✅ Registro creado en Firestore: ${solicitudId}`);
         } else {
@@ -81,8 +97,15 @@ exports.handler = async (event) => {
         });
 
         // 2. MOTOR DE RESPUESTA HÍBRIDA (ME Crece Intelligence Engine)
-        const { tipo } = JSON.parse(event.body);
         let emailSubject, emailHtml;
+
+        const escHtml = (s) => String(s || '')
+            .replace(/&/g, '&amp;')
+            .replace(/</g, '&lt;')
+            .replace(/>/g, '&gt;')
+            .replace(/"/g, '&quot;');
+
+        const baseUrl = process.env.URL || 'https://dreams.miempresacrece.com.mx';
 
         // Estilos Base Prestige para consistencia de marca
         const headerStyle = "font-family: 'Montserrat', sans-serif; color: #0F3460; padding: 40px; border-top: 6px solid #957C3D; background: #fdfdfd; max-width: 600px; margin: auto;";
@@ -128,7 +151,7 @@ exports.handler = async (event) => {
                     <div style="text-align: center; margin: 30px 0; background: #f4f7f9; padding: 30px; border-radius: 16px; border: 1px solid rgba(15, 52, 96, 0.1);">
                         <h3 style="color: #0F3460; margin: 0 0 10px 0; font-size: 1.1rem;">${servicio.titulo}</h3>
                         <p style="font-size: 0.85rem; color: #666; margin-bottom: 20px;">Para activar tu acceso, selecciona un horario de sesión estratégica (Martes y Jueves de 4:00 PM a 6:00 PM).</p>
-                        <a href="${process.env.URL}/agendar.html?service=${servicio.id}" style="${buttonStyle}">AGENDAR SESIÓN Y ACTIVAR</a>
+                        <a href="${baseUrl}/agendar.html?service=${encodeURIComponent(servicio.id)}" style="${buttonStyle}">AGENDAR SESIÓN Y ACTIVAR</a>
                     </div>
                     <p style="font-size: 0.85rem; color: #666; text-align: center; font-style: italic;">"El éxito económico es consecuencia de un liderazgo ético."</p>
                     <div style="${footerStyle}">ME Crece Platform | Arquitectos de Legados PyME</div>
@@ -136,16 +159,45 @@ exports.handler = async (event) => {
             `;
         } else if (tipo === 'INTERES_APPS') {
             emailSubject = `🚀 Escalando la operativa de ${cliente.empresa || 'tu empresa'}`;
+            const agendarApps = `${baseUrl}/agendar.html?service=${encodeURIComponent(servicio.id || 'apps-ecosistema')}`;
             emailHtml = `
                 <div style="${headerStyle}">
                     <h2 style="font-weight: 900; text-transform: uppercase;">Arquitectura de Procesos</h2>
                     <p>Hola <strong>${cliente.nombre}</strong>,</p>
                     <p>Pasar del caos operativo a una arquitectura de procesos es posible con las herramientas de <strong>ME Crece Platform</strong>. Nuestro CRM, ERP y Process Designer están listos para darte el control total que tu liderazgo requiere.</p>
                     <div style="background: #0F3460; color: #ffffff; padding: 25px; border-radius: 12px; text-align: center; margin: 30px 0;">
-                        <p style="margin: 0 0 15px 0;">Queremos que veas el impacto real por ti mismo. Te invitamos a una videollamada para diseñar tu ecosistema digital a medida.</p>
-                        <a href="https://zoom.us/j/ME-CRECE-VENTAS" style="display: inline-block; padding: 12px 25px; background: #957C3D; color: #fff; text-decoration: none; border-radius: 6px; font-weight: 700;">AGENDAR SESIÓN POR ZOOM</a>
+                        <p style="margin: 0 0 15px 0;">Queremos que veas el impacto real por ti mismo. Agenda una sesión estratégica (videollamada vía Zoom según tu cita) en el mismo flujo que <strong>agendar.html</strong> y Calendly.</p>
+                        <a href="${agendarApps}" style="display: inline-block; padding: 12px 25px; background: #957C3D; color: #fff; text-decoration: none; border-radius: 6px; font-weight: 700;">AGENDAR SESIÓN</a>
                     </div>
                     <div style="${footerStyle}">Enviado por ME Crece Platform</div>
+                </div>
+            `;
+        } else if (tipo === 'CONTACTO_APPS_CANAL') {
+            const canalLabel = canal === 'whatsapp' ? 'WhatsApp' : 'correo electrónico';
+            const cuerpoEsc = escHtml(cuerpoTexto || '(sin texto)');
+            const asuntoRef = escHtml(asuntoPlantilla || servicio.titulo);
+            const agendarLink = `${baseUrl}/agendar.html?service=${encodeURIComponent(servicio.id)}`;
+            emailSubject = `📋 Tu mensaje — ${servicio.titulo} | ME Crece Apps`;
+            emailHtml = `
+                <div style="${headerStyle}">
+                    <h2 style="font-weight: 900; text-transform: uppercase; color: #0F3460;">Copia de tu consulta</h2>
+                    <p>Hola <strong>${escHtml(cliente.nombre)}</strong>,</p>
+                    <p>Gracias por dar el siguiente paso desde el <strong>módulo de Aplicaciones</strong>. Acabas de usar el canal <strong>${escHtml(canalLabel)}</strong> para acercarte a nuestro equipo respecto a <strong>${escHtml(servicio.titulo)}</strong>.</p>
+                    <p style="font-size: 0.88rem; color: #555;">Abajo tienes la <strong>misma plantilla personalizada</strong> que preparamos para tu mensaje (por si tu app no abrió el borrador o quieres reenviarla). El equipo también queda notificado con esta solicitud.</p>
+                    <div style="background: #f4f7f9; border-left: 4px solid #957C3D; padding: 18px 20px; margin: 24px 0; border-radius: 10px;">
+                        <span style="font-size: 0.7rem; color: #957C3D; font-weight: 800; text-transform: uppercase; letter-spacing: 0.08em;">Asunto sugerido (correo)</span>
+                        <p style="margin: 8px 0 0 0; font-size: 0.9rem; color: #0F3460;">${asuntoRef}</p>
+                    </div>
+                    <div style="background: #fff; border: 1px solid rgba(15, 52, 96, 0.12); padding: 20px; border-radius: 12px; margin: 20px 0;">
+                        <span style="font-size: 0.7rem; color: #957C3D; font-weight: 800; text-transform: uppercase; letter-spacing: 0.08em;">Texto listo para enviar</span>
+                        <pre style="margin: 12px 0 0 0; font-family: 'Montserrat', sans-serif; font-size: 0.82rem; line-height: 1.55; color: #333; white-space: pre-wrap; word-break: break-word;">${cuerpoEsc}</pre>
+                    </div>
+                    <div style="text-align: center; margin: 28px 0;">
+                        <p style="font-size: 0.85rem; color: #666; margin-bottom: 16px;">¿Prefieres agendar ya una videollamada? Usa el mismo calendario que enlazamos en la plataforma (sesión por Zoom según tu cita).</p>
+                        <a href="${agendarLink}" style="${buttonStyle}">AGENDAR EN CALENDLY</a>
+                    </div>
+                    <p style="font-size: 0.8rem; color: #888; text-align: center;">Responderemos a <strong>${escHtml(cliente.email)}</strong> o por el canal que elegiste.</p>
+                    <div style="${footerStyle}">ME Crece Platform | Módulo Apps</div>
                 </div>
             `;
         } else if (tipo === 'CONFIRMACION_SOPORTE') {
