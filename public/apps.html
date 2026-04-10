@@ -85,16 +85,25 @@
         </div>
     </header>
 
-    <main class="main-content" style="padding-top: 75px;">
-        <div class="container" style="margin-top: 30px;">
-            <header class="apps-header mb-4">
-                <h1 class="text-midnight font-black" style="font-size: var(--font-size-h1);">Ecosistema de Aplicaciones</h1>
-                <p class="text-midnight-light" style="font-size: var(--font-size-body);">Herramientas tácticas para la profesionalización de tu PyME.</p>
+    <main class="main-content container" style="padding-top: 75px;">
+        <div id="view-apps-intro" style="display: block; animation: fadeIn 0.5s ease-out; margin-top: 10px;">
+            <header class="section-header academia-pillars-header">
+                <h1 class="academia-pillars-title">Ecosistema de Aplicaciones</h1>
+                <div class="academia-pillars-intro">
+                    <p class="academia-pillars-lead">
+                        Bienvenido al <strong>módulo de aplicaciones</strong> de Mi Empresa Crece. Aquí concentras las <strong>herramientas tácticas</strong> (CRM, ERP y futuras soluciones) pensadas para <strong>profesionalizar tu PyME</strong>: datos de ventas, finanzas y operación en un solo ecosistema, con acceso gobernado por tu expediente. Cada aplicación está descrita abajo; al activarla con tu consultor, podrás <strong>INGRESAR</strong> directamente al entorno de trabajo.
+                    </p>
+                    <p class="academia-pillars-subhead">Qué encontrarás en cada herramienta y cómo avanzar</p>
+                    <p class="academia-pillars-reflection">
+                        Estas soluciones no sustituyen el criterio del líder: <strong>ordenan información y procesos</strong> para que decidas con claridad. Si una app aún no está en tu contrato, verás la opción de <strong>solicitar acceso</strong> y agendar configuración con el equipo. Revisa con calma cada recuadro; elige la herramienta que hoy necesitas abrir.
+                    </p>
+                    <p class="academia-pillars-cta academia-pillars-cta--before-list">
+                        <strong>Cómo continuar:</strong> pulsa <strong>INGRESAR</strong> (o el recuadro completo) en la aplicación con acceso activo, o <strong>SOLICITAR ACCESO</strong> si aún está restringida.
+                    </p>
+                    <div id="loading-apps" class="loading-spinner" style="margin: 24px auto;">Cargando herramientas de autoridad...</div>
+                    <ul id="apps-pillars-list" class="academia-pillars-list" aria-label="Aplicaciones del ecosistema" hidden></ul>
+                </div>
             </header>
-
-            <div id="apps-grid" class="bento-grid">
-                <div id="loading-apps" class="loading-spinner">Cargando herramientas de autoridad...</div>
-            </div>
         </div>
     </main>
 

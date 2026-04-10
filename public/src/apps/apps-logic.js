@@ -1,45 +1,22 @@
 //public/src/apps/apps-logic.js
 
 // TRACEABILIDAD: Importación centralizada desde el núcleo de configuración de Dreams
-// TRACEABILIDAD: Importación centralizada con soporte para persistencia de leads
 import { db, auth, collection, getDocs, doc, getDoc, setDoc } from '../shared/firebase-config.js';
 
-// CONFIGURACIÓN DE IDENTIDAD VISUAL (ESTRUCTURA PRESTIGE)
-const APP_TEMPLATES = {
-    active: (app) => `
-        <article class="card bento-item glass-card bento-kpi-card animate-fade-in">
-            <div class="card-content" style="display: flex; flex-direction: column; height: 100%; width: 100%;">
-                <div class="card-header-app">
-                    <div class="app-icon">${app.icon || '🚀'}</div>
-                    <span class="card-category" style="color: var(--accent-gold); display: block; margin-bottom: 5px;">Herramienta de Autoridad</span>
-                    <h3 style="color: var(--primary-midnight); margin: 0;">${app.name}</h3>
-                    <p>${app.description}</p>
-                </div>
-                <div class="card-footer-app" style="margin-top: auto;">
-                    <button class="btn-primary" onclick="window.location.href='${app.route}'">ABRIR HERRAMIENTA</button>
-                    <div class="status-tag status-active">Acceso Total Sincronizado</div>
-                </div>
-            </div>
-        </article>`,
-    locked: (app, appId) => `
-        <article class="card bento-item glass-card animate-fade-in" style="position: relative;">
-            <div class="card-content" style="display: flex; flex-direction: column; height: 100%; width: 100%;">
-                <div class="card-header-app" style="opacity: 0.6; filter: grayscale(1);">
-                    <div class="app-icon">🔒</div>
-                    <span class="card-category" style="color: #718096; display: block; margin-bottom: 5px;">Módulo Restringido</span>
-                    <h3 style="color: #4A5568; margin: 0;">${app.name}</h3>
-                    <p>${app.description}</p>
-                </div>
-                <div class="card-footer-app" style="margin-top: auto;">
-                    <button class="btn-primary" 
-                            style="background: var(--primary-midnight); border-color: var(--primary-midnight);"
-                            onclick="window.requestAppAccess('${appId}', '${app.name}')">
-                        SOLICITAR ACCESO Y AGENDAR
-                    </button>
-                </div>
-            </div>
-        </article>`
-};
+function escapeHtml(s) {
+    return String(s ?? '')
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;')
+        .replace(/"/g, '&quot;');
+}
+
+function escapeAttr(s) {
+    return String(s ?? '')
+        .replace(/&/g, '&amp;')
+        .replace(/"/g, '&quot;')
+        .replace(/'/g, '&#39;');
+}
 
 /**
  * MOTOR DE SOLICITUD QUIRÚRGICO (Replica flujo de Consultoría)
@@ -55,12 +32,10 @@ window.requestAppAccess = async (appId, appName) => {
     if (!confirmacion) return;
 
     try {
-        // 1. OBTENER PERFIL PARA TRAZABILIDAD
         const profileSnap = await getDoc(doc(db, "usuarios", user.uid));
         const userData = profileSnap.exists() ? profileSnap.data() : {};
         const nombreUsuario = userData.nombre || user.email.split('@')[0];
 
-        // 2. REGISTRO EN FIRESTORE (Panel Admin)
         const solicitudId = `app_req_${appId}_${Date.now()}`;
         await setDoc(doc(db, "solicitudes_contacto", solicitudId), {
             usuarioId: user.uid,
@@ -73,8 +48,6 @@ window.requestAppAccess = async (appId, appName) => {
             canal: "Dashboard Apps"
         });
 
-        // 3. HANDSHAKE CON NETLIFY (Disparo de Calendly)
-        // Usamos 'CARRITO_COMPRA' porque intervencion-notificacion.js ya tiene el link a agendar.html configurado ahí
         await fetch('/.netlify/functions/intervencion-notificacion', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
@@ -82,12 +55,11 @@ window.requestAppAccess = async (appId, appName) => {
                 destinatario: user.email,
                 cliente: { uid: user.uid, email: user.email, nombre: nombreUsuario },
                 servicio: { id: appId, titulo: appName },
-                tipo: 'CARRITO_COMPRA', // TRACEABILIDAD: Sincronizado con el flujo de Calendly
-                omitirRegistroFirestore: true 
+                tipo: 'CARRITO_COMPRA',
+                omitirRegistroFirestore: true
             })
         });
 
-        // PROTOCOLO PRESTIGE: Redirección inmediata al Calendly (agendar.html)
         alert(`🚀 Solicitud registrada.\n\nPara finalizar, selecciona tu horario en la siguiente pantalla.`);
         window.location.href = `agendar.html?service=${appId}`;
     } catch (error) {
@@ -96,44 +68,182 @@ window.requestAppAccess = async (appId, appName) => {
     }
 };
 
+function openPillarApp(row) {
+    const hasAccess = row.dataset.hasAccess === '1';
+    const appId = row.dataset.appId;
+    const appName = row.dataset.appName || '';
+    const route = row.dataset.route || '';
+
+    if (hasAccess && route) {
+        window.location.href = route;
+        return;
+    }
+    if (!hasAccess && appId) {
+        window.requestAppAccess(appId, appName);
+    }
+}
+
+/**
+ * Misma microinteracción que #view-categories .academia-pillars-list en academia.js
+ */
+function wireAppsPillarsHover(pillarsList) {
+    if (!pillarsList || pillarsHoverBound) return;
+    pillarsHoverBound = true;
+
+    const refreshCards = () => pillarsList.querySelectorAll('li.apps-pillar-item');
+
+    pillarsList.addEventListener('mouseover', (e) => {
+        const hoveredCard = e.target.closest('li.apps-pillar-item');
+        if (!hoveredCard || !pillarsList.contains(hoveredCard)) return;
+
+        const cards = refreshCards();
+        cards.forEach((card) => {
+            card.style.transition = 'all 0.4s ease';
+            if (card !== hoveredCard) {
+                card.style.filter = 'blur(4px) grayscale(0.25)';
+                card.style.opacity = '0.45';
+                card.style.transform = 'scale(0.99)';
+            } else {
+                card.style.filter = 'none';
+                card.style.opacity = '1';
+                card.style.transform = 'scale(1.01)';
+                card.style.zIndex = '2';
+            }
+        });
+    });
+
+    pillarsList.addEventListener('mouseleave', () => {
+        refreshCards().forEach((card) => {
+            card.style.filter = 'none';
+            card.style.opacity = '1';
+            card.style.transform = 'scale(1)';
+            card.style.zIndex = '1';
+        });
+    });
+}
+
+function animatePillarCards(pillarsList) {
+    const cards = pillarsList.querySelectorAll('li.apps-pillar-item');
+    cards.forEach((card, i) => {
+        card.style.opacity = '0';
+        card.style.transform = 'translateY(20px)';
+        card.style.transition = `all 0.6s cubic-bezier(0.23, 1, 0.32, 1) ${i * 0.1}s`;
+        requestAnimationFrame(() => {
+            setTimeout(() => {
+                card.style.opacity = '1';
+                card.style.transform = 'translateY(0)';
+            }, 100);
+        });
+    });
+}
+
+let pillarsClickBound = false;
+let pillarsHoverBound = false;
+
+function bindPillarsClickOnce(pillarsList) {
+    if (pillarsClickBound || !pillarsList) return;
+    pillarsClickBound = true;
+
+    pillarsList.addEventListener('click', (e) => {
+        const row = e.target.closest('.apps-pillar-item');
+        if (!row || !pillarsList.contains(row)) return;
+        openPillarApp(row);
+    });
+
+    pillarsList.addEventListener('keydown', (e) => {
+        if (e.key !== 'Enter' && e.key !== ' ') return;
+        const row = e.target.closest('.apps-pillar-item');
+        if (!row || !pillarsList.contains(row)) return;
+        e.preventDefault();
+        openPillarApp(row);
+    });
+}
+
 async function renderApps() {
-    const grid = document.getElementById('apps-grid');
+    const list = document.getElementById('apps-pillars-list');
+    const loading = document.getElementById('loading-apps');
     const user = auth.currentUser;
 
-    if (!user) return;
+    if (!list) return;
+
+    if (!user) {
+        if (loading) loading.style.display = 'none';
+        list.hidden = false;
+        list.innerHTML = `
+            <li class="academia-pillar-item apps-pillar-item" style="cursor: default;">
+                <div class="academia-pillar-copy"><strong>Acceso al ecosistema</strong> — Inicia sesión en la plataforma para ver las aplicaciones asociadas a tu expediente y solicitar nuevas activaciones.</div>
+            </li>`;
+        return;
+    }
 
     try {
-        // 1. OBTENER EXPEDIENTE DEL USUARIO (SENTINEL)
         const userDoc = await getDoc(doc(db, "expedientes", user.uid));
         const userData = userDoc.data();
         const appsContratadas = userData?.servicios?.apps || {};
 
-        // 2. OBTENER CATÁLOGO MAESTRO DE APPS
         const querySnapshot = await getDocs(collection(db, "config_apps"));
-        grid.innerHTML = ''; // Limpiar spinner de carga
+        const items = [];
+        querySnapshot.forEach((d) => {
+            items.push({ id: d.id, ...d.data() });
+        });
+        items.sort((a, b) => String(a.name || '').localeCompare(String(b.name || ''), 'es'));
 
-        querySnapshot.forEach((doc) => {
-            const app = doc.data();
-            const infoContrato = appsContratadas[doc.id];
+        if (loading) loading.style.display = 'none';
+        list.hidden = false;
 
-            // 3. LÓGICA DEL SENTINEL DE SEGURIDAD
-            const hoy = new Date();
-            const vencimiento = infoContrato?.fechaVencimiento?.toDate();
-            const tieneAcceso = infoContrato && vencimiento > hoy;
+        if (items.length === 0) {
+            list.innerHTML = `
+                <li class="academia-pillar-item apps-pillar-item" style="cursor: default;">
+                    <div class="academia-pillar-copy"><strong>Catálogo en sincronización</strong> — Aún no hay aplicaciones publicadas en el ecosistema. Vuelve más tarde o contacta a soporte.</div>
+                </li>`;
+            return;
+        }
 
-            // 4. RENDERIZADO CONDICIONAL
-            grid.innerHTML += tieneAcceso ? APP_TEMPLATES.active(app) : APP_TEMPLATES.locked(app);
+        const hoy = new Date();
+        let html = '';
+        items.forEach((app, index) => {
+            const infoContrato = appsContratadas[app.id];
+            let vencimiento = infoContrato?.fechaVencimiento;
+            if (vencimiento && typeof vencimiento.toDate === 'function') {
+                vencimiento = vencimiento.toDate();
+            }
+            const tieneAcceso = !!(infoContrato && vencimiento && vencimiento > hoy);
+            const lockedClass = tieneAcceso ? '' : ' apps-pillar-item--locked';
+            const btnLabel = tieneAcceso ? 'INGRESAR' : 'SOLICITAR ACCESO';
+            const icon = app.icon ? `${escapeHtml(app.icon)} ` : '';
+            const name = escapeHtml(app.name || app.id);
+            const desc = escapeHtml(app.description || '');
+            const route = escapeAttr(app.route || '');
+            const ariaName = escapeAttr(app.name || app.id);
+
+            html += `
+            <li class="academia-pillar-item apps-pillar-item${lockedClass}"
+                data-app-id="${escapeAttr(app.id)}"
+                data-app-name="${escapeAttr(app.name || app.id)}"
+                data-has-access="${tieneAcceso ? '1' : '0'}"
+                data-route="${route}"
+                tabindex="0"
+                role="button"
+                aria-label="${ariaName}: ${tieneAcceso ? 'abrir aplicación' : 'solicitar acceso'}">
+                <div class="academia-pillar-copy"><strong>${index + 1}. ${icon}${name}</strong> — ${desc}</div>
+                <button type="button" class="btn-primary btn-pillar-enter">${btnLabel}</button>
+            </li>`;
         });
 
+        list.innerHTML = html;
+        animatePillarCards(list);
+        bindPillarsClickOnce(list);
+        wireAppsPillarsHover(list);
     } catch (error) {
         console.error("Error en el despliegue de Apps:", error);
-        grid.innerHTML = `<p class="text-error">Error al sincronizar con el ecosistema. Intenta de nuevo.</p>`;
+        if (loading) loading.style.display = 'none';
+        list.hidden = false;
+        list.innerHTML = `<li class="academia-pillar-item apps-pillar-item" style="cursor: default;"><div class="academia-pillar-copy">Error al sincronizar con el ecosistema. Intenta de nuevo más tarde.</div></li>`;
     }
 }
 
-// Iniciar cuando el usuario esté autenticado
-auth.onAuthStateChanged((user) => {
-    if (user) renderApps();
+auth.onAuthStateChanged(() => {
+    renderApps();
 });
 
 // FUNCIÓN DE EMERGENCIA PARA POBLAR EL CATÁLOGO (USO ÚNICO)
@@ -144,9 +254,9 @@ window.setupAppsMaster = async () => {
     ];
 
     try {
-        const { setDoc, doc } = await import("https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js");
+        const { setDoc, doc: docFn } = await import("https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js");
         for (const app of apps) {
-            await setDoc(doc(db, "config_apps", app.id), app);
+            await setDoc(docFn(db, "config_apps", app.id), app);
             console.log(`✅ App ${app.id} sincronizada.`);
         }
         alert("Catálogo creado con éxito. Recarga la página.");
@@ -155,23 +265,19 @@ window.setupAppsMaster = async () => {
     }
 };
 
-// MOTOR DE BÚSQUEDA AURA - FILTRADO EN TIEMPO REAL
 document.addEventListener('input', (e) => {
     if (e.target.id === 'app-searcher') {
         const term = e.target.value.toLowerCase();
-        const cards = document.querySelectorAll('#apps-grid article');
-        
-        cards.forEach(card => {
-            const title = card.querySelector('h3').innerText.toLowerCase();
-            const description = card.querySelector('p').innerText.toLowerCase();
-            
-            // Si el término coincide con el título o la descripción, se muestra; si no, se oculta suavemente.
-            if (title.includes(term) || description.includes(term)) {
-                card.style.display = "flex";
-                card.style.opacity = "1";
+        const rows = document.querySelectorAll('#apps-pillars-list li.apps-pillar-item');
+
+        rows.forEach((row) => {
+            const text = row.innerText.toLowerCase();
+            if (text.includes(term)) {
+                row.style.display = '';
+                row.style.opacity = '1';
             } else {
-                card.style.display = "none";
-                card.style.opacity = "0";
+                row.style.display = 'none';
+                row.style.opacity = '0';
             }
         });
     }
