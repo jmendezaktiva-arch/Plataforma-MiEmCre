@@ -168,7 +168,7 @@ function digitsOnly(s) {
 const WHATSAPP_MOBILE_UA = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i;
 
 /**
- * URL oficial para abrir composición: en PC prioriza WhatsApp Web; en móvil la app vía api.whatsapp.com.
+ * Con número (lada + dígitos): abre chat hacia ese teléfono con mensaje precargado.
  */
 function buildWhatsAppSendUrl(phoneDigits, text) {
     const q = encodeURIComponent(text);
@@ -177,6 +177,31 @@ function buildWhatsAppSendUrl(phoneDigits, text) {
         return `https://api.whatsapp.com/send/?${base}`;
     }
     return `https://web.whatsapp.com/send?${base}`;
+}
+
+/**
+ * Sin número en APPS_CONTACT: abre WhatsApp Web o la app con solo el texto sugerido (el usuario elige el contacto).
+ * Así el botón funciona aunque whatsappDigits esté vacío.
+ */
+function buildWhatsAppSendUrlWithoutPhone(text) {
+    const q = encodeURIComponent(text || '');
+    const hasText = Boolean(text && String(text).trim());
+    if (WHATSAPP_MOBILE_UA.test(navigator.userAgent || '')) {
+        return hasText
+            ? `https://api.whatsapp.com/send/?text=${q}`
+            : 'https://api.whatsapp.com/';
+    }
+    return hasText
+        ? `https://web.whatsapp.com/send?text=${q}`
+        : 'https://web.whatsapp.com/';
+}
+
+function buildWhatsAppOpenUrl(phoneDigits, text) {
+    const d = digitsOnly(phoneDigits);
+    if (d.length >= 10) {
+        return buildWhatsAppSendUrl(d, text);
+    }
+    return buildWhatsAppSendUrlWithoutPhone(text);
 }
 
 /**
@@ -200,9 +225,9 @@ function buildAppContactActionsHtml(app, tieneAcceso, routeEscaped) {
     const phoneHref = phoneOk ? `tel:${APPS_CONTACT.phoneE164.replace(/\s/g, '')}` : '#';
     const phoneClass = phoneOk ? 'apps-contact-btn' : 'apps-contact-btn apps-contact-btn--pending';
 
-    const waDigits = digitsOnly(APPS_CONTACT.whatsappDigits);
-    const waOk = waDigits.length >= 10;
-    const waClass = waOk ? 'apps-contact-btn apps-contact-wa' : 'apps-contact-btn apps-contact-wa apps-contact-btn--pending';
+    const waDigitsCfg = digitsOnly(APPS_CONTACT.whatsappDigits);
+    const waOk = waDigitsCfg.length >= 10;
+    const waClass = 'apps-contact-btn apps-contact-wa';
 
     const scheduleHref = `${APPS_SCHEDULE_PAGE}?service=${encodeURIComponent(app.id)}`;
     const openAppBlock = tieneAcceso && routeEscaped
@@ -215,7 +240,7 @@ function buildAppContactActionsHtml(app, tieneAcceso, routeEscaped) {
     return `
         <div class="apps-pillar-actions" role="group" aria-label="Contacto y agenda">
             <a href="${phoneHref}" class="${phoneClass}" title="${phoneOk ? 'Llamada telefónica' : 'Número por configurar'}">📞 Llamada</a>
-            <a href="#" class="${waClass}" data-app-id="${escapeAttr(app.id)}" title="${waOk ? 'WhatsApp Web o app de escritorio (mensaje sugerido)' : 'Número por configurar'}">💬 WhatsApp</a>
+            <a href="#" class="${waClass}" data-app-id="${escapeAttr(app.id)}" title="${waOk ? 'WhatsApp: chat directo al número configurado' : 'WhatsApp Web o app (mensaje sugerido; configura whatsappDigits para número fijo)'}">💬 WhatsApp</a>
             <a href="#" class="apps-contact-btn apps-contact-email" data-app-id="${escapeAttr(app.id)}" title="Correo a ${escapeAttr(APPS_CONTACT.email)} con plantilla">✉️ Correo</a>
             <a href="${scheduleHref}" class="apps-contact-btn apps-contact-btn--schedule" title="Agenda sesión estratégica (videollamada vía Zoom según tu cita)">📹 Videollamada</a>
         </div>
@@ -286,7 +311,7 @@ function bindPillarsActionsOnce(pillarsList) {
 
     pillarsList.addEventListener('click', (e) => {
         const pending = e.target.closest('.apps-contact-btn--pending');
-        if (pending && pillarsList.contains(pending)) {
+        if (pending && !pending.classList.contains('apps-contact-wa') && pillarsList.contains(pending)) {
             e.preventDefault();
             alert(APPS_CONTACT_PENDING_MSG);
             return;
@@ -309,7 +334,7 @@ function bindPillarsActionsOnce(pillarsList) {
             e.preventDefault();
             const id = waBtn.dataset.appId;
             const p = id ? appsContactPayloadCache.get(id) : null;
-            if (p?.waUrl && p.waUrl !== '#') {
+            if (p?.waUrl) {
                 notifyAppsContactChannel('whatsapp', id);
                 openWhatsAppComposeUrl(p.waUrl);
             }
@@ -398,8 +423,7 @@ async function renderApps() {
             const whatsappText = fillAppsTemplate(APPS_MESSAGE_TEMPLATES.whatsapp, vars);
             const mailtoUrl = `mailto:${APPS_CONTACT.email}?subject=${encodeURIComponent(emailSubject)}&body=${encodeURIComponent(emailBody)}`;
             const waDigits = digitsOnly(APPS_CONTACT.whatsappDigits);
-            const waOk = waDigits.length >= 10;
-            const waUrl = waOk ? buildWhatsAppSendUrl(waDigits, whatsappText) : '#';
+            const waUrl = buildWhatsAppOpenUrl(waDigits, whatsappText);
 
             appsContactPayloadCache.set(app.id, {
                 emailSubject,
