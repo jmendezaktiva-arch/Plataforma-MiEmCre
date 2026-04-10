@@ -7,26 +7,32 @@
     "version": "1.2",
     "lastUpdated": "2026-03-11"
   },
+  "guideIntro": {
+    "objective": "Tener claridad de cómo se conectan tus canales (mensaje, redes, WhatsApp, web, seguimiento) para que un interesado no se pierda en el camino hacia la venta.",
+    "needs": "Mensajes distintos en cada red, respuestas tarde a mensajes, falta de un flujo sencillo de seguimiento y dependencia solo del boca a boca o del descuento.",
+    "benefits": "Un mapa ordenado de “primer contacto → seguimiento → cierre o siguiente paso”, menos esfuerzo disperso y más conversaciones que avanzan con criterio.",
+    "discipline": "El ecosistema digital se alimenta con constancia: responder, publicar con intención y revisar qué funcionó cada semana. Mejor un ritmo pequeño y sostenido que una campaña única y olvidada."
+  },
   "guideLabels": {
     "video": {
-      "title": "Visión del Ecosistema",
-      "desc": "Cápsula estratégica sobre la ruta digital de ventas."
+      "title": "Video de la sesión",
+      "desc": "Video con la ruta de ventas y canales digitales explicada con ejemplos para que tu equipo hable el mismo idioma comercial."
     },
     "pres": {
-      "title": "Mapa de Ventas Digitales",
-      "desc": "Estructura del ecosistema y puntos de captura."
+      "title": "Presentación guía",
+      "desc": "Láminas con el paso a paso del ecosistema: captación, seguimiento y cierre, sin saltarte piezas."
     },
     "workbook": {
-      "title": "Plan de Configuración Digital",
-      "desc": "Herramienta para implementar tu flujo consultivo."
+      "title": "Cuaderno de trabajo",
+      "desc": "Aquí bajas la estrategia a tu realidad: qué canal usas, qué dices, quién responde y cómo mides si avanzas."
     },
     "audio": {
-      "title": "Inmersión: Ecosistema",
-      "desc": "Profundiza en la estrategia de canales mientras operas."
+      "title": "Audios y refuerzos",
+      "desc": "Audios para reforzar ideas de ventas digitales mientras vas de un cliente a otro o en trayectos cortos."
     },
     "support": {
-      "title": "Soporte Estratégico",
-      "desc": "Consultoría directa para tu implementación digital."
+      "title": "Soporte y consultoría",
+      "desc": "Si necesitas ayuda con la plataforma o con cómo aplicar el tema a tu negocio, escríbenos por soporte."
     }
   },
   "multimedia": {

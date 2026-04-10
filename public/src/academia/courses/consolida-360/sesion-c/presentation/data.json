@@ -7,26 +7,32 @@
     "version": "1.1",
     "lastUpdated": "2026-03-11"
   },
+  "guideIntro": {
+    "objective": "Distinguir gasto necesario, gasto mejorable e inversión con retorno, para decidir con números y criterios y no solo con la presión del momento.",
+    "needs": "Caja apretada, compras o proyectos decididos “a ojo”, poca claridad de costos fijos vs variables y riesgo de invertir sin saber si la empresa aguanta el golpe.",
+    "benefits": "Criterios para decir sí o no a un gasto o a una inversión, más tranquilidad de flujo y conversaciones más objetivas con socios, contador o equipo.",
+    "discipline": "La parte financiera mejora con un ritmo breve y repetido: revisar pocos indicadores cada semana o quincena y ajustar. El cuaderno te ayuda a mantener ese hábito sin convertirlo en papeleo eterno."
+  },
   "guideLabels": {
     "video": {
-      "title": "Visión de Blindaje",
-      "desc": "Cápsula audio visual sobre gasto inteligente e inversión efectiva."
+      "title": "Video de la sesión",
+      "desc": "Video que explica gasto inteligente, inversiones y blindaje financiero con ejemplos aplicables a una PyME."
     },
     "pres": {
-      "title": "Mapa de Inteligencia Financiera",
-      "desc": "El \"porqué\" detrás del método de rentabilidad."
+      "title": "Presentación guía",
+      "desc": "Láminas que ordenan conceptos y el “por qué” de cada decisión financiera antes de meter números al cuaderno."
     },
     "workbook": {
-      "title": "Plan Maestro de Inversión",
-      "desc": "Kit de herramientas para el Arquitecto de su PyME."
+      "title": "Cuaderno de trabajo",
+      "desc": "Donde cargas tus cifras, escenarios y decisiones: es la herramienta para pasar de teoría a plan concreto en tu empresa."
     },
     "audio": {
-      "title": "Inmersión: Rentabilidad",
-      "desc": "Refuerzo auditivo sobre sostenibilidad financiera."
+      "title": "Audios y refuerzos",
+      "desc": "Audios para repasar criterios de rentabilidad y riesgo cuando no puedes sentarte frente a la laptop."
     },
     "support": {
-      "title": "Soporte de Consultoría",
-      "desc": "Asistencia técnica para tus cálculos financieros."
+      "title": "Soporte y consultoría",
+      "desc": "Si te trabas con la plataforma o con cómo interpretar tus números, el equipo de soporte te orienta."
     }
   },
   "multimedia": {

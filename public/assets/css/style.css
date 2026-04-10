@@ -2081,3 +2081,57 @@ body.cinema-mode #view-workbook {
         max-height: min(42vh, 300px) !important;
     }
 }
+
+/* ========================================================================== */
+/* ACADEMIA — Guía previa a la sesión (intro + tarjetas de herramientas) */
+/* ========================================================================== */
+
+.intro-guide-body {
+    text-align: left;
+    max-width: 720px;
+    margin: 0 auto;
+}
+
+.intro-guide-section {
+    margin-top: 1.15rem;
+    padding-top: 1rem;
+    border-top: 1px solid rgba(15, 52, 96, 0.08);
+}
+
+.intro-guide-section:first-of-type {
+    margin-top: 0;
+    padding-top: 0;
+    border-top: none;
+}
+
+.intro-guide-section-title {
+    font-family: 'Montserrat', sans-serif;
+    font-size: 0.7rem;
+    font-weight: 800;
+    text-transform: uppercase;
+    letter-spacing: 0.12em;
+    color: var(--accent-gold);
+    margin: 0 0 8px 0;
+}
+
+.intro-guide-section-text {
+    margin: 0;
+    font-size: 0.88rem;
+    line-height: 1.58;
+    color: #444;
+}
+
+.intro-guide-fallback {
+    margin: 0;
+    font-size: 0.88rem;
+    line-height: 1.58;
+    color: #555;
+    text-align: left;
+}
+
+.guide-card-title {
+    text-transform: none !important;
+    font-size: 0.92rem !important;
+    line-height: 1.3 !important;
+    letter-spacing: 0 !important;
+}

@@ -21,6 +21,44 @@ function escapeHtmlCart(s) {
         .replace(/"/g, '&quot;');
 }
 
+/**
+ * Pantalla previa (guía intro): objetivo, necesidades, beneficios, disciplina — desde JSON por sesión.
+ */
+function hydrateGuideIntro(guideIntro, sessionTitle) {
+    const body = document.getElementById('guide-intro-body');
+    const eyebrow = document.getElementById('guide-session-eyebrow');
+    if (eyebrow) eyebrow.textContent = (sessionTitle || '').trim();
+    if (!body) return;
+
+    const g = guideIntro && typeof guideIntro === 'object' ? guideIntro : {};
+    const sections = [
+        { key: 'objective', heading: 'Objetivo de la sesión' },
+        { key: 'needs', heading: 'Qué necesidades aborda' },
+        { key: 'benefits', heading: 'Beneficios si lo aplicas en tu empresa' },
+        { key: 'discipline', heading: 'Disciplina y enfoque sistémico' },
+    ];
+
+    const blocks = [];
+    sections.forEach(({ key, heading }) => {
+        const t = String(g[key] ?? '').trim();
+        if (t) {
+            blocks.push(
+                `<section class="intro-guide-section"><h3 class="intro-guide-section-title">${escapeHtmlCart(heading)}</h3>`
+                + `<p class="intro-guide-section-text">${escapeHtmlCart(t)}</p></section>`,
+            );
+        }
+    });
+
+    if (blocks.length === 0) {
+        body.innerHTML = `<p class="intro-guide-fallback">${escapeHtmlCart(
+            'En esta sesión usarás herramientas prácticas para llevar el contenido a tu operación. '
+            + 'Tómate el tiempo en esta pantalla: entender el contexto te ayuda a sacar más provecho del video, la presentación y el cuaderno.',
+        )}</p>`;
+        return;
+    }
+    body.innerHTML = blocks.join('');
+}
+
 function formatPlainLeadParagraphs(text) {
     const t = String(text ?? '').trim();
     if (!t) return '';
@@ -1070,25 +1108,27 @@ document.addEventListener('DOMContentLoaded', () => {
                 if (elSidebar) elSidebar.style.display = isVisible ? 'flex' : 'none';
             };
 
+            const setGuideLabel = (id, text) => {
+                const el = document.getElementById(id);
+                if (el) el.innerText = text || '';
+            };
+            setGuideLabel('guide-title-video', labels.video?.title);
+            setGuideLabel('guide-desc-video', labels.video?.desc);
+            setGuideLabel('guide-title-pres', labels.pres?.title);
+            setGuideLabel('guide-desc-pres', labels.pres?.desc);
+            setGuideLabel('guide-title-workbook', labels.workbook?.title);
+            setGuideLabel('guide-desc-workbook', labels.workbook?.desc);
+            setGuideLabel('guide-title-audio', labels.audio?.title);
+            setGuideLabel('guide-desc-audio', labels.audio?.desc);
+            setGuideLabel('guide-title-support', labels.support?.title);
+            setGuideLabel('guide-desc-support', labels.support?.desc);
+
             if (courseConfig) {
-                // 1. Sincronización de Materiales (Intro + Sidebar)
                 syncMaterialUI('guide-title-video', 'btn-toggle-video', courseConfig.hasVideo);
                 syncMaterialUI('guide-title-pres', 'btn-toggle-presentation', courseConfig.hasPresentation);
                 syncMaterialUI('guide-title-workbook', 'btn-toggle-workbook', courseConfig.hasWorkbook);
                 syncMaterialUI('guide-title-audio', 'btn-toggle-podcast', courseConfig.hasPodcast);
 
-                // 2. Hidratación de Etiquetas (Guía)
-                const setLabel = (id, text) => { if(document.getElementById(id)) document.getElementById(id).innerText = text || ''; };
-                setLabel('guide-title-video', labels.video?.title);
-                setLabel('guide-desc-video', labels.video?.desc);
-                setLabel('guide-title-pres', labels.pres?.title);
-                setLabel('guide-desc-pres', labels.pres?.desc);
-                setLabel('guide-title-workbook', labels.workbook?.title);
-                setLabel('guide-desc-workbook', labels.workbook?.desc);
-                setLabel('guide-title-audio', labels.audio?.title);
-                setLabel('guide-desc-audio', labels.audio?.desc);
-
-                // 3. Inteligencia Zoom (Barra Lateral)
                 const btnZoom = document.getElementById('btn-toggle-zoom');
                 if (btnZoom) {
                     if (courseConfig.modality === 'LIVE' && courseConfig.zoomLink) {
@@ -1096,9 +1136,12 @@ document.addEventListener('DOMContentLoaded', () => {
                         btnZoom.onclick = () => window.open(courseConfig.zoomLink, '_blank');
                     } else { btnZoom.style.display = 'none'; }
                 }
-
-                // 4. Propósito Dinámico: Funcionalidad removida para optimizar el flujo de carga.
             }
+
+            hydrateGuideIntro(
+                currentSessionData.guideIntro,
+                currentSessionData.courseMetadata?.sessionTitle || sessionTitle,
+            );
 
             // --- RECONEXIÓN MULTIMEDIA ---
             if (currentSessionData.multimedia) {

@@ -7,26 +7,32 @@
     "version": "1.1",
     "lastUpdated": "2026-03-11"
   },
+  "guideIntro": {
+    "objective": "Que tu equipo pase de “solo hacer tareas” a avanzar en resultados que importan para la empresa: prioridades claras, seguimiento simple y menos retrabajo.",
+    "needs": "Juntas largas sin cierre, acuerdos que se olvidan, papeles de cada quien poco claros y mucho tiempo operativo que no se traduce en avances visibles.",
+    "benefits": "Un lenguaje común para decidir qué sí y qué no hacer, criterios para medir avance sin micromanagement y herramientas para alinear al equipo con lo que la empresa necesita este mes.",
+    "discipline": "Lo que ves aquí funciona si lo vuelves hábito: revisar brevemente acuerdos e indicadores en tus juntas y 1:1. Un día intenso en el curso no sustituye constancia; la constancia es lo que vuelve el cambio sistémico."
+  },
   "guideLabels": {
     "video": {
-      "title": "Visión Ejecutiva",
-      "desc": "Cápsula audiovisual con el contenido completo de la sesión de trabajo."
+      "title": "Video de la sesión",
+      "desc": "Aquí ves el contenido completo en video: ideas, ejemplos y pasos que podrás comentar con tu equipo."
     },
     "pres": {
-      "title": "Mapa Metodológico",
-      "desc": "Estructura lógica para transformar tareas en resultados."
+      "title": "Presentación guía",
+      "desc": "Láminas con el hilo del tema: te orientan antes de pasar al trabajo práctico en tu negocio."
     },
     "workbook": {
-      "title": "Plan de Acción",
-      "desc": "Herramienta para diseñar el nuevo ownership de tu equipo."
+      "title": "Cuaderno de trabajo",
+      "desc": "Donde pasas de escuchar a decidir: registras acuerdos, prioridades y seguimiento para que el curso se vuelva acción en tu PyME."
     },
     "audio": {
-      "title": "Inmersión Estratégica",
-      "desc": "Profundiza en cápsulas de audio que profundizan en la metodología."
+      "title": "Audios y refuerzos",
+      "desc": "Escucha resúmenes y casos mientras conduces o estás en planta: refuerzas ideas sin parar la operación."
     },
     "support": {
-      "title": "Consultoría ME Crece",
-      "desc": "Asistencia directa para la implementación de este módulo."
+      "title": "Soporte y consultoría",
+      "desc": "Si te atoras con la plataforma o con el tema de negocio, contáctanos por el canal de soporte; estamos para ayudarte a implementar."
     }
   },
 "multimedia": {
