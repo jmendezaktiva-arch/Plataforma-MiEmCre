@@ -463,7 +463,7 @@ auth.onAuthStateChanged(() => {
 // FUNCIÓN DE EMERGENCIA PARA POBLAR EL CATÁLOGO (USO ÚNICO)
 window.setupAppsMaster = async () => {
     const apps = [
-        { id: "app-crm", name: "CRM Ventas Prestige", description: "Gestión de embudos y prospectos de alto valor.", route: "apps/crm/index.html", icon: "📈" },
+        { id: "app-crm", name: "CRM Ventas", description: "Gestión de embudos y prospectos de alto valor.", route: "apps/crm/index.html", icon: "📈" },
         { id: "app-erp", name: "ERP Finanzas", description: "Control de flujo de caja y salud financiera.", route: "apps/erp/index.html", icon: "💰" }
     ];
 
