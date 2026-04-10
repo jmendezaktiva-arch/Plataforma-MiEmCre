@@ -195,18 +195,27 @@ strong, b, .calculation-label {
 /* --- HEADER AURA: ARQUITECTURA DE TRES ZONAS (PRESTIGE) --- */
 .navbar {
     height: var(--navbar-height) !important;
-    padding: 0 40px;
+    padding: 0 clamp(12px, 3vw, 40px);
     background: rgba(255, 255, 255, 0.7) !important;
     backdrop-filter: blur(20px) saturate(180%);
     -webkit-backdrop-filter: blur(20px) saturate(180%);
     border-bottom: 1px solid rgba(15, 52, 96, 0.08);
     display: flex;
+    flex-wrap: nowrap;
     justify-content: space-between;
     align-items: center;
     position: sticky !important;
     top: 0 !important;
     z-index: 9000;
     transition: all 0.4s ease;
+    overflow-x: auto;
+    overflow-y: hidden;
+    -webkit-overflow-scrolling: touch;
+    scrollbar-width: none;
+}
+
+.navbar::-webkit-scrollbar {
+    display: none;
 }
 
 /* --- COMPONENTES NAV-ACTIONS (ICON-ONLY PRESTIGE) --- */
@@ -250,12 +259,18 @@ strong, b, .calculation-label {
     margin-bottom: 2px;
 }
 
-/* BLINDAJE DE ALINEACIÓN: Regla de los Tres Tercios */
-.nav-left, .nav-right {
-    flex: 1 1 30%; /* Garantiza que los extremos tengan el mismo peso */
+/* BLINDAJE DE ALINEACIÓN: extremos + centro con recorte de título (una sola fila) */
+.nav-left {
+    flex: 0 1 auto;
+    min-width: 0;
+}
+.nav-right {
+    flex: 0 0 auto;
+    min-width: 0;
 }
 .nav-center {
-    flex: 1 1 40%; /* El centro tiene el espacio necesario para el título sin asfixiarse */
+    flex: 1 1 0;
+    min-width: 0;
 }
 
 /* ESTÁNDAR PRESTIGE: Botones de Comando (Alta Visibilidad) */
@@ -291,21 +306,35 @@ strong, b, .calculation-label {
     color: #FFFFFF !important; /* El icono brilla en blanco */
 }
 
-/* Zonas de Control: Blindaje de Simetría y Escalabilidad */
-.nav-left, .nav-right {
+/* Zonas de Control: una fila; el centro cede espacio antes que los iconos */
+.nav-left {
     display: flex;
     align-items: center;
-    gap: var(--navbar-button-gap); /* 25px: Espacio para expansión futura */
-    flex: 1; /* Fuerza al centro a mantenerse en el eje real */
+    gap: clamp(8px, 2vw, var(--navbar-button-gap));
 }
 
-.nav-right { justify-content: flex-end; }
+.nav-right {
+    display: flex;
+    align-items: center;
+    gap: clamp(8px, 2vw, var(--navbar-button-gap));
+    justify-content: flex-end;
+}
 
 .nav-center {
     display: flex;
     justify-content: center;
     align-items: center;
-    flex: 0 0 auto; /* El eje de marca es prioritario e inamovible */
+    padding: 0 8px;
+}
+
+/* Título Aura: no empuja ni rompe fila; puntos suspensivos si es largo (cursos, programas) */
+#header-aura-title {
+    min-width: 0;
+    max-width: 100%;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    text-align: center;
 }
 
 /* --- ESTILIZACIÓN DEL LOGO INSTITUCIONAL (IMPACTO PREMIUM) --- */
@@ -1507,18 +1536,23 @@ body.cinema-mode #view-workbook {
     text-align: center;
 }
 
-/* Agrupación: módulos (Academia / Apps / Consultoría) + herramientas (IA / búsqueda / soporte) */
+/* Agrupación Aura: una sola fila en todas las páginas (Academia curso, Dashboard, Apps…) */
 #header-aura-actions.nav-right {
-    flex-wrap: wrap;
+    flex-wrap: nowrap !important;
     justify-content: flex-end;
-    row-gap: 10px;
-    column-gap: var(--navbar-button-gap, 12px);
+    align-items: center;
+    flex: 0 0 auto;
+    gap: 10px;
+    row-gap: 0;
+    max-width: none;
 }
 
 .nav-aura-group {
     display: flex;
+    flex-wrap: nowrap;
     align-items: center;
-    gap: var(--navbar-button-gap, 12px);
+    gap: 8px;
+    flex-shrink: 0;
 }
 
 .nav-aura-sep {
@@ -1531,8 +1565,8 @@ body.cinema-mode #view-workbook {
 
 @media (max-width: 520px) {
     #header-aura-actions.nav-right {
-        max-width: min(100%, 380px);
-        margin-left: auto;
+        max-width: none;
+        margin-left: 0;
     }
 
     .nav-aura-sep {
@@ -1540,7 +1574,22 @@ body.cinema-mode #view-workbook {
     }
 
     #header-aura-actions .nav-aura-group {
-        gap: 8px;
+        gap: 6px;
+    }
+
+    #header-aura-actions .nav-btn-prestige {
+        width: 34px !important;
+        height: 34px !important;
+    }
+
+    #header-aura-actions .nav-btn-prestige .icon {
+        font-size: 0.98rem !important;
+    }
+
+    .btn-nav-back {
+        font-size: 0.65rem !important;
+        padding: 6px 8px !important;
+        margin-right: 6px !important;
     }
 }
 
