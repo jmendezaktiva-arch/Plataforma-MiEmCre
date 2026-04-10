@@ -164,6 +164,34 @@ function digitsOnly(s) {
     return String(s ?? '').replace(/\D/g, '');
 }
 
+/** UA móvil/tablet: api.whatsapp.com suele abrir la app. Escritorio: web.whatsapp.com/send abre WhatsApp Web (o el cliente de escritorio si el sistema enlaza el dominio). */
+const WHATSAPP_MOBILE_UA = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i;
+
+/**
+ * URL oficial para abrir composición: en PC prioriza WhatsApp Web; en móvil la app vía api.whatsapp.com.
+ */
+function buildWhatsAppSendUrl(phoneDigits, text) {
+    const q = encodeURIComponent(text);
+    const base = `phone=${phoneDigits}&text=${q}`;
+    if (WHATSAPP_MOBILE_UA.test(navigator.userAgent || '')) {
+        return `https://api.whatsapp.com/send/?${base}`;
+    }
+    return `https://web.whatsapp.com/send?${base}`;
+}
+
+/**
+ * Abre WhatsApp en pestaña nueva. Sin noopener/noreferrer en window.open para no interferir
+ * con el manejo del SO hacia WhatsApp Desktop cuando corresponda.
+ * Si el bloqueador de ventanas impide abrir, navega en la misma pestaña.
+ */
+function openWhatsAppComposeUrl(url) {
+    if (!url || url === '#') return;
+    const win = window.open(url, '_blank');
+    if (win == null) {
+        window.location.assign(url);
+    }
+}
+
 function buildAppContactActionsHtml(app, tieneAcceso, routeEscaped) {
     const appNamePlain = app.name || app.id;
 
@@ -187,7 +215,7 @@ function buildAppContactActionsHtml(app, tieneAcceso, routeEscaped) {
     return `
         <div class="apps-pillar-actions" role="group" aria-label="Contacto y agenda">
             <a href="${phoneHref}" class="${phoneClass}" title="${phoneOk ? 'Llamada telefónica' : 'Número por configurar'}">📞 Llamada</a>
-            <a href="#" class="${waClass}" data-app-id="${escapeAttr(app.id)}" rel="noopener noreferrer" title="${waOk ? 'WhatsApp con mensaje sugerido' : 'Número por configurar'}">💬 WhatsApp</a>
+            <a href="#" class="${waClass}" data-app-id="${escapeAttr(app.id)}" title="${waOk ? 'WhatsApp Web o app de escritorio (mensaje sugerido)' : 'Número por configurar'}">💬 WhatsApp</a>
             <a href="#" class="apps-contact-btn apps-contact-email" data-app-id="${escapeAttr(app.id)}" title="Correo a ${escapeAttr(APPS_CONTACT.email)} con plantilla">✉️ Correo</a>
             <a href="${scheduleHref}" class="apps-contact-btn apps-contact-btn--schedule" title="Agenda sesión estratégica (videollamada vía Zoom según tu cita)">📹 Videollamada</a>
         </div>
@@ -283,7 +311,7 @@ function bindPillarsActionsOnce(pillarsList) {
             const p = id ? appsContactPayloadCache.get(id) : null;
             if (p?.waUrl && p.waUrl !== '#') {
                 notifyAppsContactChannel('whatsapp', id);
-                window.open(p.waUrl, '_blank', 'noopener,noreferrer');
+                openWhatsAppComposeUrl(p.waUrl);
             }
             return;
         }
@@ -371,7 +399,7 @@ async function renderApps() {
             const mailtoUrl = `mailto:${APPS_CONTACT.email}?subject=${encodeURIComponent(emailSubject)}&body=${encodeURIComponent(emailBody)}`;
             const waDigits = digitsOnly(APPS_CONTACT.whatsappDigits);
             const waOk = waDigits.length >= 10;
-            const waUrl = waOk ? `https://wa.me/${waDigits}?text=${encodeURIComponent(whatsappText)}` : '#';
+            const waUrl = waOk ? buildWhatsAppSendUrl(waDigits, whatsappText) : '#';
 
             appsContactPayloadCache.set(app.id, {
                 emailSubject,
