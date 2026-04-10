@@ -2135,19 +2135,3 @@ body.cinema-mode #view-workbook {
     line-height: 1.3 !important;
     letter-spacing: 0 !important;
 }
-
-/* Academia — hoja intermedia (barra de herramientas vs. aula) */
-.tools-orient-shell .tools-orient-title {
-    text-transform: none;
-}
-
-.tools-orient-back:hover {
-    opacity: 0.85;
-    text-decoration: underline;
-}
-
-@media (max-width: 640px) {
-    .view-tools-orientation .tools-orient-shell {
-        padding: 40px 20px 36px !important;
-    }
-}
