@@ -16,14 +16,14 @@
         }
         .bento-consultoria {
             /* Tokens locales: control quirúrgico de geometría del grid */
-            --consultoria-grid-gap: 20px;
+            --consultoria-grid-gap: 24px; /* respiro institucional entre filas/columnas */
             /*
               Altura base de cada celda (reposo). Está calibrada para:
               - Homologar dimensiones entre servicios (evita "mega-bloques")
               - Mantener legibilidad del título + inversión
               - Preservar el efecto de expansión existente (card-expanded)
             */
-            --consultoria-row-height: 190px;
+            --consultoria-row-height: 220px; /* alinea altura útil con tarjetas “Servicio especializado” sin recortes agresivos */
 
             display: grid;
             grid-template-columns: repeat(3, 1fr);
@@ -103,9 +103,15 @@
             }
         }
 
+        /*
+          IMPORTANTE: no usar grid-row: span 2 aquí.
+          Si Consultor IA ocupa 2 filas y “Proyectos a Medida” se auto-coloca en la fila 2
+          de la misma columna, ambos comparten celda y se ven ENCIMADOS.
+          Una sola fila por tarjeta; el ritmo vertical lo marca gap + grid-auto-rows.
+        */
         .card-ia {
             grid-column: span 1;
-            grid-row: span 2;
+            grid-row: span 1;
             background: rgba(255, 255, 255, 0.85); /* Transparencia Prestige */
             backdrop-filter: blur(12px); /* Efecto Liquid Glass */
             -webkit-backdrop-filter: blur(12px);
