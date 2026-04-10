@@ -30,6 +30,10 @@
       "title": "Audios y refuerzos",
       "desc": "Audios para repasar criterios de rentabilidad y riesgo cuando no puedes sentarte frente a la laptop."
     },
+    "zoom": {
+      "title": "Acceso a la sala Zoom",
+      "desc": "Si tu programa incluye sesión en vivo, conecta por Zoom desde el botón azul; ideal para revisar números y dudas con acompañamiento en tiempo real."
+    },
     "support": {
       "title": "Soporte y consultoría",
       "desc": "Si te trabas con la plataforma o con cómo interpretar tus números, el equipo de soporte te orienta."

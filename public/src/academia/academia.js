@@ -1112,29 +1112,33 @@ document.addEventListener('DOMContentLoaded', () => {
                 const el = document.getElementById(id);
                 if (el) el.innerText = text || '';
             };
+            setGuideLabel('guide-title-audio', labels.audio?.title);
+            setGuideLabel('guide-desc-audio', labels.audio?.desc);
+            setGuideLabel('guide-title-zoom', labels.zoom?.title || 'Acceso a la sala Zoom');
+            setGuideLabel('guide-desc-zoom', labels.zoom?.desc
+                || 'En mentoría en vivo, usa el botón azul de la barra lateral para entrar a la videollamada en la fecha y hora acordadas con tu consultor.');
             setGuideLabel('guide-title-video', labels.video?.title);
             setGuideLabel('guide-desc-video', labels.video?.desc);
             setGuideLabel('guide-title-pres', labels.pres?.title);
             setGuideLabel('guide-desc-pres', labels.pres?.desc);
             setGuideLabel('guide-title-workbook', labels.workbook?.title);
             setGuideLabel('guide-desc-workbook', labels.workbook?.desc);
-            setGuideLabel('guide-title-audio', labels.audio?.title);
-            setGuideLabel('guide-desc-audio', labels.audio?.desc);
             setGuideLabel('guide-title-support', labels.support?.title);
             setGuideLabel('guide-desc-support', labels.support?.desc);
 
             if (courseConfig) {
+                const showZoom = courseConfig.modality === 'LIVE' && !!courseConfig.zoomLink;
+                syncMaterialUI('guide-title-audio', 'btn-toggle-podcast', courseConfig.hasPodcast);
+                syncMaterialUI('guide-title-zoom', 'btn-toggle-zoom', showZoom);
                 syncMaterialUI('guide-title-video', 'btn-toggle-video', courseConfig.hasVideo);
                 syncMaterialUI('guide-title-pres', 'btn-toggle-presentation', courseConfig.hasPresentation);
                 syncMaterialUI('guide-title-workbook', 'btn-toggle-workbook', courseConfig.hasWorkbook);
-                syncMaterialUI('guide-title-audio', 'btn-toggle-podcast', courseConfig.hasPodcast);
 
                 const btnZoom = document.getElementById('btn-toggle-zoom');
                 if (btnZoom) {
-                    if (courseConfig.modality === 'LIVE' && courseConfig.zoomLink) {
-                        btnZoom.style.display = 'flex';
-                        btnZoom.onclick = () => window.open(courseConfig.zoomLink, '_blank');
-                    } else { btnZoom.style.display = 'none'; }
+                    btnZoom.onclick = (showZoom && courseConfig.zoomLink)
+                        ? () => window.open(courseConfig.zoomLink, '_blank')
+                        : null;
                 }
             }
 

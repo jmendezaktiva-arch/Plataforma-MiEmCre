@@ -11,7 +11,7 @@
     "objective": "Que tu equipo pase de “solo hacer tareas” a avanzar en resultados que importan para la empresa: prioridades claras, seguimiento simple y menos retrabajo.",
     "needs": "Juntas largas sin cierre, acuerdos que se olvidan, papeles de cada quien poco claros y mucho tiempo operativo que no se traduce en avances visibles.",
     "benefits": "Un lenguaje común para decidir qué sí y qué no hacer, criterios para medir avance sin micromanagement y herramientas para alinear al equipo con lo que la empresa necesita este mes.",
-    "discipline": "Lo que ves aquí funciona si lo vuelves hábito: revisar brevemente acuerdos e indicadores en tus juntas y 1:1. Un día intenso en el curso no sustituye constancia; la constancia es lo que vuelve el cambio sistémico."
+    "discipline": "Lo que ves aquí funciona si lo vuelves hábito: revisar brevemente acuerdos e indicadores en tus juntas y sesiones 1:1. Un día intenso en el curso no sustituye la disciplina ni constancia; replicarlo de manera sistemática es lo que vuelve a tu equipo en un generador de resultados favorables."
   },
   "guideLabels": {
     "video": {
@@ -29,6 +29,10 @@
     "audio": {
       "title": "Audios y refuerzos",
       "desc": "Escucha resúmenes y casos mientras conduces o estás en planta: refuerzas ideas sin parar la operación."
+    },
+    "zoom": {
+      "title": "Acceso a la sala Zoom",
+      "desc": "Solo en modalidad mentoría en vivo: aquí enlazas la videollamada grupal con tu consultor. Úsalo en el horario que te compartieron al activar tu acceso."
     },
     "support": {
       "title": "Soporte y consultoría",
