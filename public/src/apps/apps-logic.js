@@ -3,6 +3,22 @@
 // TRACEABILIDAD: Importación centralizada desde el núcleo de configuración de Dreams
 import { db, auth, collection, getDocs, doc, getDoc, setDoc } from '../shared/firebase-config.js';
 
+/**
+ * Contacto Apps — completa teléfonos cuando los definas (formato E.164 recomendado para Llamada).
+ * WhatsApp: solo dígitos con lada de país, sin + ni espacios (ej. 525512345678).
+ * Videollamada: misma página que public/agendar.html (Calendly; la sala Zoom se confirma al agendar),
+ * alineado con netlify/functions/intervencion-notificacion.js (enlace a agendar.html?service=…).
+ */
+const APPS_CONTACT = {
+    phoneE164: '',
+    whatsappDigits: '',
+    email: 'contacto@miempresacrece.com.mx',
+};
+
+const APPS_SCHEDULE_PAGE = 'agendar.html';
+
+const APPS_CONTACT_PENDING_MSG = 'Estamos actualizando este canal. Mientras tanto escribe a contacto@miempresacrece.com.mx o usa Videollamada para agendar en Calendly.';
+
 function escapeHtml(s) {
     return String(s ?? '')
         .replace(/&/g, '&amp;')
@@ -68,19 +84,42 @@ window.requestAppAccess = async (appId, appName) => {
     }
 };
 
-function openPillarApp(row) {
-    const hasAccess = row.dataset.hasAccess === '1';
-    const appId = row.dataset.appId;
-    const appName = row.dataset.appName || '';
-    const route = row.dataset.route || '';
+function digitsOnly(s) {
+    return String(s ?? '').replace(/\D/g, '');
+}
 
-    if (hasAccess && route) {
-        window.location.href = route;
-        return;
-    }
-    if (!hasAccess && appId) {
-        window.requestAppAccess(appId, appName);
-    }
+function buildAppContactActionsHtml(app, tieneAcceso, routeEscaped) {
+    const appNamePlain = app.name || app.id;
+    const subject = encodeURIComponent(`Consulta: ${appNamePlain} — Ecosistema de aplicaciones ME Crece`);
+    const mailto = `mailto:${APPS_CONTACT.email}?subject=${subject}`;
+
+    const phoneDigits = digitsOnly(APPS_CONTACT.phoneE164);
+    const phoneOk = phoneDigits.length >= 10;
+    const phoneHref = phoneOk ? `tel:${APPS_CONTACT.phoneE164.replace(/\s/g, '')}` : '#';
+    const phoneClass = phoneOk ? 'apps-contact-btn' : 'apps-contact-btn apps-contact-btn--pending';
+
+    const waDigits = digitsOnly(APPS_CONTACT.whatsappDigits);
+    const waOk = waDigits.length >= 10;
+    const waHref = waOk ? `https://wa.me/${waDigits}` : '#';
+    const waClass = waOk ? 'apps-contact-btn' : 'apps-contact-btn apps-contact-btn--pending';
+
+    const scheduleHref = `${APPS_SCHEDULE_PAGE}?service=${encodeURIComponent(app.id)}`;
+    const openAppBlock = tieneAcceso && routeEscaped
+        ? `<p class="apps-pillar-open-wrap"><a class="apps-open-app-link" href="${routeEscaped}">Abrir aplicación →</a></p>`
+        : '';
+    const requestBlock = !tieneAcceso
+        ? `<p class="apps-pillar-request-wrap"><button type="button" class="apps-request-access-btn" data-app-id="${escapeAttr(app.id)}" data-app-name="${escapeAttr(appNamePlain)}">Solicitar activación en mi expediente</button></p>`
+        : '';
+
+    return `
+        <div class="apps-pillar-actions" role="group" aria-label="Contacto y agenda">
+            <a href="${phoneHref}" class="${phoneClass}" title="${phoneOk ? 'Llamada telefónica' : 'Número por configurar'}">📞 Llamada</a>
+            <a href="${waHref}" class="${waClass}" rel="noopener noreferrer" target="_blank" title="${waOk ? 'WhatsApp' : 'Número por configurar'}">💬 WhatsApp</a>
+            <a href="${mailto}" class="apps-contact-btn" title="Correo ${APPS_CONTACT.email}">✉️ Correo</a>
+            <a href="${scheduleHref}" class="apps-contact-btn apps-contact-btn--schedule" title="Agenda sesión estratégica (videollamada vía Zoom según tu cita)">📹 Videollamada</a>
+        </div>
+        ${openAppBlock}
+        ${requestBlock}`;
 }
 
 /**
@@ -137,25 +176,27 @@ function animatePillarCards(pillarsList) {
     });
 }
 
-let pillarsClickBound = false;
 let pillarsHoverBound = false;
+let pillarsActionsBound = false;
 
-function bindPillarsClickOnce(pillarsList) {
-    if (pillarsClickBound || !pillarsList) return;
-    pillarsClickBound = true;
+function bindPillarsActionsOnce(pillarsList) {
+    if (pillarsActionsBound || !pillarsList) return;
+    pillarsActionsBound = true;
 
     pillarsList.addEventListener('click', (e) => {
-        const row = e.target.closest('.apps-pillar-item');
-        if (!row || !pillarsList.contains(row)) return;
-        openPillarApp(row);
-    });
-
-    pillarsList.addEventListener('keydown', (e) => {
-        if (e.key !== 'Enter' && e.key !== ' ') return;
-        const row = e.target.closest('.apps-pillar-item');
-        if (!row || !pillarsList.contains(row)) return;
-        e.preventDefault();
-        openPillarApp(row);
+        const pending = e.target.closest('.apps-contact-btn--pending');
+        if (pending && pillarsList.contains(pending)) {
+            e.preventDefault();
+            alert(APPS_CONTACT_PENDING_MSG);
+            return;
+        }
+        const req = e.target.closest('.apps-request-access-btn');
+        if (req && pillarsList.contains(req)) {
+            e.preventDefault();
+            const id = req.dataset.appId;
+            const name = req.dataset.appName || '';
+            if (id) window.requestAppAccess(id, name);
+        }
     });
 }
 
@@ -209,30 +250,23 @@ async function renderApps() {
             }
             const tieneAcceso = !!(infoContrato && vencimiento && vencimiento > hoy);
             const lockedClass = tieneAcceso ? '' : ' apps-pillar-item--locked';
-            const btnLabel = tieneAcceso ? 'INGRESAR' : 'SOLICITAR ACCESO';
             const icon = app.icon ? `${escapeHtml(app.icon)} ` : '';
             const name = escapeHtml(app.name || app.id);
             const desc = escapeHtml(app.description || '');
             const route = escapeAttr(app.route || '');
             const ariaName = escapeAttr(app.name || app.id);
+            const actionsHtml = buildAppContactActionsHtml(app, tieneAcceso, route);
 
             html += `
-            <li class="academia-pillar-item apps-pillar-item${lockedClass}"
-                data-app-id="${escapeAttr(app.id)}"
-                data-app-name="${escapeAttr(app.name || app.id)}"
-                data-has-access="${tieneAcceso ? '1' : '0'}"
-                data-route="${route}"
-                tabindex="0"
-                role="button"
-                aria-label="${ariaName}: ${tieneAcceso ? 'abrir aplicación' : 'solicitar acceso'}">
+            <li class="academia-pillar-item apps-pillar-item${lockedClass}" aria-label="${ariaName}">
                 <div class="academia-pillar-copy"><strong>${index + 1}. ${icon}${name}</strong> — ${desc}</div>
-                <button type="button" class="btn-primary btn-pillar-enter">${btnLabel}</button>
+                ${actionsHtml}
             </li>`;
         });
 
         list.innerHTML = html;
         animatePillarCards(list);
-        bindPillarsClickOnce(list);
+        bindPillarsActionsOnce(list);
         wireAppsPillarsHover(list);
     } catch (error) {
         console.error("Error en el despliegue de Apps:", error);

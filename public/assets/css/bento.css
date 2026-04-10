@@ -1284,10 +1284,109 @@
 }
 
 /* Apps | recuadros tipo pilares (acceso restringido) */
+.academia-pillars-list li.apps-pillar-item {
+    min-height: 0;
+}
+
 .academia-pillars-list li.apps-pillar-item--locked {
     opacity: 0.94;
     filter: grayscale(0.2);
     border-left-color: rgba(149, 124, 61, 0.45);
+}
+
+/* Apps | acciones de contacto compactas (sustituyen el botón INGRESAR ancho) */
+.apps-pillar-actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+    justify-content: center;
+    align-items: stretch;
+    width: 100%;
+    margin-top: 1rem;
+    box-sizing: border-box;
+}
+
+.apps-contact-btn {
+    box-sizing: border-box;
+    flex: 1 1 calc(50% - 10px);
+    min-width: 132px;
+    max-width: 200px;
+    padding: 10px 12px;
+    font-family: 'Montserrat', sans-serif;
+    font-size: 0.68rem;
+    font-weight: 700;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+    text-align: center;
+    text-decoration: none;
+    color: #fff;
+    background: var(--primary-midnight);
+    border: none;
+    border-radius: 10px;
+    cursor: pointer;
+    box-shadow: 0 4px 14px rgba(15, 52, 96, 0.18);
+    transition: transform 0.2s ease, box-shadow 0.2s ease, opacity 0.2s ease;
+}
+
+.apps-contact-btn:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 6px 18px rgba(15, 52, 96, 0.22);
+    color: #fff;
+}
+
+.apps-contact-btn--pending {
+    opacity: 0.72;
+    cursor: pointer;
+}
+
+.apps-contact-btn--schedule {
+    background: #2d8cff;
+    box-shadow: 0 4px 14px rgba(45, 140, 255, 0.25);
+}
+
+.apps-contact-btn--schedule:hover {
+    box-shadow: 0 6px 18px rgba(45, 140, 255, 0.32);
+    color: #fff;
+}
+
+.apps-pillar-open-wrap,
+.apps-pillar-request-wrap {
+    margin: 0.85rem 0 0;
+    text-align: center;
+    width: 100%;
+}
+
+.apps-open-app-link {
+    font-family: 'Montserrat', sans-serif;
+    font-size: 0.78rem;
+    font-weight: 700;
+    color: var(--accent-gold);
+    text-decoration: none;
+    letter-spacing: 0.04em;
+}
+
+.apps-open-app-link:hover {
+    text-decoration: underline;
+}
+
+.apps-request-access-btn {
+    font-family: 'Montserrat', sans-serif;
+    font-size: 0.72rem;
+    font-weight: 600;
+    color: var(--primary-midnight);
+    background: transparent;
+    border: none;
+    padding: 0;
+    cursor: pointer;
+    text-decoration: underline;
+    text-underline-offset: 3px;
+}
+
+@media (max-width: 600px) {
+    .apps-contact-btn {
+        flex: 1 1 100%;
+        max-width: none;
+    }
 }
 
 .academia-pillars-reflection {
