@@ -155,6 +155,39 @@ function applyCheckoutCopyToDom(copy) {
         }
     }
     if (btnPay) btnPay.textContent = copy.ctaLabel;
+
+    wireCartReadMoreToggle();
+}
+
+const CART_SCROLL_CLAMP_THRESHOLD_PX = 124;
+
+function wireCartReadMoreToggle() {
+    const scrollEl = document.getElementById('cart-checkout-scroll');
+    const toggle = document.getElementById('cart-read-more-toggle');
+    if (!scrollEl || !toggle) return;
+
+    scrollEl.scrollTop = 0;
+    scrollEl.classList.remove('cart-scroll--clamped', 'cart-scroll--expanded');
+    toggle.hidden = true;
+    toggle.textContent = 'Ver más detalle';
+    toggle.setAttribute('aria-expanded', 'false');
+
+    toggle.onclick = () => {
+        const expanded = scrollEl.classList.toggle('cart-scroll--expanded');
+        toggle.setAttribute('aria-expanded', expanded ? 'true' : 'false');
+        toggle.textContent = expanded ? 'Ver menos' : 'Ver más detalle';
+        if (!expanded) scrollEl.scrollTop = 0;
+    };
+
+    requestAnimationFrame(() => {
+        requestAnimationFrame(() => {
+            const tall = scrollEl.scrollHeight > CART_SCROLL_CLAMP_THRESHOLD_PX;
+            if (tall) {
+                scrollEl.classList.add('cart-scroll--clamped');
+                toggle.hidden = false;
+            }
+        });
+    });
 }
 
 document.addEventListener('DOMContentLoaded', () => {
