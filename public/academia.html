@@ -237,6 +237,71 @@
             </div>
         </div>
 
+        <div id="view-tools-orientation" class="view-tools-orientation" style="display: none; max-width: 1300px; margin: 30px auto; padding: 0 20px; animation: fadeIn 0.8s ease-out;">
+            <div class="intro-guide-shell tools-orient-shell" style="background: rgba(255, 255, 255, 0.7); backdrop-filter: blur(25px); -webkit-backdrop-filter: blur(25px); border-radius: 40px; padding: 56px 36px 48px; border: 1px solid rgba(255, 255, 255, 0.5); box-shadow: 0 30px 60px rgba(15, 52, 96, 0.1); text-align: center;">
+                <header class="tools-orient-header" style="margin-bottom: 32px;">
+                    <span class="tools-orient-eyebrow" style="color: var(--accent-gold); font-weight: 700; text-transform: uppercase; letter-spacing: 0.2em; display: block; margin-bottom: 10px; font-size: 0.68rem;">Experiencia Mi Empresa Crece</span>
+                    <p id="tools-orient-session-line" class="tools-orient-session" style="margin: 0 0 12px 0; font-size: 0.75rem; font-weight: 700; color: var(--primary-midnight); letter-spacing: 0.06em; text-transform: uppercase;"></p>
+                    <h2 class="tools-orient-title" style="letter-spacing: -0.02em; line-height: 1.2; color: var(--primary-midnight); margin: 0 0 16px 0; font-size: clamp(1.15rem, 2.5vw, 1.45rem);">Tu aula y la barra de herramientas</h2>
+                    <p class="tools-orient-lead" style="margin: 0 auto 20px; max-width: 720px; font-size: 0.9rem; line-height: 1.6; color: #444; text-align: left;">
+                        A la <strong>derecha</strong> verás una columna de <strong>botones redondos</strong>: son accesos directos a cada recurso de la sesión (audio, videollamada si aplica, video, presentación, cuaderno y soporte). <strong>No todos aparecen siempre</strong>: solo los que tu consultor o el programa activaron para esta experiencia.
+                    </p>
+                    <p class="tools-orient-lead tools-orient-lead--tight" style="margin: 0 auto 24px; max-width: 720px; font-size: 0.88rem; line-height: 1.55; color: #555; text-align: left;">
+                        El <strong>área grande</strong> es donde verás la <strong>presentación guía</strong> o el <strong>cuaderno de trabajo</strong>, según el diseño de la sesión. Los recursos en burbuja (audio o video) se abren encima para no perder el hilo.
+                    </p>
+                    <div class="tools-orient-cta-box" style="max-width: 720px; margin: 0 auto; padding: 18px 22px; border-radius: 16px; background: rgba(149, 124, 61, 0.1); border: 1px solid rgba(149, 124, 61, 0.22); text-align: left;">
+                        <p style="margin: 0; font-size: 0.85rem; line-height: 1.55; color: #3d3d3d;">
+                            <strong>Cómo continuar:</strong> revisa el resumen de cada icono abajo; cuando estés listo, pulsa <strong>ENTRAR AL AULA</strong> para ver la barra lateral y empezar con el material principal.
+                        </p>
+                    </div>
+                </header>
+
+                <p class="intro-guide-tools-lead" style="margin: 0 0 22px 0; font-size: 0.88rem; color: #555; max-width: 640px; margin-left: auto; margin-right: auto; line-height: 1.55;">Qué hace cada acceso (los que no ves en tu sesión fueron omitidos a propósito).</p>
+
+                <div class="tools-orient-cards" style="display: flex; flex-wrap: wrap; justify-content: center; gap: 20px; margin-bottom: 40px; width: 100%;">
+                    <div class="card-guide" style="background: white; padding: 30px 20px; border-radius: 24px; border: 1px solid #f0f0f0; display: flex; flex-direction: column; align-items: center; flex: 1 1 200px; max-width: 240px;">
+                        <div style="font-size: 2.5rem; margin-bottom: 15px;">🎧</div>
+                        <h4 id="orient-title-audio" class="guide-card-title" style="font-weight: 700; color: var(--primary-midnight); margin-bottom: 10px;">Audios y refuerzos</h4>
+                        <p id="orient-desc-audio" style="margin: 0; line-height: 1.5; font-size: 0.85rem; color: #555;">Escucha material de refuerzo sin dejar de moverte.</p>
+                    </div>
+                    <div class="card-guide" style="background: white; padding: 30px 20px; border-radius: 24px; border: 1px solid #f0f0f0; display: flex; flex-direction: column; align-items: center; flex: 1 1 200px; max-width: 240px;">
+                        <div style="font-size: 2.5rem; margin-bottom: 15px;">📹</div>
+                        <h4 id="orient-title-zoom" class="guide-card-title" style="font-weight: 700; color: var(--primary-midnight); margin-bottom: 10px;">Acceso a la sala Zoom</h4>
+                        <p id="orient-desc-zoom" style="margin: 0; line-height: 1.5; font-size: 0.85rem; color: #555;">Videollamada en vivo en la hora acordada.</p>
+                    </div>
+                    <div class="card-guide" style="background: white; padding: 30px 20px; border-radius: 24px; border: 1px solid #f0f0f0; display: flex; flex-direction: column; align-items: center; flex: 1 1 200px; max-width: 240px;">
+                        <div style="font-size: 2.5rem; margin-bottom: 15px;">📺</div>
+                        <h4 id="orient-title-video" class="guide-card-title" style="font-weight: 700; color: var(--primary-midnight); margin-bottom: 10px;">Video de la sesión</h4>
+                        <p id="orient-desc-video" style="margin: 0; line-height: 1.5; font-size: 0.85rem; color: #555;">Contenido en video para ver con calma.</p>
+                    </div>
+                    <div class="card-guide" style="background: white; padding: 30px 20px; border-radius: 24px; border: 1px solid #f0f0f0; display: flex; flex-direction: column; align-items: center; flex: 1 1 200px; max-width: 240px;">
+                        <div style="font-size: 2.5rem; margin-bottom: 15px;">📽️</div>
+                        <h4 id="orient-title-pres" class="guide-card-title" style="font-weight: 700; color: var(--primary-midnight); margin-bottom: 10px;">Presentación guía</h4>
+                        <p id="orient-desc-pres" style="margin: 0; line-height: 1.5; font-size: 0.85rem; color: #555;">Láminas que ordenan el tema paso a paso.</p>
+                    </div>
+                    <div class="card-guide" style="background: white; padding: 30px 20px; border-radius: 24px; border: 1px solid #f0f0f0; display: flex; flex-direction: column; align-items: center; flex: 1 1 200px; max-width: 240px;">
+                        <div style="font-size: 2.5rem; margin-bottom: 15px;">📝</div>
+                        <h4 id="orient-title-workbook" class="guide-card-title" style="font-weight: 700; color: var(--primary-midnight); margin-bottom: 10px;">Cuaderno de trabajo</h4>
+                        <p id="orient-desc-workbook" style="margin: 0; line-height: 1.5; font-size: 0.85rem; color: #555;">Donde aterrizas ideas y números en tu negocio.</p>
+                    </div>
+                    <div class="card-guide" style="background: white; padding: 30px 20px; border-radius: 24px; border: 1px solid #f0f0f0; display: flex; flex-direction: column; align-items: center; flex: 1 1 200px; max-width: 240px;">
+                        <div style="font-size: 2.5rem; margin-bottom: 15px;">✉️</div>
+                        <h4 id="orient-title-support" class="guide-card-title" style="font-weight: 700; color: var(--primary-midnight); margin-bottom: 10px;">Soporte y consultoría</h4>
+                        <p id="orient-desc-support" style="margin: 0; line-height: 1.5; font-size: 0.85rem; color: #555;">Dudas de plataforma o de negocio.</p>
+                    </div>
+                </div>
+
+                <div class="tools-orient-actions" style="display: flex; flex-direction: column; align-items: center; gap: 14px;">
+                    <button type="button" id="btn-tools-orient-continue" class="btn-primary" style="width: auto; max-width: 420px;">
+                        ENTRAR AL AULA INTERACTIVA
+                    </button>
+                    <button type="button" id="btn-tools-orient-back" class="tools-orient-back" style="background: none; border: none; color: var(--accent-gold); cursor: pointer; font-weight: 700; font-size: 0.72rem; letter-spacing: 0.08em; text-transform: uppercase;">
+                        ← Volver a la guía anterior
+                    </button>
+                </div>
+            </div>
+        </div>
+
             <div id="view-learning-stage" style="display: none; padding-top: 5px;">
                 <div style="display: flex; gap: 20px; align-items: flex-start; max-width: 1300px; margin: 0 auto; height: 85vh; min-height: 600px;">
                     

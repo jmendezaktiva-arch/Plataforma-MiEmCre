@@ -869,28 +869,40 @@ document.addEventListener('DOMContentLoaded', () => {
         if (viewLobby && viewLobby.style.display === 'none') {
             if (e) e.preventDefault(); 
 
-            // CASO A: Salida desde el Smart Learning Stage o Guía Intro
+            // CASO A: Aula, hoja intermedia de herramientas o guía intro
             const introGuide = document.getElementById('view-intro-guide');
+            const toolsOrient = document.getElementById('view-tools-orientation');
             const isAtStage = viewLearningStage && viewLearningStage.style.display === 'block';
+            const isAtOrient = toolsOrient && toolsOrient.style.display === 'block';
             const isAtGuide = introGuide && introGuide.style.display === 'block';
 
-            if (isAtStage || isAtGuide) {
-                // 1. Limpieza de procesos y medios activos
+            if (isAtStage) {
                 ['podcast-player', 'video-tutorial'].forEach(id => toggleBubble(id, false));
-                
-                // 2. RESTAURACIÓN CRÍTICA DE SCROLL (Libera el bloqueo Cinema)
+
                 document.body.classList.remove('reveal-viewport', 'cinema-mode');
-                document.documentElement.style.overflow = 'auto'; // Limpia el HTML
-                document.body.style.overflow = 'auto';           // Limpia el Body
-                document.body.style.height = 'auto';             // Restaura altura natural
-                
-                // 3. Desmontaje Atómico de capas de curso
+                document.documentElement.style.overflow = 'auto';
+                document.body.style.overflow = 'auto';
+                document.body.style.height = 'auto';
+
                 if (viewLearningStage) viewLearningStage.style.display = 'none';
+                if (toolsOrient) toolsOrient.style.display = 'none';
                 if (introGuide) introGuide.style.display = 'none';
                 viewPresentation.style.display = 'none';
                 viewWorkbook.style.display = 'none';
-                
-                // 4. Regreso al Selector de Sesiones y Reset de posición
+
+                if (sessionSelector) {
+                    sessionSelector.style.display = 'block';
+                    setTimeout(() => window.scrollTo({ top: 0, behavior: 'instant' }), 10);
+                }
+            } else if (isAtOrient) {
+                if (toolsOrient) toolsOrient.style.display = 'none';
+                if (introGuide) {
+                    introGuide.style.display = 'block';
+                    window.scrollTo({ top: 0, behavior: 'smooth' });
+                }
+            } else if (isAtGuide) {
+                if (introGuide) introGuide.style.display = 'none';
+                if (toolsOrient) toolsOrient.style.display = 'none';
                 if (sessionSelector) {
                     sessionSelector.style.display = 'block';
                     setTimeout(() => window.scrollTo({ top: 0, behavior: 'instant' }), 10);
@@ -900,9 +912,8 @@ document.addEventListener('DOMContentLoaded', () => {
             else if (sessionSelector && sessionSelector.style.display === 'block') {
                 sessionSelector.style.display = 'none';
                 viewLobby.style.display = 'block';
+                window.scrollTo(0, 0);
             }
-
-            window.scrollTo(0, 0);
         }
     };
 
@@ -1100,11 +1111,15 @@ document.addEventListener('DOMContentLoaded', () => {
             const courseConfig = COURSES_CONFIG.find(c => c.id === (e.detail.courseId));
             const labels = currentSessionData.guideLabels || {};
             
-            // Función auxiliar para sincronizar visibilidad en Guía Intro Y Barra Lateral simultáneamente
-            const syncMaterialUI = (idIntro, idSidebar, isVisible) => {
-                const elIntro = document.getElementById(idIntro);
+            // Guía intro, hoja intermedia (orientación) y barra lateral: misma regla de visibilidad
+            const syncToolPair = (idGuideCardTitle, idOrientCardTitle, idSidebar, isVisible) => {
+                [idGuideCardTitle, idOrientCardTitle].forEach((id) => {
+                    const el = document.getElementById(id);
+                    if (!el) return;
+                    const card = el.closest('.card-guide');
+                    if (card) card.style.display = isVisible ? 'flex' : 'none';
+                });
                 const elSidebar = document.getElementById(idSidebar);
-                if (elIntro) elIntro.closest('.card-guide').style.display = isVisible ? 'flex' : 'none';
                 if (elSidebar) elSidebar.style.display = isVisible ? 'flex' : 'none';
             };
 
@@ -1126,13 +1141,33 @@ document.addEventListener('DOMContentLoaded', () => {
             setGuideLabel('guide-title-support', labels.support?.title);
             setGuideLabel('guide-desc-support', labels.support?.desc);
 
+            setGuideLabel('orient-title-audio', labels.audio?.title);
+            setGuideLabel('orient-desc-audio', labels.audio?.desc);
+            setGuideLabel('orient-title-zoom', labels.zoom?.title || 'Acceso a la sala Zoom');
+            setGuideLabel('orient-desc-zoom', labels.zoom?.desc
+                || 'En mentoría en vivo, usa el botón azul de la barra lateral para entrar a la videollamada en la fecha y hora acordadas con tu consultor.');
+            setGuideLabel('orient-title-video', labels.video?.title);
+            setGuideLabel('orient-desc-video', labels.video?.desc);
+            setGuideLabel('orient-title-pres', labels.pres?.title);
+            setGuideLabel('orient-desc-pres', labels.pres?.desc);
+            setGuideLabel('orient-title-workbook', labels.workbook?.title);
+            setGuideLabel('orient-desc-workbook', labels.workbook?.desc);
+            setGuideLabel('orient-title-support', labels.support?.title);
+            setGuideLabel('orient-desc-support', labels.support?.desc);
+
+            const orientSessionLine = document.getElementById('tools-orient-session-line');
+            if (orientSessionLine) {
+                const st = currentSessionData.courseMetadata?.sessionTitle || sessionTitle;
+                orientSessionLine.textContent = st ? `Sesión · ${st}` : '';
+            }
+
             if (courseConfig) {
                 const showZoom = courseConfig.modality === 'LIVE' && !!courseConfig.zoomLink;
-                syncMaterialUI('guide-title-audio', 'btn-toggle-podcast', courseConfig.hasPodcast);
-                syncMaterialUI('guide-title-zoom', 'btn-toggle-zoom', showZoom);
-                syncMaterialUI('guide-title-video', 'btn-toggle-video', courseConfig.hasVideo);
-                syncMaterialUI('guide-title-pres', 'btn-toggle-presentation', courseConfig.hasPresentation);
-                syncMaterialUI('guide-title-workbook', 'btn-toggle-workbook', courseConfig.hasWorkbook);
+                syncToolPair('guide-title-audio', 'orient-title-audio', 'btn-toggle-podcast', courseConfig.hasPodcast);
+                syncToolPair('guide-title-zoom', 'orient-title-zoom', 'btn-toggle-zoom', showZoom);
+                syncToolPair('guide-title-video', 'orient-title-video', 'btn-toggle-video', courseConfig.hasVideo);
+                syncToolPair('guide-title-pres', 'orient-title-pres', 'btn-toggle-presentation', courseConfig.hasPresentation);
+                syncToolPair('guide-title-workbook', 'orient-title-workbook', 'btn-toggle-workbook', courseConfig.hasWorkbook);
 
                 const btnZoom = document.getElementById('btn-toggle-zoom');
                 if (btnZoom) {
@@ -1259,31 +1294,58 @@ document.addEventListener('DOMContentLoaded', () => {
             const sessionSelector = document.getElementById('view-session-selector');
             const introGuide = document.getElementById('view-intro-guide');
             const btnContinue = document.getElementById('btn-guide-continue');
+            const toolsOrient = document.getElementById('view-tools-orientation');
 
             if (viewLobby) viewLobby.style.display = 'none';
             if (sessionSelector) sessionSelector.style.display = 'none';
+            if (toolsOrient) toolsOrient.style.display = 'none';
             if (introGuide) {
                 introGuide.style.display = 'block';
                 window.scrollTo({ top: 0, behavior: 'smooth' });
             }
 
+            const enterLearningStage = () => {
+                if (toolsOrient) toolsOrient.style.display = 'none';
+                if (introGuide) introGuide.style.display = 'none';
+                document.body.classList.add('cinema-mode');
+                if (viewLearningStage) viewLearningStage.style.display = 'block';
+
+                if (courseConfig?.hasPresentation) {
+                    viewPresentation.style.display = 'block';
+                    viewWorkbook.style.display = 'none';
+                    renderSlides(currentSessionData);
+                    setTimeout(() => { if (window.Reveal) Reveal.layout(); }, 100);
+                } else if (courseConfig?.hasWorkbook) {
+                    viewPresentation.style.display = 'none';
+                    window.dispatchEvent(new CustomEvent('openWorkbook'));
+                } else if (courseConfig?.hasVideo) {
+                    document.getElementById('btn-toggle-video')?.click();
+                }
+            };
+
             if (btnContinue) {
                 btnContinue.onclick = () => {
+                    if (!introGuide) return;
                     introGuide.style.display = 'none';
-                    document.body.classList.add('cinema-mode');
-                    if (viewLearningStage) viewLearningStage.style.display = 'block';
+                    if (toolsOrient) {
+                        toolsOrient.style.display = 'block';
+                        window.scrollTo({ top: 0, behavior: 'smooth' });
+                    } else {
+                        enterLearningStage();
+                    }
+                };
+            }
 
-                    // Lógica de arranque basada en lo que esté activo en el Admin
-                    if (courseConfig.hasPresentation) {
-                        viewPresentation.style.display = 'block';
-                        viewWorkbook.style.display = 'none';
-                        renderSlides(currentSessionData);
-                        setTimeout(() => { if (window.Reveal) Reveal.layout(); }, 100);
-                    } else if (courseConfig.hasWorkbook) {
-                        viewPresentation.style.display = 'none';
-                        window.dispatchEvent(new CustomEvent('openWorkbook'));
-                    } else if (courseConfig.hasVideo) {
-                        document.getElementById('btn-toggle-video').click();
+            const btnOrientContinue = document.getElementById('btn-tools-orient-continue');
+            if (btnOrientContinue) btnOrientContinue.onclick = () => enterLearningStage();
+
+            const btnOrientBack = document.getElementById('btn-tools-orient-back');
+            if (btnOrientBack) {
+                btnOrientBack.onclick = () => {
+                    if (toolsOrient) toolsOrient.style.display = 'none';
+                    if (introGuide) {
+                        introGuide.style.display = 'block';
+                        window.scrollTo({ top: 0, behavior: 'smooth' });
                     }
                 };
             }
